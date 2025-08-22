@@ -57,13 +57,17 @@ class VirusTotalIntegration(HTTPIntegration):
         # Initialize VT client if available
         if VT_AVAILABLE and self.api_key:
             try:
-                self.client = vt.Client(self.api_key)
-                self.logger.info("✅ VirusTotal client initialized successfully")
+                # Don't store the client - create fresh for each request to avoid async issues
+                self.client_available = True
+                self.logger.info("✅ VirusTotal API key configured successfully")
             except Exception as e:
-                self.logger.error(f"❌ Failed to initialize VirusTotal client: {e}")
-                self.client = None
+                self.logger.error(f"❌ Failed to configure VirusTotal: {e}")
+                self.client_available = False
         elif not VT_AVAILABLE:
             self.logger.warning("⚠️ VirusTotal library not available (install vt-py)")
+            self.client_available = False
+        else:
+            self.client_available = False
         
         # Provider patterns for enhanced detection
         self.provider_domain_patterns = {
@@ -136,7 +140,8 @@ class VirusTotalIntegration(HTTPIntegration):
         return (
             VT_AVAILABLE and 
             self.api_key is not None and 
-            len(self.api_key.strip()) >= 64  # VT API keys are typically 64 chars
+            len(self.api_key.strip()) >= 64 and  # VT API keys are typically 64 chars
+            self.client_available
         )
     
     def _get_auth_headers(self) -> Dict[str, str]:
@@ -256,32 +261,40 @@ class VirusTotalIntegration(HTTPIntegration):
     
     def _get_domain_report(self, domain: str) -> Dict[str, Any]:
         """Get domain report from VirusTotal"""
-        if not self.client:
-            raise Exception("VirusTotal client not initialized")
+        if not self.client_available:
+            self.logger.debug("VirusTotal client not available")
+            return {}
         
         try:
-            with self.client as client:
-                domain_obj = client.get_object(f"/domains/{domain}")
-                return domain_obj.to_dict()
-        except vt.APIError as e:
-            if e.code == "NotFoundError":
-                self.logger.info(f"Domain {domain} not found in VirusTotal")
-                return {}
-            raise Exception(f"VirusTotal API error: {e}")
+            # Create fresh client for each request to avoid async context issues
+            with vt.Client(self.api_key) as client:
+                try:
+                    domain_obj = client.get_object(f"/domains/{domain}")
+                    return domain_obj.to_dict()
+                except vt.APIError as e:
+                    if e.code == "NotFoundError":
+                        self.logger.debug(f"Domain {domain} not found in VirusTotal")
+                        return {}
+                    self.logger.warning(f"VirusTotal API error for {domain}: {e}")
+                    return {}
+        except Exception as e:
+            self.logger.debug(f"VirusTotal connection error for {domain}: {str(e)}")
+            return {}
     
     def _get_domain_resolutions(self, domain: str) -> List[Dict[str, Any]]:
         """Get domain resolutions (Premium feature)"""
-        if not self.is_premium or not self.client:
+        if not self.is_premium or not self.client_available:
             return []
         
         try:
-            with self.client as client:
+            # Create fresh client for each request to avoid async context issues
+            with vt.Client(self.api_key) as client:
                 resolutions = []
                 for resolution in client.iterator(f"/domains/{domain}/resolutions", limit=10):
                     resolutions.append(resolution.to_dict())
                 return resolutions
         except Exception as e:
-            self.logger.warning(f"Failed to get resolutions for {domain}: {e}")
+            self.logger.debug(f"Failed to get resolutions for {domain}: {e}")
             return []
     
     def _extract_multi_layer_providers(self, domain_data: Dict, resolutions: List[Dict]) -> Dict[str, Any]:

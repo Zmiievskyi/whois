@@ -161,7 +161,13 @@ class MultiLevelCache:
             'dns': Cache(default_ttl=default_ttl, max_size=1000),        # DNS records
             'whois': Cache(default_ttl=default_ttl * 4, max_size=500),   # WHOIS data cache longest
             'headers': Cache(default_ttl=default_ttl // 2, max_size=500), # Headers cache shortest
-            'virustotal': Cache(default_ttl=default_ttl, max_size=1000)   # VirusTotal data
+            'virustotal': Cache(default_ttl=default_ttl, max_size=1000),  # VirusTotal data
+            'bgp_analysis': Cache(default_ttl=default_ttl * 2, max_size=2000), # BGP data (2h TTL)
+            'ssl_analysis': Cache(default_ttl=default_ttl * 4, max_size=1000), # SSL data (4h TTL)
+            'enhanced_dns': Cache(default_ttl=default_ttl // 2, max_size=2000), # Enhanced DNS (30min TTL)
+            'geo_intelligence': Cache(default_ttl=default_ttl * 6, max_size=1500), # Geographic data (6h TTL)
+            'threat_intelligence': Cache(default_ttl=default_ttl * 4, max_size=1000), # Threat data (4h TTL)
+            'hurricane_electric': Cache(default_ttl=default_ttl * 8, max_size=800) # HE BGP data (8h TTL)
         }
     
     def get(self, cache_type: str, key: str) -> Optional[Any]:

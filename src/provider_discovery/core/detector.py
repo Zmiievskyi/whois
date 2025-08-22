@@ -143,6 +143,10 @@ class ProviderDetector:
         Returns:
             Header string or error message
         """
+        # Auto-add https:// if no scheme provided
+        if not url.startswith(('http://', 'https://')):
+            url = f"https://{url}"
+        
         # Validate URL first
         is_valid, validation_msg = validate_url(url)
         if not is_valid:
@@ -196,6 +200,10 @@ class ProviderDetector:
             IP address or error message
         """
         try:
+            # Auto-add https:// if no scheme provided
+            if not url.startswith(('http://', 'https://')):
+                url = f"https://{url}"
+            
             parsed = urlparse(url)
             hostname = parsed.hostname or parsed.netloc
             

@@ -25,6 +25,12 @@ class Settings:
     vt_timeout: int = 30
     vt_cache_ttl: int = 3600
     
+    # Censys Configuration (Phase 3B: Shodan alternative)
+    censys_api_id: Optional[str] = None
+    censys_api_secret: Optional[str] = None
+    censys_cache_ttl: int = 7200  # 2 hours (longer due to rate limits)
+    censys_rate_limit: int = 10  # requests per minute (conservative)
+    
     # Application Settings
     app_debug: bool = False
     app_log_level: str = "INFO"
@@ -70,6 +76,12 @@ class Settings:
         self.vt_premium = self._get_bool_env("VT_PREMIUM", self.vt_premium)
         self.vt_timeout = self._get_int_env("VT_TIMEOUT", self.vt_timeout)
         self.vt_cache_ttl = self._get_int_env("VT_CACHE_TTL", self.vt_cache_ttl)
+        
+        # Load Censys settings
+        self.censys_api_id = os.getenv("CENSYS_API_ID", self.censys_api_id)
+        self.censys_api_secret = os.getenv("CENSYS_API_SECRET", self.censys_api_secret)
+        self.censys_cache_ttl = self._get_int_env("CENSYS_CACHE_TTL", self.censys_cache_ttl)
+        self.censys_rate_limit = self._get_int_env("CENSYS_RATE_LIMIT", self.censys_rate_limit)
         
         self.app_debug = self._get_bool_env("APP_DEBUG", self.app_debug)
         self.app_log_level = os.getenv("APP_LOG_LEVEL", self.app_log_level)
@@ -123,6 +135,15 @@ class Settings:
             len(self.vt_api_key.strip()) > 0
         )
     
+    def is_censys_enabled(self) -> bool:
+        """Check if Censys integration should be enabled"""
+        return (
+            self.censys_api_id is not None and 
+            self.censys_api_secret is not None and
+            len(self.censys_api_id.strip()) > 0 and
+            len(self.censys_api_secret.strip()) > 0
+        )
+    
     def get_virustotal_config(self) -> Dict[str, Any]:
         """Get VirusTotal-specific configuration"""
         return {
@@ -132,6 +153,15 @@ class Settings:
             "cache_ttl": self.vt_cache_ttl,
             "rate_limit_calls": self.vt_rate_limit_calls,
             "rate_limit_window": self.vt_rate_limit_window,
+        }
+    
+    def get_censys_config(self) -> Dict[str, Any]:
+        """Get Censys-specific configuration"""
+        return {
+            "api_id": self.censys_api_id,
+            "api_secret": self.censys_api_secret,
+            "cache_ttl": self.censys_cache_ttl,
+            "rate_limit": self.censys_rate_limit,
         }
     
     def get_performance_config(self) -> Dict[str, int]:
@@ -212,6 +242,12 @@ def print_configuration_info(settings: Settings):
         masked_key = settings.vt_api_key[:8] + "..." + settings.vt_api_key[-4:]
         print(f"   API Key: {masked_key}")
         print(f"   Premium: {'Yes' if settings.vt_premium else 'No'}")
+    
+    print(f"🔍 Censys: {'✅ Enabled' if settings.is_censys_enabled() else '❌ Disabled'}")
+    if settings.censys_api_id:
+        masked_id = settings.censys_api_id[:8] + "..." + settings.censys_api_id[-4:]
+        print(f"   API ID: {masked_id}")
+        print(f"   Rate Limit: {settings.censys_rate_limit}/min")
     
     print(f"🔍 DNS Analysis: {'✅ Enabled' if settings.enable_dns_analysis else '❌ Disabled'}")
     print(f"📊 Caching: {'✅ Enabled' if settings.enable_caching else '❌ Disabled'}")

@@ -1,14 +1,30 @@
-# 🔍 Provider Discovery Tool
+# 🚀 Enhanced Provider Discovery Tool - v3.0
 
-**Advanced multi-layer CDN/hosting provider detection with DNS chain analysis**
+**Advanced Multi-Layer CDN/Hosting Provider Detection with 6 FREE Data Sources**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![Streamlit](https://img.shields.io/badge/streamlit-1.48+-red.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![FREE Tier](https://img.shields.io/badge/FREE-6%20Integrations-green.svg)](https://github.com)
+
+## 🌟 Major Enhancement - Version 3.0
+
+**Enhanced Provider Detection System** with **6 FREE data source integrations** providing comprehensive multi-layer analysis without requiring expensive API keys.
 
 ## Overview
 
-This tool performs comprehensive analysis of websites to identify their hosting and CDN infrastructure. Unlike simple IP-based detection, it uses multi-layer analysis including DNS chain resolution, HTTP headers, official IP ranges, and enhanced WHOIS data to provide accurate provider identification with confidence scoring.
+The Enhanced Provider Discovery Tool performs comprehensive analysis of websites using **6 completely FREE data sources** to identify hosting and CDN infrastructure. The system combines traditional detection methods with modern intelligence sources for unparalleled accuracy and insight.
+
+### 🆓 **6 FREE Data Source Integrations**
+
+| Integration | Status | Description | Key Features |
+|-------------|--------|-------------|--------------|
+| 🔒 **SSL Certificate Analysis** | ✅ FREE | Certificate Authority detection | Security scoring, provider hints |
+| 🌐 **Enhanced DNS Framework** | ✅ FREE | Multi-resolver + DoH analysis | Cross-validation, consensus |
+| 🌍 **Geographic Intelligence** | ✅ FREE | Multi-provider geolocation | IP location, cloud classification |
+| 📡 **BGP Analysis (BGPView)** | ✅ FREE | ASN and routing data | Network topology, peering |
+| 🌐 **BGP Analysis (Hurricane Electric)** | ✅ FREE | Enhanced BGP intelligence | Web scraping, detailed ASN data |
+| 🛡️ **Threat Intelligence** | ✅ FREE | Security assessment | Domain reputation, threat scoring |
 
 ## 🆕 Key Features
 
