@@ -357,3 +357,4 @@ For support, please:
 ---
 
 **Built with ❤️ for network infrastructure analysis**
+# whois
