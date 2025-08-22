@@ -11,8 +11,9 @@ import re
 import ipaddress
 import requests
 import json
+import dns.resolver
 from urllib.parse import urlparse
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 class UltimateProviderDetector:
     def __init__(self):
