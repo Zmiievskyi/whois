@@ -15,12 +15,37 @@ import dns.resolver
 from urllib.parse import urlparse
 from typing import Dict, List, Optional, Set, Tuple
 
+# VirusTotal integration (optional)
+try:
+    from virustotal_integrator import VirusTotalIntegrator
+    VT_AVAILABLE = True
+except ImportError:
+    VT_AVAILABLE = False
+    VirusTotalIntegrator = None
+
 class UltimateProviderDetector:
-    def __init__(self):
+    def __init__(self, vt_api_key: Optional[str] = None):
         self.aws_ranges: Set[str] = set()
         self.cloudflare_ranges: Set[str] = set()
         self.ip_cache: Dict[str, Optional[str]] = {}
         self.dns_cache: Dict[str, List] = {}
+        
+        # Initialize VirusTotal integration
+        self.vt_integrator = None
+        if VT_AVAILABLE and vt_api_key:
+            try:
+                self.vt_integrator = VirusTotalIntegrator(vt_api_key)
+                if self.vt_integrator.is_enabled():
+                    print("✅ VirusTotal integration enabled")
+                else:
+                    print("⚠️ VirusTotal integration failed to initialize")
+                    self.vt_integrator = None
+            except Exception as e:
+                print(f"⚠️ VirusTotal integration error: {e}")
+                self.vt_integrator = None
+        elif not VT_AVAILABLE:
+            print("⚠️ VirusTotal integration not available (install vt-py)")
+        
         self.load_official_ip_ranges()
     
     def load_official_ip_ranges(self):
@@ -693,6 +718,219 @@ class UltimateProviderDetector:
         print(f"   Total sites analyzed: {total_sites}")
         print(f"   Multi-provider setups detected: {multi_provider_sites}")
         print(f"   Multi-provider ratio: {(multi_provider_sites/total_sites*100):.1f}%")
+
+    # =================================================================
+    # Phase 2A: Advanced DNS Analysis Implementation
+    # =================================================================
+    
+    def analyze_ns_records(self, domain: str) -> Dict:
+        """Analyze NS records to identify DNS provider"""
+        try:
+            ns_records = dns.resolver.resolve(domain, 'NS')
+            ns_providers = []
+            
+            for ns in ns_records:
+                ns_domain = str(ns).rstrip('.')
+                dns_provider = self.identify_dns_provider(ns_domain)
+                if dns_provider:
+                    ns_providers.append({
+                        'ns_server': ns_domain,
+                        'provider': dns_provider,
+                        'role': 'DNS'
+                    })
+            
+            return {
+                'dns_providers': ns_providers,
+                'dns_diversity': len(set(p['provider'] for p in ns_providers)),
+                'all_ns_servers': [str(ns).rstrip('.') for ns in ns_records]
+            }
+        except Exception as e:
+            return {'error': str(e), 'dns_providers': [], 'dns_diversity': 0, 'all_ns_servers': []}
+
+    def analyze_ttl_patterns(self, domain: str) -> Dict:
+        """Analyze TTL values to detect migration patterns"""
+        ttl_data = {}
+        
+        for record_type in ['A', 'CNAME', 'NS']:
+            try:
+                answers = dns.resolver.resolve(domain, record_type)
+                ttl_value = answers.rrset.ttl
+                ttl_data[record_type] = {
+                    'ttl': ttl_value,
+                    'migration_indicator': 'high' if ttl_value < 300 else 'medium' if ttl_value < 3600 else 'low',
+                    'description': self.get_ttl_description(ttl_value)
+                }
+            except Exception as e:
+                ttl_data[record_type] = {'error': str(e)}
+        
+        return ttl_data
+
+    def get_ttl_description(self, ttl: int) -> str:
+        """Get human-readable TTL description"""
+        if ttl < 60:
+            return f"Very low ({ttl}s) - Active migration possible"
+        elif ttl < 300:
+            return f"Low ({ttl}s) - Recent changes or testing"
+        elif ttl < 3600:
+            return f"Medium ({ttl//60}m) - Normal operation"
+        elif ttl < 86400:
+            return f"High ({ttl//3600}h) - Stable configuration"
+        else:
+            return f"Very high ({ttl//86400}d) - Long-term stable"
+
+    def reverse_dns_lookup(self, ip: str) -> Optional[str]:
+        """Perform reverse DNS lookup for additional context"""
+        if not ip:
+            return None
+            
+        try:
+            reverse_domain = dns.reversename.from_address(ip)
+            reverse_result = str(dns.resolver.resolve(reverse_domain, 'PTR')[0])
+            
+            # Extract provider from reverse DNS
+            provider = self.identify_provider_from_domain(reverse_result.rstrip('.'))
+            return {
+                'reverse_domain': reverse_result.rstrip('.'),
+                'provider': provider
+            }
+        except Exception:
+            return None
+
+    def identify_dns_provider(self, ns_domain: str) -> Optional[str]:
+        """Identify DNS provider from NS domain patterns"""
+        if not ns_domain:
+            return None
+            
+        ns_lower = ns_domain.lower()
+        
+        dns_patterns = {
+            'AWS Route53': [
+                r'awsdns-.*\.net$', r'awsdns-.*\.org$', r'awsdns-.*\.com$', r'awsdns-.*\.co\.uk$'
+            ],
+            'Cloudflare': [
+                r'.*\.ns\.cloudflare\.com$', r'.*\.cloudflare\.com$'
+            ],
+            'Google Cloud DNS': [
+                r'ns-cloud-.*\.googledomains\.com$', r'.*\.google\.com$'
+            ],
+            'Azure DNS': [
+                r'.*\.ns\.azure-dns\..*$', r'.*\.azure-dns\..*$'
+            ],
+            'Namecheap': [
+                r'dns.*\.registrar-servers\.com$', r'.*\.registrar-servers\.com$'
+            ],
+            'GoDaddy': [
+                r'ns.*\.domaincontrol\.com$', r'.*\.domaincontrol\.com$'
+            ],
+            'DigitalOcean': [
+                r'ns.*\.digitalocean\.com$', r'.*\.digitalocean\.com$'
+            ],
+            'Gcore': [
+                r'.*\.gcorelabs\.net$', r'.*\.g-core\.net$'
+            ],
+            'OVH': [
+                r'.*\.ovh\.net$', r'.*\.ovh\.com$'
+            ],
+            'Hetzner': [
+                r'.*\.hetzner\.com$', r'.*\.hetzner\.de$'
+            ]
+        }
+        
+        for provider, patterns in dns_patterns.items():
+            for pattern in patterns:
+                if re.search(pattern, ns_lower):
+                    return provider
+        
+        return None
+
+    def detect_provider_multi_layer_enhanced(self, headers: str, ip: str, whois_data: str, domain: str) -> Dict:
+        """Enhanced multi-layer detection with Phase 2A DNS analysis"""
+        result = {
+            'providers': [],
+            'primary_provider': 'Unknown',
+            'confidence_factors': [],
+            'dns_chain': [],
+            'dns_analysis': {},
+            'ttl_analysis': {}
+        }
+        
+        # Original multi-layer detection
+        original_result = self.detect_provider_multi_layer(headers, ip, whois_data, domain)
+        result.update(original_result)
+        
+        # Phase 2A: Enhanced DNS Analysis
+        try:
+            # NS Record Analysis
+            ns_analysis = self.analyze_ns_records(domain)
+            result['dns_analysis'] = ns_analysis
+            
+            # Add DNS providers to the providers list
+            for dns_provider_info in ns_analysis.get('dns_providers', []):
+                dns_provider = {
+                    'name': dns_provider_info['provider'],
+                    'role': 'DNS',
+                    'confidence': 'High',
+                    'source': 'NS Record Analysis'
+                }
+                if dns_provider not in result['providers']:
+                    result['providers'].append(dns_provider)
+                    result['confidence_factors'].append(f"DNS provider identified: {dns_provider_info['provider']}")
+            
+            # TTL Analysis
+            ttl_analysis = self.analyze_ttl_patterns(domain)
+            result['ttl_analysis'] = ttl_analysis
+            
+            # Add migration indicators to confidence factors
+            for record_type, ttl_info in ttl_analysis.items():
+                if 'migration_indicator' in ttl_info and ttl_info['migration_indicator'] == 'high':
+                    result['confidence_factors'].append(f"Low TTL detected ({record_type}): {ttl_info['description']}")
+            
+            # Reverse DNS Analysis
+            if ip:
+                reverse_dns = self.reverse_dns_lookup(ip)
+                if reverse_dns and reverse_dns['provider']:
+                    result['confidence_factors'].append(f"Reverse DNS confirms: {reverse_dns['provider']}")
+                    
+                    # Cross-validate with existing providers
+                    for provider in result['providers']:
+                        if provider['name'].lower() == reverse_dns['provider'].lower():
+                            provider['confidence'] = 'Very High'
+                            result['confidence_factors'].append('Reverse DNS validation successful')
+                            break
+            
+        except Exception as e:
+            result['confidence_factors'].append(f"DNS analysis error: {str(e)}")
+        
+        return result
+
+    def detect_provider_ultimate_with_virustotal(self, headers: str, ip: str, whois_data: str, domain: str) -> Dict:
+        """
+        Phase 2B: Ultimate detection with VirusTotal enhancement
+        
+        Args:
+            headers: HTTP headers
+            ip: IP address
+            whois_data: WHOIS data
+            domain: Domain name
+            
+        Returns:
+            Enhanced detection result with VirusTotal data
+        """
+        # Start with Phase 2A enhanced detection
+        result = self.detect_provider_multi_layer_enhanced(headers, ip, whois_data, domain)
+        
+        # Enhance with VirusTotal if available
+        if self.vt_integrator and self.vt_integrator.is_enabled():
+            try:
+                result = self.vt_integrator.enhance_existing_detection(result, domain)
+                result['virustotal_enhanced'] = True
+            except Exception as e:
+                result['confidence_factors'].append(f"VirusTotal enhancement failed: {str(e)}")
+                result['virustotal_enhanced'] = False
+        else:
+            result['virustotal_enhanced'] = False
+            
+        return result
 
 def main():
     """Main function"""

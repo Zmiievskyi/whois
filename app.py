@@ -10,8 +10,14 @@ import re
 import ipaddress
 import io
 import time
+import os
+import sys
 from urllib.parse import urlparse
-from ultimate_provider_detector import UltimateProviderDetector
+
+# Add src to path for new modular imports
+sys.path.insert(0, 'src')
+
+from provider_discovery.core import get_provider_detector
 
 # Page configuration
 st.set_page_config(
@@ -21,17 +27,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize the ultimate provider detector (cached for performance)
+# Initialize the provider detector (cached for performance)
 @st.cache_resource
-def get_detector():
-    """Get cached instance of UltimateProviderDetector"""
-    det = UltimateProviderDetector()
-    # Clear any existing cache to avoid issues
+def get_detector_instance():
+    """Get cached instance of ProviderDetector with new modular architecture"""
+    # Check for VirusTotal API key in environment or secrets
+    vt_api_key = None
+    try:
+        # Try Streamlit secrets first
+        vt_api_key = st.secrets.get("VT_API_KEY")
+    except:
+        pass
+    
+    if not vt_api_key:
+        # Try environment variable
+        vt_api_key = os.getenv("VT_API_KEY")
+    
+    det = get_provider_detector(vt_api_key=vt_api_key)
+    # Clear any existing cache to avoid issues (backward compatibility)
     det.ip_cache = {}
     det.dns_cache = {}
     return det
 
-detector = get_detector()
+detector = get_detector_instance()
 
 def validate_url(url):
     """Validate and clean URL format"""
@@ -166,7 +184,7 @@ def detect_provider(headers, ip, whois_data):
     return detector.detect_provider_ultimate(headers, ip, whois_data)
 
 def process_single_url(url, progress_callback=None):
-    """Process single URL with enhanced multi-layer detection"""
+    """Process single URL with Phase 2A enhanced DNS analysis"""
     if progress_callback:
         progress_callback(f"Analyzing {url}...")
     
@@ -176,14 +194,15 @@ def process_single_url(url, progress_callback=None):
     ip = detector.get_ip(url)
     whois_data = detector.get_whois(ip) if ip else ""
     
-    # Enhanced multi-layer detection
-    enhanced_result = detector.detect_provider_multi_layer(headers, ip, whois_data, domain)
+    # Phase 2B: Enhanced multi-layer detection with DNS analysis + VirusTotal
+    enhanced_result = detector.detect_provider_ultimate_with_virustotal(headers, ip, whois_data, domain)
     
     # Format providers by role
     origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
     cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
     waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
     lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
+    dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
     
     return {
         'URL': url,
@@ -193,8 +212,11 @@ def process_single_url(url, progress_callback=None):
         'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
         'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
         'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
+        'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
         'Confidence_Factors': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low',
-        'DNS_Chain': enhanced_result['dns_chain']
+        'DNS_Chain': enhanced_result['dns_chain'],
+        'DNS_Analysis': enhanced_result.get('dns_analysis', {}),
+        'TTL_Analysis': enhanced_result.get('ttl_analysis', {})
     }
 
 # Main application
@@ -205,13 +227,26 @@ def main():
     # Sidebar with information
     with st.sidebar:
         st.header("ℹ️ Information")
-        st.markdown("""
-        **🆕 Enhanced Multi-Layer Detection:**
-        1. **DNS Chain Analysis** - CNAME resolution paths
-        2. **HTTP Headers** - 50+ provider patterns
-        3. **Official IP Ranges** - AWS, Cloudflare, etc.
-        4. **WHOIS Analysis** - RIPE/APNIC integration
-        5. **Provider Roles** - Origin/CDN/WAF/LB separation
+        # Check VirusTotal status
+        vt_status = "✅ Enabled" if detector.vt_integrator and detector.vt_integrator.is_enabled else "⚠️ Not configured"
+        
+        st.markdown(f"""
+        **🆕 Phase 2B - VirusTotal Integration:**
+        - **VirusTotal Status**: {vt_status}
+        - **Cross-validation** with VT database
+        - **Historical DNS data** (Premium feature)
+        - **Domain reputation** scoring
+        - **Security threat** detection
+        
+        **🔬 Phase 2A - Advanced DNS Analysis:**
+        1. **NS Record Analysis** - DNS provider identification
+        2. **TTL Analysis** - Migration pattern detection  
+        3. **Reverse DNS Lookup** - Additional validation
+        4. **DNS Chain Analysis** - CNAME resolution paths
+        5. **HTTP Headers** - 50+ provider patterns
+        6. **Official IP Ranges** - AWS, Cloudflare, etc.
+        7. **WHOIS Analysis** - RIPE/APNIC integration
+        8. **Provider Roles** - Origin/CDN/WAF/LB/DNS separation
         
         **Supported providers:**
         - **Major**: Cloudflare, AWS, Google, Microsoft
@@ -219,11 +254,16 @@ def main():
         - **Cloud**: DigitalOcean, Linode, Vultr, OVH
         - **ANY provider** via dynamic WHOIS analysis
         
-        **🎯 Key improvements:**
+        **🎯 Phase 2B Key improvements:**
+        - ✅ VirusTotal cross-validation
+        - ✅ Domain reputation analysis
+        - ✅ Security threat detection
+        - ✅ Historical DNS analysis (Premium)
+        - ✅ Enhanced confidence scoring
+        - ✅ DNS provider separation from web hosting
+        - ✅ Migration pattern detection via TTL analysis
+        - ✅ Reverse DNS validation 
         - ✅ Multi-provider detection
-        - ✅ Reduced false positives
-        - ✅ DNS chain visibility
-        - ✅ Confidence scoring
         """)
         
         st.header("📋 CSV Format")
@@ -324,19 +364,20 @@ def main():
                                 progress_bar.progress(progress)
                                 status_text.text(f"Processing {idx + 1}/{len(df_clean)}: {company}")
                             
-                                # Enhanced multi-layer analysis
+                                # Phase 2A: Enhanced multi-layer analysis with DNS
                                 domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
                                 
                                 headers = detector.get_headers(url)
                                 ip = detector.get_ip(url)
                                 whois_data = detector.get_whois(ip) if ip else ""
-                                enhanced_result = detector.detect_provider_multi_layer(headers, ip, whois_data, domain)
+                                enhanced_result = detector.detect_provider_ultimate_with_virustotal(headers, ip, whois_data, domain)
                                 
                                 # Format providers by role
                                 origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
                                 cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
                                 waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
                                 lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
+                                dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
                                 
                                 result = {
                                     'Company': company,
@@ -346,6 +387,7 @@ def main():
                                     'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
                                     'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
                                     'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
+                                    'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
                                     'IP_Address': ip or 'N/A',
                                     'Confidence': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low'
                                 }
@@ -353,10 +395,10 @@ def main():
                         
                             # Create enhanced result DataFrame
                             results_df = pd.DataFrame(results)
-                            # Reorder columns for better display
+                            # Reorder columns for better display (Phase 2A update)
                             column_order = ['Company', 'URL', 'Primary_Provider', 'Origin_Provider', 
                                           'CDN_Providers', 'WAF_Providers', 'LB_Providers', 
-                                          'IP_Address', 'Confidence']
+                                          'DNS_Providers', 'IP_Address', 'Confidence']
                             results_df = results_df[column_order]
                         
                             # Clear progress
@@ -441,8 +483,8 @@ def main():
                     # Result
                     st.success("✅ Analysis completed!")
                     
-                    # Enhanced result display
-                    col1, col2, col3 = st.columns(3)
+                    # Enhanced result display (Phase 2A update)
+                    col1, col2, col3, col4 = st.columns(4)
                     with col1:
                         st.metric("URL", result['URL'])
                         st.metric("IP Address", result['IP_Address'])
@@ -451,7 +493,10 @@ def main():
                         st.metric("Origin", result['Origin_Provider'])
                     with col3:
                         st.metric("CDN", result['CDN_Providers'])
-                        st.metric("Confidence", result['Confidence_Factors'][:20] + "..." if len(result['Confidence_Factors']) > 20 else result['Confidence_Factors'])
+                        st.metric("DNS Provider", result['DNS_Providers'])
+                    with col4:
+                        st.metric("WAF/LB", f"{result['WAF_Providers']}/{result['LB_Providers']}")
+                        st.metric("Confidence", result['Confidence_Factors'][:15] + "..." if len(result['Confidence_Factors']) > 15 else result['Confidence_Factors'])
                     
                     # Multi-provider summary
                     if result['CDN_Providers'] != 'None' or result['WAF_Providers'] != 'None':
@@ -465,8 +510,86 @@ def main():
                             provider_summary.append(f"**WAF**: {result['WAF_Providers']}")
                         if result['LB_Providers'] != 'None':
                             provider_summary.append(f"**Load Balancer**: {result['LB_Providers']}")
+                        if result['DNS_Providers'] != 'Unknown':
+                            provider_summary.append(f"**DNS**: {result['DNS_Providers']}")
                         
                         st.markdown(" | ".join(provider_summary))
+                    
+                    # Phase 2A: Enhanced DNS Analysis Display
+                    if result.get('DNS_Analysis') or result.get('TTL_Analysis'):
+                        with st.expander("🔬 Advanced DNS Analysis (Phase 2A)"):
+                            if result.get('DNS_Analysis'):
+                                dns_data = result['DNS_Analysis']
+                                if dns_data.get('dns_providers'):
+                                    st.subheader("NS Record Analysis")
+                                    for dns_prov in dns_data['dns_providers']:
+                                        st.write(f"**{dns_prov['provider']}**: {dns_prov['ns_server']}")
+                                    
+                                    if dns_data.get('dns_diversity', 0) > 1:
+                                        st.warning(f"⚠️ Multiple DNS providers detected ({dns_data['dns_diversity']}) - Complex setup")
+                                    else:
+                                        st.info("✅ Single DNS provider configuration")
+                            
+                            if result.get('TTL_Analysis'):
+                                st.subheader("TTL Analysis")
+                                ttl_data = result['TTL_Analysis']
+                                for record_type, ttl_info in ttl_data.items():
+                                    if 'ttl' in ttl_info:
+                                        indicator = ttl_info.get('migration_indicator', 'unknown')
+                                        if indicator == 'high':
+                                            st.error(f"🚨 **{record_type}**: {ttl_info['description']}")
+                                        elif indicator == 'medium':
+                                            st.warning(f"⚠️ **{record_type}**: {ttl_info['description']}")
+                                        else:
+                                            st.success(f"✅ **{record_type}**: {ttl_info['description']}")
+                    
+                    # Phase 2B: VirusTotal Analysis Display
+                    if result.get('virustotal_enhanced') and result.get('virustotal_data'):
+                        with st.expander("🦠 VirusTotal Analysis (Phase 2B)"):
+                            vt_data = result['virustotal_data']
+                            
+                            # Confidence and reputation
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                confidence = vt_data.get('confidence_score', 0)
+                                st.metric("VT Confidence", f"{confidence}%")
+                            with col2:
+                                reputation = vt_data.get('reputation', 0)
+                                rep_color = "green" if reputation > 0 else "red" if reputation < 0 else "gray"
+                                st.metric("Reputation", reputation)
+                            
+                            # Security analysis
+                            stats = vt_data.get('last_analysis_stats', {})
+                            if stats:
+                                st.subheader("Security Analysis")
+                                col1, col2, col3, col4 = st.columns(4)
+                                with col1:
+                                    st.metric("Harmless", stats.get('harmless', 0))
+                                with col2:
+                                    malicious = stats.get('malicious', 0)
+                                    if malicious > 0:
+                                        st.error(f"Malicious: {malicious}")
+                                    else:
+                                        st.metric("Malicious", malicious)
+                                with col3:
+                                    suspicious = stats.get('suspicious', 0)
+                                    if suspicious > 0:
+                                        st.warning(f"Suspicious: {suspicious}")
+                                    else:
+                                        st.metric("Suspicious", suspicious)
+                                with col4:
+                                    st.metric("Undetected", stats.get('undetected', 0))
+                            
+                            # VirusTotal providers
+                            vt_providers = vt_data.get('providers', {})
+                            if any(vt_providers.values()):
+                                st.subheader("VirusTotal Provider Analysis")
+                                if vt_providers.get('origin'):
+                                    st.write(f"**Origin**: {vt_providers['origin']}")
+                                if vt_providers.get('cdn'):
+                                    st.write(f"**CDN**: {', '.join(vt_providers['cdn'])}")
+                                if vt_providers.get('dns_provider'):
+                                    st.write(f"**DNS**: {vt_providers['dns_provider']}")
                     
                     # DNS Chain Analysis
                     if result['DNS_Chain']:
