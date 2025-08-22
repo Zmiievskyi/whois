@@ -28,7 +28,7 @@ def get_detector():
     det = UltimateProviderDetector()
     # Clear any existing cache to avoid issues
     det.ip_cache = {}
-    det.whois_cache = {}
+    det.dns_cache = {}
     return det
 
 detector = get_detector()
@@ -166,19 +166,35 @@ def detect_provider(headers, ip, whois_data):
     return detector.detect_provider_ultimate(headers, ip, whois_data)
 
 def process_single_url(url, progress_callback=None):
-    """Process single URL"""
+    """Process single URL with enhanced multi-layer detection"""
     if progress_callback:
         progress_callback(f"Analyzing {url}...")
+    
+    domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
     
     headers = detector.get_headers(url)
     ip = detector.get_ip(url)
     whois_data = detector.get_whois(ip) if ip else ""
-    provider = detector.detect_provider_ultimate(headers, ip, whois_data)
+    
+    # Enhanced multi-layer detection
+    enhanced_result = detector.detect_provider_multi_layer(headers, ip, whois_data, domain)
+    
+    # Format providers by role
+    origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
+    cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
+    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
+    lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
     
     return {
         'URL': url,
         'IP_Address': ip or 'N/A',
-        'Provider': provider
+        'Primary_Provider': enhanced_result['primary_provider'],
+        'Origin_Provider': ', '.join(origin_providers) if origin_providers else 'Unknown',
+        'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
+        'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
+        'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
+        'Confidence_Factors': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low',
+        'DNS_Chain': enhanced_result['dns_chain']
     }
 
 # Main application
@@ -190,17 +206,24 @@ def main():
     with st.sidebar:
         st.header("ℹ️ Information")
         st.markdown("""
-        **How it works:**
-        1. Analyzes HTTP headers with 50+ patterns
-        2. Checks official IP ranges (9000+ AWS, 22 Cloudflare)
-        3. Enhanced WHOIS analysis with RIPE/APNIC
-        4. Smart organization extraction
+        **🆕 Enhanced Multi-Layer Detection:**
+        1. **DNS Chain Analysis** - CNAME resolution paths
+        2. **HTTP Headers** - 50+ provider patterns
+        3. **Official IP Ranges** - AWS, Cloudflare, etc.
+        4. **WHOIS Analysis** - RIPE/APNIC integration
+        5. **Provider Roles** - Origin/CDN/WAF/LB separation
         
         **Supported providers:**
-        - Major: Cloudflare, AWS, Google, Microsoft
-        - CDNs: Akamai, Fastly, Netlify, Vercel
-        - Cloud: DigitalOcean, Linode, Vultr, OVH
-        - + ANY provider via dynamic WHOIS analysis
+        - **Major**: Cloudflare, AWS, Google, Microsoft
+        - **CDNs**: Akamai, Fastly, Netlify, Vercel
+        - **Cloud**: DigitalOcean, Linode, Vultr, OVH
+        - **ANY provider** via dynamic WHOIS analysis
+        
+        **🎯 Key improvements:**
+        - ✅ Multi-provider detection
+        - ✅ Reduced false positives
+        - ✅ DNS chain visibility
+        - ✅ Confidence scoring
         """)
         
         st.header("📋 CSV Format")
@@ -301,23 +324,40 @@ def main():
                                 progress_bar.progress(progress)
                                 status_text.text(f"Processing {idx + 1}/{len(df_clean)}: {company}")
                             
-                                # Analyze using ultimate detector
+                                # Enhanced multi-layer analysis
+                                domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
+                                
                                 headers = detector.get_headers(url)
                                 ip = detector.get_ip(url)
                                 whois_data = detector.get_whois(ip) if ip else ""
-                                provider = detector.detect_provider_ultimate(headers, ip, whois_data)
+                                enhanced_result = detector.detect_provider_multi_layer(headers, ip, whois_data, domain)
+                                
+                                # Format providers by role
+                                origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
+                                cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
+                                waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
+                                lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
                                 
                                 result = {
                                     'Company': company,
                                     'URL': url,
-                                    'Provider': provider,
-                                    'IP_Address': ip or 'N/A'
+                                    'Primary_Provider': enhanced_result['primary_provider'],
+                                    'Origin_Provider': ', '.join(origin_providers) if origin_providers else 'Unknown',
+                                    'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
+                                    'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
+                                    'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
+                                    'IP_Address': ip or 'N/A',
+                                    'Confidence': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low'
                                 }
                                 results.append(result)
                         
-                            # Create result DataFrame
+                            # Create enhanced result DataFrame
                             results_df = pd.DataFrame(results)
-                            results_df = results_df[['Company', 'URL', 'Provider', 'IP_Address']]
+                            # Reorder columns for better display
+                            column_order = ['Company', 'URL', 'Primary_Provider', 'Origin_Provider', 
+                                          'CDN_Providers', 'WAF_Providers', 'LB_Providers', 
+                                          'IP_Address', 'Confidence']
+                            results_df = results_df[column_order]
                         
                             # Clear progress
                             progress_bar.empty()
@@ -331,22 +371,34 @@ def main():
                             with col1:
                                 st.metric("Total Websites", len(results_df))
                             with col2:
-                                identified = len(results_df[results_df['Provider'] != 'Unknown'])
+                                identified = len(results_df[results_df['Primary_Provider'] != 'Unknown'])
                                 st.metric("Identified", identified)
                             with col3:
-                                unknown = len(results_df[results_df['Provider'] == 'Unknown'])
-                                st.metric("Unknown", unknown)
+                                multi_provider = len(results_df[(results_df['CDN_Providers'] != 'None') | 
+                                                              (results_df['WAF_Providers'] != 'None')])
+                                st.metric("Multi-Provider", multi_provider)
                             
                             # Results
                             st.subheader("📊 Results:")
                             st.dataframe(results_df, use_container_width=True)
                             
-                            # Top providers
+                            # Enhanced analytics
                             if len(results_df) > 0:
-                                provider_counts = results_df['Provider'].value_counts()
-                                if len(provider_counts) > 1:
-                                    st.subheader("📈 Top Providers:")
-                                    st.bar_chart(provider_counts)
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    st.subheader("📈 Primary Providers:")
+                                    provider_counts = results_df['Primary_Provider'].value_counts()
+                                    if len(provider_counts) > 1:
+                                        st.bar_chart(provider_counts)
+                                
+                                with col2:
+                                    st.subheader("🌐 CDN Usage:")
+                                    cdn_data = results_df[results_df['CDN_Providers'] != 'None']['CDN_Providers'].str.split(', ').explode().value_counts()
+                                    if len(cdn_data) > 0:
+                                        st.bar_chart(cdn_data)
+                                    else:
+                                        st.info("No CDN providers detected")
                             
                             # Download results
                             csv_buffer = io.StringIO()
@@ -389,18 +441,54 @@ def main():
                     # Result
                     st.success("✅ Analysis completed!")
                     
-                    col1, col2 = st.columns(2)
+                    # Enhanced result display
+                    col1, col2, col3 = st.columns(3)
                     with col1:
                         st.metric("URL", result['URL'])
                         st.metric("IP Address", result['IP_Address'])
                     with col2:
-                        st.metric("Provider", result['Provider'])
+                        st.metric("Primary Provider", result['Primary_Provider'])
+                        st.metric("Origin", result['Origin_Provider'])
+                    with col3:
+                        st.metric("CDN", result['CDN_Providers'])
+                        st.metric("Confidence", result['Confidence_Factors'][:20] + "..." if len(result['Confidence_Factors']) > 20 else result['Confidence_Factors'])
+                    
+                    # Multi-provider summary
+                    if result['CDN_Providers'] != 'None' or result['WAF_Providers'] != 'None':
+                        st.success("🎯 **Multi-provider setup detected!**")
+                        provider_summary = []
+                        if result['Origin_Provider'] != 'Unknown':
+                            provider_summary.append(f"**Origin**: {result['Origin_Provider']}")
+                        if result['CDN_Providers'] != 'None':
+                            provider_summary.append(f"**CDN**: {result['CDN_Providers']}")
+                        if result['WAF_Providers'] != 'None':
+                            provider_summary.append(f"**WAF**: {result['WAF_Providers']}")
+                        if result['LB_Providers'] != 'None':
+                            provider_summary.append(f"**Load Balancer**: {result['LB_Providers']}")
+                        
+                        st.markdown(" | ".join(provider_summary))
+                    
+                    # DNS Chain Analysis
+                    if result['DNS_Chain']:
+                        with st.expander("🔗 DNS Resolution Chain"):
+                            for i, step in enumerate(result['DNS_Chain']):
+                                if step['type'] == 'CNAME':
+                                    st.write(f"**Step {i+1}**: `{step['domain']}` → `{step['cname']}` ({step['provider'] or 'Unknown'}) - {step['role']}")
+                                else:
+                                    st.write(f"**Step {i+1}**: `{step['domain']}` → `{step['ip']}` ({step['provider'] or 'Unknown'}) - {step['role']}")
                     
                     # Detailed information
-                    with st.expander("🔍 Detailed Information"):
+                    with st.expander("🔍 Technical Details"):
                         headers = detector.get_headers(clean_url)
                         if headers:
                             st.text_area("HTTP headers (first 500 characters):", headers[:500], height=150)
+                        
+                        st.write("**Confidence Factors:**")
+                        if result['Confidence_Factors']:
+                            for factor in result['Confidence_Factors'].split('; '):
+                                st.write(f"• {factor}")
+                        else:
+                            st.write("• Low confidence - based on fallback methods")
             else:
                 st.warning("⚠️ Please enter a URL")
 

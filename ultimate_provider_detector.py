@@ -20,6 +20,7 @@ class UltimateProviderDetector:
         self.aws_ranges: Set[str] = set()
         self.cloudflare_ranges: Set[str] = set()
         self.ip_cache: Dict[str, Optional[str]] = {}
+        self.dns_cache: Dict[str, List] = {}
         self.load_official_ip_ranges()
     
     def load_official_ip_ranges(self):
@@ -442,8 +443,190 @@ class UltimateProviderDetector:
         
         return cleaned
 
+    def analyze_dns_chain(self, domain: str) -> List[Dict]:
+        """Analyze CNAME chain to identify all providers in the resolution path"""
+        if domain in self.dns_cache:
+            return self.dns_cache[domain]
+        
+        chain = []
+        current_domain = domain
+        visited = set()  # Prevent infinite loops
+        
+        try:
+            while current_domain and current_domain not in visited:
+                visited.add(current_domain)
+                
+                # Try to get CNAME record
+                try:
+                    answers = dns.resolver.resolve(current_domain, 'CNAME')
+                    if answers:
+                        cname = str(answers[0]).rstrip('.')
+                        provider = self.identify_provider_from_domain(cname)
+                        chain.append({
+                            'domain': current_domain,
+                            'cname': cname,
+                            'provider': provider,
+                            'role': self.determine_provider_role(provider, cname),
+                            'type': 'CNAME'
+                        })
+                        current_domain = cname
+                        continue
+                except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+                    pass
+                
+                # If no CNAME, get A record
+                try:
+                    answers = dns.resolver.resolve(current_domain, 'A')
+                    if answers:
+                        ip = str(answers[0])
+                        provider = self.analyze_ip_ranges_official(ip)
+                        if not provider:
+                            # Fallback to WHOIS if IP ranges don't match
+                            whois_data = self.get_whois(ip)
+                            provider = self.analyze_whois_enhanced(whois_data)
+                        
+                        chain.append({
+                            'domain': current_domain,
+                            'ip': ip,
+                            'provider': provider or 'Unknown',
+                            'role': 'Origin',
+                            'type': 'A'
+                        })
+                        break
+                except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+                    break
+                    
+        except Exception as e:
+            print(f"DNS analysis error for {domain}: {e}")
+        
+        self.dns_cache[domain] = chain
+        return chain
+
+    def identify_provider_from_domain(self, domain: str) -> Optional[str]:
+        """Identify provider from domain name patterns"""
+        domain_lower = domain.lower()
+        
+        # Common CDN/Cloud provider domain patterns
+        provider_patterns = {
+            'Cloudflare': [r'cloudflare\.', r'\.cloudflare\.', r'cf-ipv6\.com$'],
+            'AWS': [r'amazonaws\.com$', r'aws\.', r'cloudfront\.net$', r'elb\.amazonaws\.com$'],
+            'Google': [r'googleusercontent\.com$', r'ghs\.google\.com$', r'\.goog$'],
+            'Microsoft': [r'azure\.', r'azurewebsites\.net$', r'cloudapp\.net$', r'trafficmanager\.net$'],
+            'Fastly': [r'fastly\.', r'fastlylb\.net$', r'\.global\.fastly\.net$'],
+            'Akamai': [r'akamai\.', r'akamaistream\.net$', r'akamaiedge\.net$'],
+            'MaxCDN': [r'maxcdn\.', r'bootstrapcdn\.com$'],
+            'Netlify': [r'netlify\.', r'netlifyglobalcdn\.com$'],
+            'Vercel': [r'vercel\.', r'now\.sh$', r'vercel\.app$'],
+            'GitHub': [r'github\.', r'githubpages\.com$', r'github\.io$']
+        }
+        
+        for provider, patterns in provider_patterns.items():
+            for pattern in patterns:
+                if re.search(pattern, domain_lower):
+                    return provider
+        
+        return None
+
+    def determine_provider_role(self, provider: Optional[str], domain: str) -> str:
+        """Determine the role of the provider based on domain patterns"""
+        if not provider:
+            return 'Unknown'
+        
+        domain_lower = domain.lower()
+        
+        # CDN indicators
+        cdn_indicators = [
+            'cdn', 'cache', 'edge', 'static', 'assets', 'media',
+            'cloudfront', 'fastly', 'akamai', 'maxcdn'
+        ]
+        
+        # WAF indicators  
+        waf_indicators = ['waf', 'security', 'protection', 'firewall']
+        
+        # Load balancer indicators
+        lb_indicators = ['lb', 'elb', 'alb', 'loadbalancer', 'balance']
+        
+        if any(indicator in domain_lower for indicator in waf_indicators):
+            return 'WAF'
+        elif any(indicator in domain_lower for indicator in cdn_indicators):
+            return 'CDN'
+        elif any(indicator in domain_lower for indicator in lb_indicators):
+            return 'Load Balancer'
+        elif provider in ['Cloudflare', 'Fastly', 'Akamai', 'MaxCDN']:
+            return 'CDN'
+        else:
+            return 'Origin'
+
+    def detect_provider_multi_layer(self, headers: str, ip: str, whois_data: str, domain: str) -> Dict:
+        """Enhanced provider detection returning multiple providers with roles"""
+        result = {
+            'providers': [],
+            'primary_provider': None,
+            'confidence_factors': [],
+            'dns_chain': []
+        }
+        
+        # Get DNS chain analysis
+        dns_chain = self.analyze_dns_chain(domain)
+        result['dns_chain'] = dns_chain
+        
+        # Collect all providers from DNS chain
+        providers_found = {}
+        for step in dns_chain:
+            if step['provider'] and step['provider'] != 'Unknown':
+                role = step['role']
+                if role not in providers_found:
+                    providers_found[role] = []
+                providers_found[role].append(step['provider'])
+        
+        # Original header analysis
+        header_provider = self.analyze_headers_comprehensive(headers)
+        if header_provider:
+            result['confidence_factors'].append('HTTP headers match')
+            if 'CDN' not in providers_found:
+                providers_found['CDN'] = []
+            if header_provider not in providers_found['CDN']:
+                providers_found['CDN'].append(header_provider)
+        
+        # IP range analysis
+        ip_provider = self.analyze_ip_ranges_official(ip)
+        if ip_provider:
+            result['confidence_factors'].append('Official IP ranges match')
+            if 'Origin' not in providers_found:
+                providers_found['Origin'] = []
+            if ip_provider not in providers_found['Origin']:
+                providers_found['Origin'].append(ip_provider)
+        
+        # WHOIS analysis as fallback
+        if not providers_found:
+            whois_provider = self.analyze_whois_enhanced(whois_data)
+            if whois_provider:
+                result['confidence_factors'].append('WHOIS data match')
+                providers_found['Origin'] = [whois_provider]
+        
+        # Format results
+        for role, provider_list in providers_found.items():
+            for provider in provider_list:
+                result['providers'].append({
+                    'name': provider,
+                    'role': role,
+                    'confidence': 'High' if role in ['Origin', 'CDN'] else 'Medium'
+                })
+        
+        # Determine primary provider (prefer Origin, then CDN)
+        if 'Origin' in providers_found:
+            result['primary_provider'] = providers_found['Origin'][0]
+        elif 'CDN' in providers_found:
+            result['primary_provider'] = providers_found['CDN'][0]
+        elif providers_found:
+            result['primary_provider'] = list(providers_found.values())[0][0]
+        else:
+            result['primary_provider'] = 'Unknown'
+        
+        return result
+
     def process_csv_file(self, input_file, output_file):
-        """Process CSV file with ultimate detection"""
+        """Process CSV file with enhanced multi-layer detection"""
         results = []
         
         with open(input_file, 'r', encoding='utf-8') as f:
@@ -453,22 +636,63 @@ class UltimateProviderDetector:
             for row in reader:
                 if len(row) >= 2:
                     company, url = row[0], row[1]
+                    domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
                     
                     headers = self.get_headers(url)
                     ip = self.get_ip(url)
                     whois_data = self.get_whois(ip) if ip else ""
-                    provider = self.detect_provider_ultimate(headers, ip, whois_data)
                     
-                    results.append([company, url, provider, ip or 'N/A'])
-                    print(f"✓ {company}: {provider}")
+                    # Enhanced multi-layer detection
+                    enhanced_result = self.detect_provider_multi_layer(headers, ip, whois_data, domain)
+                    
+                    # Format providers by role
+                    origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
+                    cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
+                    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
+                    lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
+                    
+                    result_row = [
+                        company,
+                        url,
+                        enhanced_result['primary_provider'],
+                        ', '.join(origin_providers) or 'Unknown',
+                        ', '.join(cdn_providers) or 'None',
+                        ', '.join(waf_providers) or 'None',
+                        ', '.join(lb_providers) or 'None',
+                        ip or 'N/A',
+                        '; '.join(enhanced_result['confidence_factors']) or 'Low'
+                    ]
+                    
+                    results.append(result_row)
+                    
+                    # Enhanced logging
+                    provider_summary = f"{enhanced_result['primary_provider']}"
+                    if cdn_providers:
+                        provider_summary += f" (CDN: {', '.join(cdn_providers)})"
+                    if waf_providers:
+                        provider_summary += f" (WAF: {', '.join(waf_providers)})"
+                    
+                    print(f"✓ {company}: {provider_summary}")
         
-        # Save results
+        # Save enhanced results
         with open(output_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow(['Company', 'URL', 'Provider', 'IP_Address'])
+            writer.writerow([
+                'Company', 'URL', 'Primary_Provider', 'Origin_Provider', 
+                'CDN_Providers', 'WAF_Providers', 'LB_Providers', 
+                'IP_Address', 'Confidence_Factors'
+            ])
             writer.writerows(results)
         
-        print(f"\nResults saved to: {output_file}")
+        print(f"\nEnhanced results saved to: {output_file}")
+        
+        # Summary statistics
+        total_sites = len(results)
+        multi_provider_sites = len([r for r in results if ',' in r[4] or ',' in r[5] or ',' in r[6]])
+        print(f"📊 Analysis Summary:")
+        print(f"   Total sites analyzed: {total_sites}")
+        print(f"   Multi-provider setups detected: {multi_provider_sites}")
+        print(f"   Multi-provider ratio: {(multi_provider_sites/total_sites*100):.1f}%")
 
 def main():
     """Main function"""
