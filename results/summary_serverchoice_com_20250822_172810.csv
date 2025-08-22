@@ -1,11 +1,11 @@
 Category,Key,Value
-Domain,URL,google.com
+Domain,URL,serverchoice.com
 Network,IP_Address,N/A
 Confidence,Enhanced_Confidence,100%
-Analysis,Timestamp,2025-08-22 16:19:40 UTC
-Providers,Primary Provider,Google
-Providers,CDN Providers,None
-Providers,DNS Providers,Google Cloud DNS
+Analysis,Timestamp,2025-08-22 17:27:24 UTC
+Providers,Primary Provider,Cloudflare
+Providers,CDN Providers,"Cloudflare, AS13335"
+Providers,DNS Providers,Cloudflare
 Providers,Hosting Providers,None
 Providers,Cloud Providers,None
 Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
