@@ -167,13 +167,25 @@ class ProviderDetector:
                 'Upgrade-Insecure-Requests': '1'
             }
             
-            response = requests.get(
-                url,
-                headers=headers,
-                timeout=self.settings.http_timeout,
-                allow_redirects=True,
-                verify=True
-            )
+            # First attempt with full timeout
+            try:
+                response = requests.get(
+                    url,
+                    headers=headers,
+                    timeout=self.settings.http_timeout,
+                    allow_redirects=True,
+                    verify=True
+                )
+            except (requests.ConnectionError, requests.Timeout, requests.exceptions.SSLError) as e:
+                # Fallback: try with reduced timeout and verify=False for SSL issues
+                self.logger.warning(f"First attempt failed for {url}, trying fallback: {e}")
+                response = requests.get(
+                    url,
+                    headers=headers,
+                    timeout=10,  # Shorter timeout for fallback
+                    allow_redirects=True,
+                    verify=False  # Skip SSL verification for problematic sites
+                )
             
             # Format headers for analysis
             header_lines = [f"{key}: {value}" for key, value in response.headers.items()]
@@ -215,7 +227,8 @@ class ProviderDetector:
             if cached_result:
                 return cached_result
             
-            # Resolve IP
+            # Resolve IP with timeout handling
+            socket.setdefaulttimeout(self.settings.dns_timeout)
             ip = socket.gethostbyname(hostname)
             
             # Cache result

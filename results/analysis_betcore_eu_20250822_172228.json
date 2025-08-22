@@ -1,0 +1,672 @@
+{
+  "analysis_metadata": {
+    "domain": "betcore.eu",
+    "ip_address": null,
+    "analysis_timestamp": "2025-08-22 17:22:21 UTC",
+    "analysis_version": "Provider Discovery Tool v3.0",
+    "enhanced_confidence": 100,
+    "total_analysis_steps": 8,
+    "backend_save_timestamp": "20250822_172228"
+  },
+  "detection_results": {
+    "primary_provider": "Google",
+    "cdn_providers": [
+      "Fastly"
+    ],
+    "dns_providers": [],
+    "hosting_providers": null,
+    "cloud_providers": null,
+    "security_providers": null
+  },
+  "step_by_step_analysis": {
+    "step_1_base_detection": {
+      "status": "completed",
+      "step_name": "Base Provider Detection",
+      "findings": [
+        "Detected 2 providers"
+      ],
+      "confidence_impact": 15,
+      "methods": [
+        "HTTP Headers",
+        "IP Ranges",
+        "WHOIS",
+        "DNS Resolution"
+      ]
+    },
+    "step_2_ssl_analysis": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_3_enhanced_dns": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_4_geographic_intel": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_5_bgp_analysis": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_6_advanced_bgp_classification": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_7_threat_intelligence": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_8_cross_validation": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    }
+  },
+  "enhanced_analysis_details": {
+    "ssl_analysis": {
+      "domain": "betcore.eu",
+      "certificate_info": {
+        "subject_cn": "betcore.eu",
+        "subject_org": "",
+        "issuer_cn": "R11",
+        "issuer_org": "Let's Encrypt",
+        "not_before": "2025-07-30T03:30:26",
+        "not_after": "2025-10-28T03:30:25",
+        "days_until_expiry": 66,
+        "is_expired": false,
+        "is_expiring_soon": false,
+        "subject_alt_names": [
+          "betcore.eu",
+          "www.betcore.eu"
+        ],
+        "serial_number": "05197432AB7264D022675BA028C309D82796",
+        "version": 3,
+        "ca_info": {
+          "ca_name": "lets_encrypt",
+          "ca_type": "Free CA",
+          "provider_hints": [
+            "Self-managed",
+            "Cloud-native"
+          ],
+          "automation_level": "High",
+          "issuer_cn": "r11",
+          "issuer_org": "let's encrypt"
+        },
+        "hosting_hints": {
+          "detected_providers": [],
+          "total_domains": 3,
+          "wildcard_domains": [],
+          "subdomain_patterns": {}
+        },
+        "wildcard_cert": false,
+        "multi_domain_cert": true,
+        "cipher_suite": "TLS_AES_128_GCM_SHA256",
+        "protocol_version": "TLSv1.3",
+        "domain": "betcore.eu",
+        "port": 443,
+        "connection_successful": true
+      },
+      "provider_analysis": {
+        "certificate_authority": "lets_encrypt",
+        "ca_type": "Free CA",
+        "automation_level": "High",
+        "detected_hosting_providers": [],
+        "infrastructure_hints": [
+          "Multi-domain certificate (shared hosting or CDN)",
+          "Let's Encrypt (automated, likely cloud-native)"
+        ]
+      },
+      "security_assessment": {
+        "security_score": 100,
+        "security_grade": "A",
+        "issues": [],
+        "recommendations": [],
+        "protocol_version": "TLSv1.3",
+        "cipher_suite": "TLS_AES_128_GCM_SHA256",
+        "certificate_valid": true
+      },
+      "data_source": "ssl_analysis"
+    },
+    "enhanced_dns": {
+      "multi_resolver": {
+        "domain": "betcore.eu",
+        "record_types": {
+          "A": {
+            "domain": "betcore.eu",
+            "record_type": "A",
+            "resolver_results": {
+              "system": {
+                "success": true,
+                "records": [
+                  "185.230.63.186"
+                ],
+                "response_time": 0.0009260177612304688
+              }
+            },
+            "consensus": {
+              "agreed_records": [
+                "185.230.63.186"
+              ],
+              "consensus_score": 1.0
+            }
+          }
+        },
+        "resolver_reliability": {
+          "system": "available"
+        },
+        "dns_security": {
+          "status": "basic_check_completed"
+        },
+        "performance_metrics": {
+          "avg_response_time": 0.1
+        },
+        "anomalies": []
+      },
+      "doh_analysis": {
+        "success": true,
+        "records": [
+          "185.230.63.171",
+          "185.230.63.107",
+          "185.230.63.186"
+        ],
+        "response_time": false,
+        "authoritative": false,
+        "recursion_desired": true,
+        "recursion_available": true
+      },
+      "cross_validation": {
+        "domain_resolves": true,
+        "resolved_ip": "185.230.63.186",
+        "validation_status": "success"
+      }
+    },
+    "geographic_intelligence": {
+      "ip": "185.230.63.186",
+      "provider_results": {
+        "ipapi_com": {
+          "success": true,
+          "country": "United States",
+          "country_code": "US",
+          "region": "Virginia",
+          "city": "Ashburn",
+          "latitude": 39.018,
+          "longitude": -77.539,
+          "timezone": "America/New_York",
+          "isp": "wix com inc",
+          "organization": "Wix Com Inc",
+          "asn": "58182",
+          "asn_name": "Wix.com Ltd.",
+          "ip": "185.230.63.186",
+          "provider": "ipapi_com",
+          "raw_response": {
+            "status": "success",
+            "country": "United States",
+            "countryCode": "US",
+            "region": "VA",
+            "regionName": "Virginia",
+            "city": "Ashburn",
+            "lat": 39.018,
+            "lon": -77.539,
+            "timezone": "America/New_York",
+            "isp": "wix com inc",
+            "org": "Wix Com Inc",
+            "as": "AS58182 Wix.com Ltd.",
+            "query": "185.230.63.186"
+          }
+        },
+        "geojs_io": {
+          "success": true,
+          "country": "United States",
+          "country_code": "US",
+          "region": "Virginia",
+          "city": "Ashburn",
+          "latitude": "39.018",
+          "longitude": "-77.539",
+          "timezone": "America/New_York",
+          "isp": null,
+          "organization": "Wix.com Ltd.",
+          "asn": null,
+          "asn_name": null,
+          "ip": "185.230.63.186",
+          "provider": "geojs_io",
+          "raw_response": {
+            "continent_code": "NA",
+            "region": "Virginia",
+            "latitude": "39.018",
+            "longitude": "-77.539",
+            "accuracy": 20,
+            "country_code": "US",
+            "timezone": "America/New_York",
+            "asn": 58182,
+            "organization": "AS58182 Wix.com Ltd.",
+            "ip": "185.230.63.186",
+            "city": "Ashburn",
+            "area_code": "0",
+            "organization_name": "Wix.com Ltd.",
+            "country": "United States",
+            "country_code3": "USA"
+          }
+        }
+      },
+      "consensus": {
+        "consensus_reached": true,
+        "consensus_data": {
+          "country": "United States",
+          "country_code": "US",
+          "region": "Virginia",
+          "city": "Ashburn",
+          "isp": "wix com inc",
+          "organization": "Wix Com Inc",
+          "asn": "58182"
+        },
+        "consensus_strength": {
+          "country": 1.0,
+          "country_code": 1.0,
+          "region": 1.0,
+          "city": 1.0,
+          "isp": 1.0,
+          "organization": 0.5,
+          "asn": 1.0
+        },
+        "successful_providers": 2,
+        "total_providers": 2
+      },
+      "confidence_score": 100
+    },
+    "bgp_analysis": {
+      "ip": "185.230.63.186",
+      "asn": 0,
+      "asn_name": "",
+      "asn_description": "",
+      "country_code": "",
+      "registry": "RIPE",
+      "prefixes": [
+        {
+          "prefix": "185.230.63.0/24",
+          "ip": "185.230.63.0",
+          "cidr": 24,
+          "asn": {
+            "asn": 58182,
+            "name": "wix_com",
+            "description": "Wix.com Ltd.",
+            "country_code": "IL"
+          },
+          "name": "wix_com_inc",
+          "description": "wix_com_inc",
+          "country_code": "US"
+        }
+      ],
+      "data_source": "bgpview"
+    },
+    "hurricane_electric_bgp": {
+      "target": "185.230.63.186",
+      "target_type": "ip",
+      "ip_analysis": {
+        "ip": "185.230.63.186",
+        "asn": 58182,
+        "asn_name": "AS58182",
+        "prefix": "185.230.63.0/24",
+        "country": null,
+        "registry": null,
+        "allocation_date": null,
+        "description": null,
+        "organization": null,
+        "raw_data": {},
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/ip/185.230.63.186"
+      },
+      "asn_analysis": {
+        "asn": 58182,
+        "name": "Wix.com Ltd.",
+        "description": null,
+        "country": null,
+        "organization": null,
+        "website": null,
+        "email": null,
+        "phone": null,
+        "prefixes_v4": [
+          "185.230.60.0/24",
+          "199.15.163.0/24",
+          "185.230.62.0/24",
+          "199.15.160.0/24",
+          "185.230.63.0/24"
+        ],
+        "prefixes_v6": [],
+        "peers": [
+          {
+            "asn": 1299,
+            "name": "AS1299",
+            "relationship": "peer"
+          },
+          {
+            "asn": 1299,
+            "name": "Arelion Sweden AB",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "Level 3 Parent, LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2914,
+            "name": "AS2914",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2914,
+            "name": "NTT America, Inc.",
+            "relationship": "peer"
+          },
+          {
+            "asn": 1299,
+            "name": "AS1299",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2914,
+            "name": "AS2914",
+            "relationship": "peer"
+          },
+          {
+            "asn": 1299,
+            "name": "AS1299",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2914,
+            "name": "AS2914",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2914,
+            "name": "AS2914",
+            "relationship": "peer"
+          },
+          {
+            "asn": 1299,
+            "name": "AS1299",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          }
+        ],
+        "upstreams": [],
+        "downstreams": [],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/AS58182"
+      },
+      "prefix_analysis": {
+        "prefix": "185.230.63.0/24",
+        "asn": 58182,
+        "asn_name": "AS58182",
+        "description": null,
+        "country": null,
+        "registry": "Status",
+        "allocation_date": null,
+        "more_specific_routes": [],
+        "less_specific_routes": [
+          "185.230.60.0/22"
+        ],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/net/185.230.63.0/24"
+      },
+      "routing_insights": {
+        "routing_security": "unknown",
+        "prefix_specificity": "high",
+        "peering_diversity": "high",
+        "geographic_presence": "unknown",
+        "recommendations": []
+      },
+      "provider_classification": {
+        "provider_type": "unknown",
+        "provider_name": "Wix.com Ltd.",
+        "confidence": 0,
+        "indicators": []
+      }
+    },
+    "threat_intelligence": {
+      "domain": "betcore.eu",
+      "domain_analysis": {
+        "domain": "betcore.eu",
+        "reputation_score": 35,
+        "threat_level": "critical",
+        "security_analysis": {
+          "urlvoid": {
+            "success": true,
+            "source": "urlvoid",
+            "data": {
+              "malicious_detections": 1,
+              "safety_indicators": [
+                "malware_detected"
+              ],
+              "risk_level": "high"
+            }
+          },
+          "safe_browsing": {
+            "success": true,
+            "source": "basic_dns_check",
+            "data": {
+              "dns_resolves": true,
+              "risk_assessment": "low",
+              "confidence": "low"
+            }
+          },
+          "dns_indicators": {
+            "mx_records": [
+              "betcore-eu.mail.protection.outlook.com"
+            ],
+            "txt_records": [
+              "v=spf1 include:spf.protection.outlook.com -all",
+              "rm_verify=8ed46032d2",
+              "atlassian-domain-verification=HhFWC0DE4Zd/D0Fy3S8MpCsYKr08QQTGRwGwHyFPvG//GTu9RBomzaLPkaY3IGFI",
+              "MS=ms54854936"
+            ],
+            "security_policies": {
+              "spf": true
+            },
+            "suspicious_patterns": []
+          }
+        },
+        "pattern_analysis": {
+          "suspicious_indicators": [],
+          "risk_factors": [],
+          "domain_age_estimate": "unknown",
+          "structure_analysis": {
+            "total_length": 10,
+            "subdomain_count": 0,
+            "has_numbers": false,
+            "has_hyphens": false,
+            "entropy": 2.52
+          }
+        },
+        "recommendations": [
+          "⚠️ CRITICAL: Avoid accessing this domain",
+          "🛡️ Block domain in firewall/DNS filter",
+          "🔐 Consider DMARC policy for email protection"
+        ]
+      },
+      "ip_analyses": {
+        "185.230.63.107": {
+          "ip": "185.230.63.107",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United States",
+            "isp": "wix com inc"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        },
+        "185.230.63.186": {
+          "ip": "185.230.63.186",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United States",
+            "isp": "wix com inc"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        },
+        "185.230.63.171": {
+          "ip": "185.230.63.171",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United States",
+            "isp": "wix com inc"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        }
+      },
+      "overall_threat_level": "high",
+      "security_recommendations": [
+        "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+        "⚠️ CRITICAL: Avoid accessing this domain",
+        "🛡️ Block domain in firewall/DNS filter",
+        "🔐 Consider DMARC policy for email protection"
+      ],
+      "confidence_score": 100
+    },
+    "cross_validation": {
+      "provider_consensus": {
+        "wix com inc": {
+          "sources": [
+            "Geographic Intelligence (ISP)",
+            "Geographic Intelligence (Org)"
+          ],
+          "confidence_boost": 20
+        }
+      },
+      "confidence_boosters": [
+        "Wix Com Inc confirmed by 2 sources: Geographic Intelligence (ISP), Geographic Intelligence (Org)"
+      ],
+      "conflicting_data": [],
+      "validation_score": 30
+    },
+    "security_assessment": {},
+    "advanced_bgp_classification": {
+      "asn": 58182,
+      "ip": "185.230.63.186",
+      "classification": "END_CUSTOMER",
+      "confidence": 0.7666666666666666,
+      "evidence": [
+        "minimal_infrastructure_customer_pattern",
+        "ml_enhanced",
+        "customer_name_pattern_wix_com - wix.com ltd.",
+        "small_prefix_count_0",
+        "limited_infrastructure_customer"
+      ],
+      "data_sources": [
+        "ripe_stat",
+        "peeringdb",
+        "bgpview"
+      ],
+      "business_type": null,
+      "customer_indicators": [],
+      "provider_indicators": [],
+      "vote_distribution": {
+        "END_CUSTOMER": 2.2
+      },
+      "ml_features": {
+        "facility_count": 0,
+        "ix_count": 0,
+        "prefix_count": 0,
+        "has_provider_keywords": false,
+        "has_customer_keywords": true,
+        "peering_policy_score": 0,
+        "data_sources_count": 3
+      },
+      "enhancement": "ml_boosted_confidence"
+    }
+  },
+  "security_findings": [
+    "Threat Level: high (confidence: 100%)",
+    "Domain Reputation: 35/100",
+    "Security policies detected: 1",
+    "IP Reputation: 50/100",
+    "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+    "⚠️ CRITICAL: Avoid accessing this domain",
+    "🛡️ Block domain in firewall/DNS filter"
+  ],
+  "geographic_insights": [
+    "Location: Ashburn, United States (confidence: 100%)",
+    "ISP: wix com inc",
+    "Organization: Wix Com Inc"
+  ],
+  "bgp_insights": [
+    "HE BGP: AS58182 - Wix.com Ltd.",
+    "BGP Peers: 15",
+    "IPv4 Prefixes: 5",
+    "Peering Diversity: high"
+  ],
+  "recommendations": [
+    "⚠️ High security risk detected - review domain carefully",
+    "🎯 High confidence detection - results highly reliable"
+  ],
+  "technical_details": {
+    "confidence_factors": [
+      "HTTP header analysis identified 2 providers"
+    ],
+    "enhanced_confidence_factors": [
+      "DoH (DNS over HTTPS) analysis completed",
+      "BGP analysis completed with 4 insights",
+      "ASN classified as end customer - not a hosting provider",
+      "DNS security policies found: ['spf']",
+      "Wix Com Inc confirmed by 2 sources: Geographic Intelligence (ISP), Geographic Intelligence (Org)"
+    ],
+    "analysis_methods": [
+      "HTTP Headers",
+      "SSL Certificate Analysis",
+      "Enhanced DNS Analysis",
+      "Geographic Intelligence",
+      "Dual BGP Analysis",
+      "Advanced BGP Customer Classification",
+      "Threat Intelligence"
+    ],
+    "dns_chain": null,
+    "whois_data": null
+  }
+}

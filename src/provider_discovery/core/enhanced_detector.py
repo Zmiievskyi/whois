@@ -24,7 +24,8 @@ from ..integrations import (
     GEO_INTEGRATION_AVAILABLE, get_geo_intelligence_integration,
     BGP_INTEGRATION_AVAILABLE, get_bgp_analysis_integration,
     THREAT_INTEGRATION_AVAILABLE, get_threat_intelligence_integration,
-    HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE, get_hurricane_electric_integration
+    HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE, get_hurricane_electric_integration,
+    ADVANCED_BGP_CLASSIFIER_AVAILABLE, get_advanced_bgp_classifier
 )
 
 logger = logging.getLogger(__name__)
@@ -59,6 +60,7 @@ class EnhancedProviderDetector(ProviderDetector):
         self.bgp_analyzer = None
         self.hurricane_electric = None
         self.threat_intel = None
+        self.advanced_bgp_classifier = None
         
         # Initialize available integrations
         self._initialize_free_integrations()
@@ -116,6 +118,14 @@ class EnhancedProviderDetector(ProviderDetector):
                 logger.info("✅ Threat Intelligence integration loaded")
             except Exception as e:
                 logger.warning(f"⚠️ Threat intelligence integration failed: {e}")
+        
+        # Advanced BGP Classifier
+        if ADVANCED_BGP_CLASSIFIER_AVAILABLE:
+            try:
+                self.advanced_bgp_classifier = get_advanced_bgp_classifier()
+                logger.info("✅ Advanced BGP Classifier integration loaded")
+            except Exception as e:
+                logger.warning(f"⚠️ Advanced BGP Classifier integration failed: {e}")
     
     def _get_available_enhancements(self) -> List[str]:
         """Get list of available enhancements"""
@@ -126,6 +136,7 @@ class EnhancedProviderDetector(ProviderDetector):
         if self.bgp_analyzer: enhancements.append("BGP Analysis")
         if self.hurricane_electric: enhancements.append("Hurricane Electric BGP")
         if self.threat_intel: enhancements.append("Threat Intelligence")
+        if self.advanced_bgp_classifier: enhancements.append("Advanced BGP Classifier")
         return enhancements
     
     def detect_provider_comprehensive(self, headers: str, ip: str, whois_data: str, domain: str) -> Dict[str, Any]:
@@ -143,10 +154,46 @@ class EnhancedProviderDetector(ProviderDetector):
         """
         logger.info(f"🔍 Starting comprehensive analysis for domain: {domain}")
         
+        # Add analysis timestamp
+        from datetime import datetime
+        analysis_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+        
         # Start with original enhanced detection
-        logger.info(f"📊 Step 1/7: Running base provider detection...")
+        logger.info(f"📊 Step 1/8: Running base provider detection...")
         result = self.detect_provider_ultimate_with_virustotal(headers, ip, whois_data, domain)
-        logger.info(f"✅ Step 1/7: Base detection completed")
+        
+        # Ensure URL field is set
+        if not result.get('URL') and domain:
+            result['URL'] = domain
+            
+        logger.info(f"✅ Step 1/8: Base detection completed")
+        
+        # Initialize step-by-step analysis report
+        result['analysis_steps_report'] = {
+            'step_1_base_detection': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_2_ssl_analysis': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_3_enhanced_dns': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_4_geographic_intel': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_5_bgp_analysis': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_6_advanced_bgp_classification': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_7_threat_intelligence': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_8_cross_validation': {'status': 'pending', 'findings': [], 'confidence_impact': 0}
+        }
+        
+        # Record Step 1 results
+        step_1_findings = []
+        if result.get('providers'):
+            step_1_findings.append(f"Detected {len(result['providers'])} providers")
+            if result.get('primary_provider'):
+                step_1_findings.append(f"Primary provider: {result['primary_provider']}")
+        
+        result['analysis_steps_report']['step_1_base_detection'] = {
+            'status': 'completed',
+            'step_name': 'Base Provider Detection',
+            'findings': step_1_findings,
+            'confidence_impact': 15,  # Base detection provides foundation
+            'methods': ['HTTP Headers', 'IP Ranges', 'WHOIS', 'DNS Resolution']
+        }
         
         # Initialize comprehensive analysis sections
         result['Enhanced_Analysis'] = {
@@ -166,40 +213,46 @@ class EnhancedProviderDetector(ProviderDetector):
         result['geographic_insights'] = []
         result['bgp_insights'] = []
         
-        # Layer 1: SSL Certificate Analysis
+        # Layer 2: SSL Certificate Analysis
         if self.ssl_analyzer:
-            logger.info(f"📊 Step 2/7: Running SSL certificate analysis...")
+            logger.info(f"📊 Step 2/8: Running SSL certificate analysis...")
             result = self._enhance_with_ssl_analysis(result, domain)
-            logger.info(f"✅ Step 2/7: SSL analysis completed")
+            logger.info(f"✅ Step 2/8: SSL analysis completed")
         
-        # Layer 2: Enhanced DNS Analysis
+        # Layer 3: Enhanced DNS Analysis
         if self.enhanced_dns:
-            logger.info(f"📊 Step 3/7: Running enhanced DNS analysis...")
+            logger.info(f"📊 Step 3/8: Running enhanced DNS analysis...")
             result = self._enhance_with_enhanced_dns(result, domain)
-            logger.info(f"✅ Step 3/7: DNS analysis completed")
+            logger.info(f"✅ Step 3/8: DNS analysis completed")
         
-        # Layer 3: Geographic Intelligence
+        # Layer 4: Geographic Intelligence
         if self.geo_intel and ip and 'failed' not in ip:
-            logger.info(f"📊 Step 4/7: Running geographic intelligence analysis...")
+            logger.info(f"📊 Step 4/8: Running geographic intelligence analysis...")
             result = self._enhance_with_geographic_intelligence(result, ip)
-            logger.info(f"✅ Step 4/7: Geographic analysis completed")
+            logger.info(f"✅ Step 4/8: Geographic analysis completed")
         
-        # Layer 4: BGP Analysis (dual sources)
+        # Layer 5: BGP Analysis (dual sources)
         if ip and 'failed' not in ip:
-            logger.info(f"📊 Step 5/7: Running BGP analysis...")
+            logger.info(f"📊 Step 5/8: Running BGP analysis...")
             result = self._enhance_with_bgp_analysis(result, ip)
-            logger.info(f"✅ Step 5/7: BGP analysis completed")
+            logger.info(f"✅ Step 5/8: BGP analysis completed")
         
-        # Layer 5: Threat Intelligence Assessment
+        # Layer 6: Advanced BGP Customer Classification
+        if self.advanced_bgp_classifier and ip and 'failed' not in ip:
+            logger.info(f"📊 Step 6/8: Running advanced BGP customer classification...")
+            result = self._enhance_with_advanced_bgp_classification(result, ip)
+            logger.info(f"✅ Step 6/8: Advanced BGP classification completed")
+        
+        # Layer 7: Threat Intelligence Assessment
         if self.threat_intel:
-            logger.info(f"📊 Step 6/7: Running threat intelligence analysis...")
+            logger.info(f"📊 Step 7/8: Running threat intelligence analysis...")
             result = self._enhance_with_threat_intelligence(result, domain, ip)
-            logger.info(f"✅ Step 6/7: Threat intelligence analysis completed")
+            logger.info(f"✅ Step 7/8: Threat intelligence analysis completed")
         
-        # Layer 6: Cross-validation and confidence enhancement
-        logger.info(f"📊 Step 7/7: Running cross-validation and final calculations...")
+        # Layer 8: Cross-validation and confidence enhancement
+        logger.info(f"📊 Step 8/8: Running cross-validation and final calculations...")
         result = self._perform_cross_validation(result)
-        logger.info(f"✅ Step 7/7: Cross-validation completed")
+        logger.info(f"✅ Step 8/8: Cross-validation completed")
         
         # Organize providers by role and determine primary provider
         if result.get('providers'):
@@ -213,8 +266,17 @@ class EnhancedProviderDetector(ProviderDetector):
         if 'primary_provider' not in result:
             result['primary_provider'] = result.get('Primary_Provider', 'Unknown')
         
+        # Add timestamp to result
+        result['timestamp'] = analysis_timestamp
+        
         # Generate comprehensive recommendations
         result['Recommendations'] = self._generate_comprehensive_recommendations(result)
+        
+        # Save analysis results to backend
+        self._save_analysis_to_backend(result, domain)
+        
+        # Record all step results for comprehensive report
+        self._record_all_step_results(result)
         
         logger.info(f"✅ Comprehensive analysis completed for {domain}")
         return result
@@ -522,6 +584,102 @@ class EnhancedProviderDetector(ProviderDetector):
         
         return result
     
+    def _enhance_with_advanced_bgp_classification(self, result: Dict, ip: str) -> Dict:
+        """Enhance detection with advanced BGP customer classification"""
+        try:
+            logger.debug(f"🎯 Advanced BGP customer classification for {ip}")
+            
+            # Get ASN for IP
+            asn_info = None
+            if self.bgp_analyzer:
+                basic_bgp = self.bgp_analyzer.get_ip_asn_info(ip)
+                if 'error' not in basic_bgp and 'prefixes' in basic_bgp:
+                    for prefix in basic_bgp['prefixes']:
+                        if 'asn' in prefix and 'asn' in prefix['asn']:
+                            asn_info = prefix['asn']['asn']
+                            break
+            
+            if asn_info:
+                # Run comprehensive ASN classification
+                classification_result = self.advanced_bgp_classifier.classify_asn_comprehensive(asn_info, ip)
+                result['Enhanced_Analysis']['advanced_bgp_classification'] = classification_result
+                
+                if 'error' not in classification_result:
+                    classification = classification_result.get('classification', 'UNKNOWN')
+                    confidence = classification_result.get('confidence', 0.0)
+                    evidence = classification_result.get('evidence', [])
+                    data_sources = classification_result.get('data_sources', [])
+                    
+                    # Update confidence factors
+                    if confidence > 0.8:
+                        result['enhanced_confidence_factors'].append(
+                            f"Advanced BGP classification: {classification} ({confidence:.1%} confidence)"
+                        )
+                    
+                    # Add customer classification insights
+                    classification_insights = []
+                    classification_insights.append(f"Customer Type: {classification}")
+                    classification_insights.append(f"Classification Confidence: {confidence:.1%}")
+                    classification_insights.append(f"Data Sources: {', '.join(data_sources)}")
+                    
+                    if evidence:
+                        top_evidence = evidence[:2]  # Top 2 pieces of evidence
+                        classification_insights.append(f"Key Evidence: {', '.join(top_evidence)}")
+                    
+                    # Store insights
+                    result['bgp_customer_insights'] = classification_insights
+                    
+                    # Adjust provider classification based on customer type
+                    if classification in ['END_CUSTOMER', 'ENTERPRISE_CUSTOMER']:
+                        # This suggests the IP belongs to an end customer, not hosting provider
+                        result['enhanced_confidence_factors'].append(
+                            "ASN classified as end customer - not a hosting provider"
+                        )
+                    elif classification in ['HOSTING_PROVIDER', 'CLOUD_PROVIDER', 'CDN_PROVIDER']:
+                        # Confirms this is a service provider
+                        result['enhanced_confidence_factors'].append(
+                            f"ASN confirmed as {classification.lower().replace('_', ' ')}"
+                        )
+                        
+                        # Add provider role
+                        provider_role = 'Hosting Provider'
+                        if 'CDN' in classification:
+                            provider_role = 'CDN'
+                        elif 'CLOUD' in classification:
+                            provider_role = 'Cloud Provider'
+                        
+                        # Update existing providers or add new one
+                        updated_existing = False
+                        for provider in result.get('providers', []):
+                            if provider.get('source') == 'BGP Analysis':
+                                provider['role'] = provider_role
+                                provider['confidence'] = 'High' if confidence > 0.85 else 'Medium'
+                                updated_existing = True
+                                break
+                        
+                        if not updated_existing:
+                            result.setdefault('providers', []).append({
+                                'name': f"AS{asn_info}",
+                                'role': provider_role,
+                                'confidence': 'High' if confidence > 0.85 else 'Medium',
+                                'source': 'Advanced BGP Classification',
+                                'evidence': f"{classification} with {confidence:.1%} confidence"
+                            })
+                    
+                    result['analysis_methods'].append('Advanced BGP Customer Classification')
+                    
+            else:
+                logger.debug("No ASN found for advanced BGP classification")
+                result['Enhanced_Analysis']['advanced_bgp_classification'] = {
+                    'error': 'No ASN information available'
+                }
+            
+        except Exception as e:
+            logger.error(f"Advanced BGP classification failed for {ip}: {e}")
+            result['Enhanced_Analysis']['advanced_bgp_classification'] = {'error': str(e)}
+        
+        return result
+    
     def _enhance_with_threat_intelligence(self, result: Dict, domain: str, ip: str) -> Dict:
         """Enhance detection with threat intelligence and security assessment"""
         try:
@@ -822,6 +980,299 @@ class EnhancedProviderDetector(ProviderDetector):
                 test_results['integration_status']['threat_intelligence'] = {'error': str(e)}
         
         return test_results
+    
+    def _record_all_step_results(self, result: Dict) -> None:
+        """Record results for all analysis steps"""
+        
+        # Initialize analysis_steps_report if not exists
+        if 'analysis_steps_report' not in result:
+            result['analysis_steps_report'] = {}
+        
+        # Step 2: SSL Analysis
+        if 'ssl_analysis' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_2_ssl_analysis', 'SSL Certificate Analysis', 
+                                    'ssl_analysis', ['Certificate Authority Detection', 'Security Grading'])
+        
+        # Step 3: Enhanced DNS
+        if 'enhanced_dns' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_3_enhanced_dns', 'Enhanced DNS Analysis', 
+                                    'enhanced_dns', ['Multi-Resolver DNS', 'DoH Validation'])
+        
+        # Step 4: Geographic Intelligence
+        if 'geographic_intelligence' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_4_geographic_intel', 'Geographic Intelligence', 
+                                    'geographic_intelligence', ['IP Geolocation', 'Provider Classification'])
+        
+        # Step 5: BGP Analysis
+        if 'bgp_analysis' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_5_bgp_analysis', 'BGP Analysis', 
+                                    'bgp_analysis', ['ASN Lookup', 'Routing Analysis'])
+        
+        # Step 6: Advanced BGP Classification
+        if 'advanced_bgp_classification' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_6_advanced_bgp_classification', 'Advanced BGP Classification', 
+                                    'advanced_bgp_classification', ['Customer Type Detection', 'ML Enhancement'])
+        
+        # Step 7: Threat Intelligence
+        if 'threat_intelligence' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_7_threat_intelligence', 'Threat Intelligence', 
+                                    'threat_intelligence', ['Security Assessment', 'Reputation Analysis'])
+        
+        # Step 8: Cross-validation (always runs)
+        cross_validation_findings = []
+        total_confidence = result.get('Enhanced_Confidence', 0)
+        if total_confidence:
+            cross_validation_findings.append(f"Final Confidence Score: {total_confidence}%")
+        
+        provider_consensus = len(result.get('providers', []))
+        if provider_consensus:
+            cross_validation_findings.append(f"Provider Consensus: {provider_consensus} sources")
+        
+        result['analysis_steps_report']['step_8_cross_validation'] = {
+            'status': 'completed',
+            'step_name': 'Cross-Validation & Final Analysis',
+            'findings': cross_validation_findings,
+            'confidence_impact': 10,
+            'methods': ['Multi-Source Validation', 'Confidence Scoring', 'Provider Consensus']
+        }
+    
+    def _record_step_results(self, result: Dict, step_key: str, step_name: str, analysis_key: str, methods: List[str]) -> None:
+        """Record results for a specific analysis step"""
+        
+        # Initialize analysis_steps_report if not exists
+        if 'analysis_steps_report' not in result:
+            result['analysis_steps_report'] = {}
+            
+        findings = []
+        confidence_impact = 0
+        status = 'skipped'
+        
+        # Check if this step was executed
+        if analysis_key in result.get('Enhanced_Analysis', {}):
+            step_data = result['Enhanced_Analysis'][analysis_key]
+            
+            if 'error' in step_data:
+                status = 'failed'
+                findings.append(f"Error: {step_data['error']}")
+            else:
+                status = 'completed'
+                
+                # Extract findings based on step type
+                if step_key == 'step_2_ssl_analysis':
+                    if 'security_assessment' in step_data:
+                        grade = step_data['security_assessment'].get('overall_grade', 'Unknown')
+                        findings.append(f"SSL Grade: {grade}")
+                        confidence_impact = 10 if grade in ['A', 'A+'] else 5
+                    if 'certificate_authority' in step_data:
+                        findings.append(f"CA: {step_data['certificate_authority']}")
+                        
+                elif step_key == 'step_3_enhanced_dns':
+                    if 'dns_providers' in step_data:
+                        dns_providers = step_data['dns_providers']
+                        findings.append(f"DNS Providers: {', '.join(dns_providers) if dns_providers else 'None detected'}")
+                        confidence_impact = 8
+                        
+                elif step_key == 'step_4_geographic_intel':
+                    if 'location_data' in step_data:
+                        location = step_data['location_data']
+                        if location.get('country'):
+                            findings.append(f"Location: {location.get('country')}")
+                            confidence_impact = 5
+                    if 'provider_classification' in step_data:
+                        provider_type = step_data['provider_classification'].get('provider_type', 'Unknown')
+                        findings.append(f"Provider Type: {provider_type}")
+                        
+                elif step_key == 'step_5_bgp_analysis':
+                    if 'asn_info' in step_data:
+                        asn_info = step_data['asn_info']
+                        if asn_info.get('asn'):
+                            findings.append(f"ASN: AS{asn_info['asn']} ({asn_info.get('name', 'Unknown')})")
+                            confidence_impact = 12
+                            
+                elif step_key == 'step_6_advanced_bgp_classification':
+                    if 'classification' in step_data:
+                        classification = step_data.get('classification', 'Unknown')
+                        confidence = step_data.get('confidence', 0)
+                        findings.append(f"Customer Type: {classification} ({confidence:.1%} confidence)")
+                        confidence_impact = int(confidence * 20)  # Scale confidence to impact
+                        
+                elif step_key == 'step_7_threat_intelligence':
+                    if 'overall_threat_level' in step_data:
+                        threat_level = step_data['overall_threat_level']
+                        findings.append(f"Threat Level: {threat_level}")
+                        confidence_impact = 5 if threat_level == 'low' else 0
+        
+        # Record the step results
+        result['analysis_steps_report'][step_key] = {
+            'status': status,
+            'step_name': step_name,
+            'findings': findings,
+            'confidence_impact': confidence_impact,
+            'methods': methods
+        }
+    
+    def _save_analysis_to_backend(self, result: Dict, domain: str) -> None:
+        """Save complete analysis results to backend results folder"""
+        import json
+        import os
+        from datetime import datetime
+        
+        try:
+            # Create results directory if it doesn't exist
+            results_dir = os.path.join(os.getcwd(), 'results')
+            os.makedirs(results_dir, exist_ok=True)
+            
+            # Generate safe filename
+            safe_domain = domain.replace('.', '_').replace('/', '_').replace(':', '_')
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # Prepare comprehensive data for backend storage
+            backend_data = {
+                "analysis_metadata": {
+                    "domain": result.get('URL', domain),
+                    "ip_address": result.get('IP_Address'),
+                    "analysis_timestamp": result.get('timestamp'),
+                    "analysis_version": "Provider Discovery Tool v3.0",
+                    "enhanced_confidence": result.get('Enhanced_Confidence'),
+                    "total_analysis_steps": len(result.get('analysis_steps_report', {})),
+                    "backend_save_timestamp": timestamp
+                },
+                "detection_results": {
+                    "primary_provider": result.get('Primary_Provider'),
+                    "cdn_providers": result.get('CDN_Providers'),
+                    "dns_providers": result.get('DNS_Providers'), 
+                    "hosting_providers": result.get('Hosting_Providers'),
+                    "cloud_providers": result.get('Cloud_Providers'),
+                    "security_providers": result.get('Security_Providers')
+                },
+                "step_by_step_analysis": result.get('analysis_steps_report', {}),
+                "enhanced_analysis_details": result.get('Enhanced_Analysis', {}),
+                "security_findings": result.get('security_findings', []),
+                "geographic_insights": result.get('geographic_insights', []),
+                "bgp_insights": result.get('bgp_insights', []),
+                "recommendations": result.get('Recommendations', []),
+                "technical_details": {
+                    "confidence_factors": result.get('confidence_factors', []),
+                    "enhanced_confidence_factors": result.get('enhanced_confidence_factors', []),
+                    "analysis_methods": result.get('analysis_methods', []),
+                    "dns_chain": result.get('dns_chain'),
+                    "whois_data": result.get('whois_data')
+                }
+            }
+            
+            # Save as JSON
+            json_filename = f"analysis_{safe_domain}_{timestamp}.json"
+            json_filepath = os.path.join(results_dir, json_filename)
+            
+            with open(json_filepath, 'w', encoding='utf-8') as f:
+                json.dump(backend_data, f, indent=2, ensure_ascii=False)
+            
+            # Also save a simplified summary CSV for easy review
+            csv_filename = f"summary_{safe_domain}_{timestamp}.csv"
+            csv_filepath = os.path.join(results_dir, csv_filename)
+            
+            # Create CSV summary
+            import csv
+            with open(csv_filepath, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Category', 'Key', 'Value'])
+                
+                # Basic info
+                writer.writerow(['Domain', 'URL', result.get('URL', domain)])
+                writer.writerow(['Network', 'IP_Address', result.get('IP_Address', 'N/A')])
+                
+                # Fix confidence display
+                confidence_value = result.get('Enhanced_Confidence', 0)
+                if isinstance(confidence_value, (int, float)):
+                    confidence_display = f"{confidence_value}%"
+                else:
+                    confidence_display = str(confidence_value)
+                writer.writerow(['Confidence', 'Enhanced_Confidence', confidence_display])
+                
+                writer.writerow(['Analysis', 'Timestamp', result.get('timestamp', 'N/A')])
+                
+                # Provider results
+                provider_categories = {
+                    'Primary_Provider': 'Primary Provider',
+                    'CDN_Providers': 'CDN Providers',
+                    'DNS_Providers': 'DNS Providers',
+                    'Hosting_Providers': 'Hosting Providers',
+                    'Cloud_Providers': 'Cloud Providers'
+                }
+                
+                for key, category in provider_categories.items():
+                    value = result.get(key, 'None')
+                    if isinstance(value, list):
+                        # Remove duplicates and join
+                        unique_values = list(dict.fromkeys([str(v) for v in value if v]))  # Preserve order, remove duplicates and empty values
+                        value = ', '.join(unique_values) if unique_values else 'None'
+                    elif not value or value == [] or value is None:
+                        value = 'None'
+                    # Clean value to prevent CSV formatting issues
+                    if isinstance(value, str):
+                        value = value.replace('\n', ' ').replace('\r', ' ').strip()
+                        if not value:  # If after cleaning the string is empty
+                            value = 'None'
+                    writer.writerow(['Providers', category, value])
+                
+                # Analysis steps summary
+                steps_report = result.get('analysis_steps_report', {})
+                for step_key, step_data in steps_report.items():
+                    step_name = step_data.get('step_name', step_key)
+                    status = step_data.get('status', 'unknown')
+                    confidence_impact = step_data.get('confidence_impact', 0)
+                    findings_count = len(step_data.get('findings', []))
+                    
+                    writer.writerow(['Analysis Steps', step_name, f"{status} | +{confidence_impact}% confidence | {findings_count} findings"])
+            
+            # Store file paths in result for WebUI display
+            result['backend_files'] = {
+                'json_file': json_filepath,
+                'csv_file': csv_filepath,
+                'json_filename': json_filename,
+                'csv_filename': csv_filename
+            }
+            
+            logger.info(f"✅ Analysis results saved to backend: {json_filename}, {csv_filename}")
+            
+            # Optional: Clean up old files (keep last 50 analyses)
+            self._cleanup_old_results(results_dir)
+            
+        except Exception as e:
+            logger.error(f"Failed to save analysis results to backend: {e}")
+            result['backend_files'] = None
+    
+    def _cleanup_old_results(self, results_dir: str, max_files: int = 50) -> None:
+        """Clean up old analysis files to prevent storage bloat"""
+        import os
+        try:
+            # Get all analysis JSON files
+            analysis_files = [f for f in os.listdir(results_dir) if f.startswith('analysis_') and f.endswith('.json')]
+            
+            if len(analysis_files) > max_files:
+                # Sort by modification time (oldest first)
+                analysis_files.sort(key=lambda x: os.path.getmtime(os.path.join(results_dir, x)))
+                
+                # Remove oldest files
+                files_to_remove = analysis_files[:-max_files]  # Keep last max_files
+                for filename in files_to_remove:
+                    try:
+                        json_path = os.path.join(results_dir, filename)
+                        csv_path = os.path.join(results_dir, filename.replace('analysis_', 'summary_').replace('.json', '.csv'))
+                        
+                        # Remove both JSON and CSV files
+                        if os.path.exists(json_path):
+                            os.remove(json_path)
+                        if os.path.exists(csv_path):
+                            os.remove(csv_path)
+                            
+                    except Exception as e:
+                        logger.debug(f"Failed to remove old file {filename}: {e}")
+                
+                logger.info(f"🧹 Cleaned up {len(files_to_remove)} old analysis files")
+                
+        except Exception as e:
+            logger.debug(f"Cleanup failed: {e}")
 
 # Singleton instance
 _enhanced_detector = None

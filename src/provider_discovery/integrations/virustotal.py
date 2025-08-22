@@ -136,8 +136,9 @@ class VirusTotalIntegration(HTTPIntegration):
     
     @property
     def is_enabled(self) -> bool:
-        """Check if VirusTotal integration is properly configured"""
+        """Check if VirusTotal integration is properly configured and enabled"""
         return (
+            self.settings.enable_virustotal and  # Check if VT is enabled in settings
             VT_AVAILABLE and 
             self.api_key is not None and 
             len(self.api_key.strip()) >= 64 and  # VT API keys are typically 64 chars

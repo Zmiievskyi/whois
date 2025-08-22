@@ -8,10 +8,10 @@ import subprocess
 import socket
 import re
 import ipaddress
-import io
 import time
 import os
 import sys
+import io
 from urllib.parse import urlparse
 
 # Add src to path for new modular imports
@@ -256,13 +256,35 @@ def validate_csv_structure(df):
     errors = []
     warnings = []
     
-    # Check required columns
+    # Auto-detect columns: First by name (case-insensitive), then by position
     required_columns = ['Company', 'URL']
-    missing_columns = [col for col in required_columns if col not in df.columns]
     
-    if missing_columns:
-        errors.append(f"Missing required columns: {', '.join(missing_columns)}")
+    # Method 1: Try to find columns by name (case-insensitive)
+    column_mapping = {}
+    for req_col in required_columns:
+        req_col_lower = req_col.lower()
+        for df_col in df.columns:
+            if df_col.lower() == req_col_lower:
+                column_mapping[req_col] = df_col
+                break
+    
+    # Method 2: If columns not found by name, use position-based mapping
+    if len(column_mapping) < 2 and len(df.columns) >= 2:
+        column_mapping = {
+            'Company': df.columns[0],  # First column = Company
+            'URL': df.columns[1]       # Second column = URL
+        }
+        warnings.append(f"Auto-detected columns by position: '{df.columns[0]}' → Company, '{df.columns[1]}' → URL")
+    
+    # Check if we have enough columns
+    if len(column_mapping) < 2:
+        available_cols = ', '.join(df.columns)
+        errors.append(f"Need at least 2 columns (Company, URL). Available columns: {available_cols}")
         return errors, warnings, None
+    
+    # Rename columns to standard format
+    df_renamed = df.rename(columns={v: k for k, v in column_mapping.items()})
+    df = df_renamed
     
     # Check for empty DataFrame
     if df.empty:
@@ -346,7 +368,13 @@ def validate_csv_structure(df):
 
 def detect_provider(headers, ip, whois_data, domain=""):
     """Detect provider using Enhanced Provider Detection System"""
+    # Get detector instance
+    detector = get_detector_instance()
+    
     if hasattr(detector, 'detect_provider_comprehensive'):
+        # Apply VirusTotal setting from UI
+        if 'vt_enabled' in st.session_state:
+            detector = apply_virustotal_setting(detector, st.session_state.vt_enabled)
         return detector.detect_provider_comprehensive(headers, ip, whois_data, domain)
     else:
         # Fallback to original method
@@ -356,6 +384,9 @@ def process_single_url(url, progress_callback=None):
     """Process single URL with Phase 2A enhanced DNS analysis"""
     if progress_callback:
         progress_callback(f"Analyzing {url}...")
+    
+    # Get detector instance
+    detector = get_detector_instance()
     
     # Enable logging for debugging
     import logging
@@ -407,21 +438,55 @@ def process_single_url(url, progress_callback=None):
     }
 
 # Main application
+def apply_virustotal_setting(detector, enabled):
+    """Apply VirusTotal enable/disable setting to detector"""
+    if detector and hasattr(detector, 'vt_integration') and detector.vt_integration:
+        # Temporarily override the enable_virustotal setting
+        detector.vt_integration.settings.enable_virustotal = enabled
+    return detector
+
 def main():
+    # Get detector instance
+    detector = get_detector_instance()
+    
     st.title("PROVIDER DISCOVERY TOOL v3.0")
-    st.markdown("**Multi-Layer Provider Detection - 6 Integrated Analysis Modules**")
+    
+    # Show current VirusTotal status in header
+    if 'vt_enabled' in st.session_state:
+        vt_header_status = "VirusTotal ON" if st.session_state.vt_enabled else "VirusTotal OFF"
+        module_count = "8 Modules" if st.session_state.vt_enabled else "7 Core Modules"
+    else:
+        vt_header_status = "VirusTotal AUTO"
+        module_count = "7+ Modules"
+    
+    st.markdown(f"**Multi-Layer Provider Detection - {module_count} | {vt_header_status}**")
     
     # Show system status
     if detector:
+        # Apply current VT setting to detector for accurate status
+        if 'vt_enabled' in st.session_state:
+            detector = apply_virustotal_setting(detector, st.session_state.vt_enabled)
+        
         test_results = detector.test_all_integrations()
         working_count = test_results.get('total_available', 0)
         
+        # Count Advanced BGP Classifier
+        if hasattr(detector, 'advanced_bgp_classifier') and detector.advanced_bgp_classifier:
+            working_count += 1
+        
+        # Adjust total modules based on VirusTotal status
+        # Base: SSL, DNS, Geo, BGP, Hurricane Electric, Threat Intelligence, Advanced BGP = 7
+        # VirusTotal is optional and should not count if disabled
+        total_modules = 7  # Core modules without VirusTotal
+        
+        # Note: VirusTotal is considered bonus functionality, not core
+        
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("SYSTEM STATUS", f"{working_count}/6 modules", "ONLINE")
+            st.metric("SYSTEM STATUS", f"{working_count}/{total_modules} modules", "ONLINE")
         with col2:
-            health_status = "OPTIMAL" if working_count >= 5 else "DEGRADED" if working_count >= 3 else "CRITICAL"
-            st.metric("SYSTEM HEALTH", f"{(working_count/6*100):.0f}%", health_status)
+            health_status = "OPTIMAL" if working_count >= 6 else "DEGRADED" if working_count >= 4 else "CRITICAL"
+            st.metric("SYSTEM HEALTH", f"{(working_count/total_modules*100):.0f}%", health_status)
         with col3:
             st.metric("LICENSE", "OPEN", "NO API REQUIRED")
     
@@ -461,8 +526,27 @@ def main():
                 
                 st.markdown(f"`{status_indicator} {name}{status_text}`")
         
-        # Check VirusTotal status
-        vt_status = "[ENABLED]" if detector and hasattr(detector, 'vt_integration') and detector.vt_integration and detector.vt_integration.is_enabled else "[OPTIONAL]"
+        # Show Advanced BGP Classifier status
+        if hasattr(detector, 'advanced_bgp_classifier') and detector.advanced_bgp_classifier:
+            st.markdown(f"`[ONLINE] ADVANCED_BGP_CLASSIFIER`")
+        else:
+            st.markdown(f"`[OFFLINE] ADVANCED_BGP_CLASSIFIER`")
+        
+        # Check VirusTotal status (use session state if available)
+        if 'vt_enabled' in st.session_state:
+            session_vt_enabled = st.session_state.vt_enabled
+            # Apply the setting to get accurate status
+            temp_detector = apply_virustotal_setting(detector, session_vt_enabled)
+            vt_enabled = temp_detector and hasattr(temp_detector, 'vt_integration') and temp_detector.vt_integration and temp_detector.vt_integration.is_enabled
+        else:
+            vt_enabled = detector and hasattr(detector, 'vt_integration') and detector.vt_integration and detector.vt_integration.is_enabled
+        
+        if vt_enabled:
+            vt_status = "[ENABLED]"
+        elif detector and hasattr(detector, 'vt_integration') and detector.vt_integration:
+            vt_status = "[DISABLED]"  # VT integration exists but is disabled
+        else:
+            vt_status = "[OPTIONAL]"  # VT not configured
         
         st.markdown(f"""
         **CORE FEATURES:**
@@ -471,6 +555,7 @@ def main():
         [✓] MULTI_RESOLVER_DNS     - 4 resolver consensus
         [✓] GEO_INTELLIGENCE       - Multi-provider location
         [✓] DUAL_BGP_ANALYSIS      - BGPView + HE fallback
+        [✓] ADVANCED_BGP_CLASSIFIER - Customer type detection
         [✓] THREAT_INTELLIGENCE    - Security assessment
         [✓] CROSS_VALIDATION       - Multi-source confidence
         ```
@@ -482,13 +567,15 @@ def main():
         
         **SYSTEM CAPABILITIES:**
         ```
-        > 6x data integrations
+        > 7x data integrations
         > Cross-validation algorithms
         > Enhanced confidence scoring
+        > Customer type classification
         > Security threat detection
         > Geographic risk analysis
         > BGP routing intelligence
         > SSL certificate grading
+        > 68+ known provider database
         ```
         
         **PERFORMANCE METRICS:**
@@ -514,6 +601,43 @@ def main():
         ```
         """)
         
+        # Show recent analysis files
+        st.header("RECENT ANALYSIS")
+        try:
+            import os
+            results_dir = 'results'
+            if os.path.exists(results_dir):
+                # Get recent analysis files (JSON files only)
+                json_files = [f for f in os.listdir(results_dir) if f.startswith('analysis_') and f.endswith('.json')]
+                json_files.sort(key=lambda x: os.path.getmtime(os.path.join(results_dir, x)), reverse=True)
+                
+                if json_files:
+                    st.markdown("**Last 5 analyses:**")
+                    for i, filename in enumerate(json_files[:5], 1):
+                        # Extract domain and timestamp from filename
+                        parts = filename.replace('analysis_', '').replace('.json', '').split('_')
+                        if len(parts) >= 2:
+                            domain = parts[0].replace('_', '.')
+                            timestamp = parts[-2] + '_' + parts[-1]
+                            # Format timestamp for display
+                            try:
+                                from datetime import datetime
+                                dt = datetime.strptime(timestamp, '%Y%m%d_%H%M%S')
+                                time_str = dt.strftime('%m/%d %H:%M')
+                            except:
+                                time_str = timestamp
+                            
+                            file_size = os.path.getsize(os.path.join(results_dir, filename)) / 1024  # KB
+                            st.markdown(f"`{i}.` **{domain}**  \n`{time_str}` ({file_size:.1f}KB)")
+                        else:
+                            st.markdown(f"`{i}.` {filename[:20]}...")
+                else:
+                    st.markdown("`No analyses yet`")
+            else:
+                st.markdown("`Results folder not found`")
+        except Exception as e:
+            st.markdown(f"`Error loading recent files: {str(e)[:30]}...`")
+        
         st.header("CSV FORMAT")
         st.markdown("""
         **Required columns:**
@@ -533,6 +657,12 @@ def main():
     if 'analysis_mode' not in st.session_state:
         st.session_state.analysis_mode = "Single URL"
     
+    # Initialize VirusTotal toggle state
+    if 'vt_enabled' not in st.session_state:
+        # Check current VT status from detector
+        current_vt_enabled = detector and hasattr(detector, 'vt_integration') and detector.vt_integration and detector.vt_integration.is_enabled
+        st.session_state.vt_enabled = current_vt_enabled
+    
     # Main interface - use radio buttons instead of tabs
     st.subheader("ANALYSIS MODE")
     analysis_mode = st.radio(
@@ -542,6 +672,58 @@ def main():
         horizontal=True,
         key="analysis_mode_radio"
     )
+    
+    # VirusTotal toggle section
+    st.subheader("⚙️ VIRUSTOTAL SETTINGS")
+    
+    col_vt1, col_vt2 = st.columns([1, 3])
+    
+    with col_vt1:
+        # VirusTotal toggle
+        vt_toggle = st.checkbox(
+            "Enable VirusTotal",
+            value=st.session_state.vt_enabled,
+            key="vt_toggle",
+            help="Toggle VirusTotal API integration"
+        )
+        
+        # Update session state
+        if vt_toggle != st.session_state.vt_enabled:
+            st.session_state.vt_enabled = vt_toggle
+            st.rerun()  # Refresh to apply changes
+    
+    with col_vt2:
+        # VirusTotal information and warning
+        if st.session_state.vt_enabled:
+            st.info("""
+            **✅ VirusTotal ENABLED** - Additional security validation and DNS history
+            
+            **Rate Limits:**
+            - Free API: 4 requests/minute (500/day max)
+            - Premium API: 300 requests/minute
+            
+            **⚠️ For CSV batch processing:** Consider disabling VirusTotal to avoid rate limits
+            """)
+        else:
+            st.warning("""
+            **❌ VirusTotal DISABLED** - System operates with 7 core modules
+            
+            **Recommended for:**
+            - CSV batch processing (no rate limits)
+            - Fast bulk analysis
+            - When VirusTotal API quota is exceeded
+            
+            **Note:** All other detection methods remain fully functional
+            """)
+        
+        # Show current VT API status
+        if detector and hasattr(detector, 'vt_integration') and detector.vt_integration:
+            actual_vt_status = detector.vt_integration.is_enabled
+            if actual_vt_status != st.session_state.vt_enabled:
+                if st.session_state.vt_enabled:
+                    st.error("⚠️ VirusTotal API not properly configured. Check your VT_API_KEY environment variable.")
+                else:
+                    st.success("✅ VirusTotal disabled as requested")
     
     # Update session state
     if analysis_mode == "SINGLE_URL":
@@ -553,6 +735,24 @@ def main():
     
     if st.session_state.analysis_mode == "CSV Upload":
         st.header("CSV_BATCH_PROCESSING")
+        
+        # VirusTotal warning for CSV batch processing
+        if st.session_state.vt_enabled:
+            st.warning("""
+            ⚠️ **VirusTotal is currently ENABLED** - This may cause delays in batch processing!
+            
+            **Free API Limits:** 4 requests/minute (500/day max)  
+            **For faster batch processing:** Consider disabling VirusTotal above
+            
+            **Estimated processing time with VT:** ~15 seconds per domain (due to rate limiting)
+            """)
+        else:
+            st.info("""
+            ✅ **VirusTotal is DISABLED** - Optimal configuration for batch processing!
+            
+            **Fast processing:** No rate limits, all 7 core modules active  
+            **Estimated time:** ~2-3 seconds per domain
+            """)
         
         uploaded_file = st.file_uploader(
             "Choose CSV file",
@@ -615,6 +815,10 @@ def main():
                         
                             results = []
                             
+                            # Track success/failure stats
+                            success_count = 0
+                            error_count = 0
+                            
                             for idx, row in df_clean.iterrows():
                                 company = row['Company']
                                 url = row['URL']
@@ -623,35 +827,62 @@ def main():
                                 progress = (idx + 1) / len(df_clean)
                                 progress_bar.progress(progress)
                                 status_text.text(f"Processing {idx + 1}/{len(df_clean)}: {company}")
-                            
-                                # Phase 2A: Enhanced multi-layer analysis with DNS
-                                domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
                                 
-                                headers = detector.get_headers(url)
-                                ip = detector.get_ip(url)
-                                whois_data = detector.get_whois(ip) if ip else ""
-                                enhanced_result = detect_provider(headers, ip, whois_data, domain)
-                                
-                                # Format providers by role
-                                origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
-                                cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
-                                waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
-                                lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
-                                dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
-                                
-                                result = {
-                                    'Company': company,
-                                    'URL': url,
-                                    'Primary_Provider': enhanced_result['primary_provider'],
-                                    'Origin_Provider': ', '.join(origin_providers) if origin_providers else 'Unknown',
-                                    'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
-                                    'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
-                                    'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
-                                    'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
-                                    'IP_Address': ip or 'N/A',
-                                    'Confidence': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low'
-                                }
-                                results.append(result)
+                                try:
+                                    # Phase 2A: Enhanced multi-layer analysis with DNS
+                                    domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
+                                    
+                                    headers = detector.get_headers(url)
+                                    ip = detector.get_ip(url)
+                                    whois_data = detector.get_whois(ip) if ip else ""
+                                    enhanced_result = detect_provider(headers, ip, whois_data, domain)
+                                    
+                                    # Format providers by role
+                                    origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
+                                    cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
+                                    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
+                                    lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
+                                    dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
+                                    
+                                    result = {
+                                        'Company': company,
+                                        'URL': url,
+                                        'Primary_Provider': enhanced_result['primary_provider'],
+                                        'Origin_Provider': ', '.join(origin_providers) if origin_providers else 'Unknown',
+                                        'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
+                                        'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
+                                        'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
+                                        'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
+                                        'IP_Address': ip or 'N/A',
+                                        'Confidence': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low'
+                                    }
+                                    results.append(result)
+                                    success_count += 1
+                                    
+                                except Exception as e:
+                                    # Create error result but continue processing
+                                    error_msg = str(e)
+                                    if 'timeout' in error_msg.lower() or 'connection' in error_msg.lower():
+                                        error_status = 'Connection Timeout'
+                                    elif 'ssl' in error_msg.lower():
+                                        error_status = 'SSL Error'
+                                    else:
+                                        error_status = 'Analysis Error'
+                                    
+                                    result = {
+                                        'Company': company,
+                                        'URL': url,
+                                        'Primary_Provider': error_status,
+                                        'Origin_Provider': 'Error',
+                                        'CDN_Providers': 'Error',
+                                        'WAF_Providers': 'Error', 
+                                        'LB_Providers': 'Error',
+                                        'DNS_Providers': 'Error',
+                                        'IP_Address': 'Error',
+                                        'Confidence': f'Error: {error_msg[:50]}...' if len(error_msg) > 50 else f'Error: {error_msg}'
+                                    }
+                                    results.append(result)
+                                    error_count += 1
                         
                             # Create enhanced result DataFrame
                             results_df = pd.DataFrame(results)
@@ -665,20 +896,20 @@ def main():
                             progress_bar.empty()
                             status_text.empty()
                             
-                            # Show results
-                            st.success("🎉 Analysis completed!")
+                            # Show results with stats
+                            if error_count > 0:
+                                st.warning(f"⚠️ Analysis completed with {error_count} errors out of {len(results_df)} total")
+                            else:
+                                st.success("🎉 Analysis completed successfully!")
                             
                             # Statistics
                             col1, col2, col3 = st.columns(3)
                             with col1:
                                 st.metric("Total Websites", len(results_df))
                             with col2:
-                                identified = len(results_df[results_df['Primary_Provider'] != 'Unknown'])
-                                st.metric("Identified", identified)
+                                st.metric("Successful", success_count, delta=success_count if success_count > 0 else None)
                             with col3:
-                                multi_provider = len(results_df[(results_df['CDN_Providers'] != 'None') | 
-                                                              (results_df['WAF_Providers'] != 'None')])
-                                st.metric("Multi-Provider", multi_provider)
+                                st.metric("Errors", error_count, delta=-error_count if error_count > 0 else None)
                             
                             # Results
                             st.subheader("📊 Results:")
@@ -798,16 +1029,29 @@ def main():
                 st.metric("CONFIDENCE", f"{enhanced_conf}%" if str(enhanced_conf).isdigit() else enhanced_conf)
             with col3:
                 enhanced_analysis = result.get('Enhanced_Analysis', {})
-                # Count only the 6 main integrations
+                # Count all 7 integrations including Advanced BGP Classifier
                 main_integrations = ['ssl_analysis', 'enhanced_dns', 'geographic_intelligence', 
-                                   'bgp_analysis', 'hurricane_electric_bgp', 'threat_intelligence']
+                                   'bgp_analysis', 'hurricane_electric_bgp', 'threat_intelligence',
+                                   'advanced_bgp_classification']
                 working_count = sum(1 for key in main_integrations 
                                   if key in enhanced_analysis 
                                   and isinstance(enhanced_analysis[key], dict) 
                                   and 'error' not in enhanced_analysis[key])
-                st.metric("MODULES_ACTIVE", f"{working_count}/6")
+                st.metric("MODULES_ACTIVE", f"{working_count}/7")
                 st.metric("CDN_STATUS", result['CDN_Providers'])
             
+            # Advanced BGP Classification Summary
+            bgp_classification = result.get('Enhanced_Analysis', {}).get('advanced_bgp_classification', {})
+            if bgp_classification and 'error' not in bgp_classification:
+                customer_type = bgp_classification.get('classification', 'Unknown')
+                bgp_confidence = bgp_classification.get('confidence', 0)
+                
+                if customer_type != 'UNKNOWN':
+                    if customer_type in ['END_CUSTOMER', 'ENTERPRISE_CUSTOMER']:
+                        st.info(f"🏢 **CUSTOMER DETECTED**: {customer_type.replace('_', ' ').title()} ({bgp_confidence:.1%} confidence)")
+                    elif customer_type in ['HOSTING_PROVIDER', 'CLOUD_PROVIDER', 'CDN_PROVIDER']:
+                        st.success(f"⚡ **SERVICE PROVIDER**: {customer_type.replace('_', ' ').title()} ({bgp_confidence:.1%} confidence)")
+                    
             # Basic provider summary
             if result['CDN_Providers'] != 'None' or result['WAF_Providers'] != 'None':
                 st.success("MULTI_PROVIDER_SETUP_DETECTED")
@@ -816,6 +1060,46 @@ def main():
             
             # Enhanced analysis details
             with st.expander("DETAILED_ANALYSIS"):
+                # Show Advanced BGP Classification details first
+                bgp_classification = result.get('Enhanced_Analysis', {}).get('advanced_bgp_classification', {})
+                if bgp_classification and 'error' not in bgp_classification:
+                    st.subheader("🎯 Advanced BGP Classification")
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**Classification**: {bgp_classification.get('classification', 'Unknown')}")
+                        st.write(f"**Confidence**: {bgp_classification.get('confidence', 0):.1%}")
+                        data_sources = bgp_classification.get('data_sources', [])
+                        if data_sources:
+                            st.write(f"**Data Sources**: {', '.join(data_sources)}")
+                    
+                    with col2:
+                        evidence = bgp_classification.get('evidence', [])
+                        if evidence:
+                            st.write("**Evidence**:")
+                            for ev in evidence[:3]:  # Show top 3 pieces of evidence
+                                st.write(f"• {ev}")
+                    
+                    # Show ML features if available
+                    if 'ml_features' in bgp_classification:
+                        ml_features = bgp_classification['ml_features']
+                        st.write("**ML Analysis Features**:")
+                        st.json({
+                            'Facilities': ml_features.get('facility_count', 0),
+                            'IX Points': ml_features.get('ix_count', 0),
+                            'Data Sources': ml_features.get('data_sources_count', 0),
+                            'Provider Keywords': ml_features.get('has_provider_keywords', False),
+                            'Customer Keywords': ml_features.get('has_customer_keywords', False)
+                        })
+                
+                # Show customer insights if available
+                customer_insights = result.get('bgp_customer_insights', [])
+                if customer_insights:
+                    st.subheader("💡 Customer Insights")
+                    for insight in customer_insights[:4]:
+                        st.write(f"• {insight}")
+                
+                st.subheader("📊 All Integrations Status")
                 # Show enhanced analysis if available
                 enhanced_analysis = result.get('Enhanced_Analysis', {})
                 if enhanced_analysis:
@@ -831,6 +1115,299 @@ def main():
                     st.subheader("🛡️ Security Findings")
                     for finding in security_findings[:5]:  # Show first 5
                         st.write(f"• {finding}")
+                
+                # Show comprehensive step-by-step analysis report
+                st.subheader("📋 Complete Analysis Report (8 Steps)")
+                
+                steps_report = result.get('analysis_steps_report', {})
+                if steps_report:
+                    for step_key, step_data in steps_report.items():
+                        if step_data.get('status') in ['completed', 'failed']:
+                            step_name = step_data.get('step_name', step_key.replace('_', ' ').title())
+                            status = step_data.get('status', 'unknown')
+                            findings = step_data.get('findings', [])
+                            methods = step_data.get('methods', [])
+                            confidence_impact = step_data.get('confidence_impact', 0)
+                            
+                            # Status indicator
+                            if status == 'completed':
+                                status_icon = "✅"
+                            elif status == 'failed':
+                                status_icon = "❌"
+                            else:
+                                status_icon = "⏭️"
+                            
+                            # Create expandable section for each step
+                            with st.expander(f"{status_icon} **{step_name}** (+{confidence_impact}% confidence)"):
+                                
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    st.write("**Status:**", status.title())
+                                    st.write("**Methods Used:**")
+                                    for method in methods:
+                                        st.write(f"• {method}")
+                                
+                                with col2:
+                                    st.write(f"**Confidence Impact:** +{confidence_impact}%")
+                                    if findings:
+                                        st.write("**Key Findings:**")
+                                        for finding in findings:
+                                            st.write(f"• {finding}")
+                                    else:
+                                        st.write("**Key Findings:** No specific findings")
+                
+                # Show backend saved files information
+                backend_files = result.get('backend_files')
+                if backend_files:
+                    st.success(f"✅ **Analysis automatically saved to backend:**")
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        st.write(f"📄 **Complete Data:** `{backend_files['json_filename']}`")
+                    with col_b:
+                        st.write(f"📊 **Summary:** `{backend_files['csv_filename']}`")
+                    
+                    st.info("💡 **Backend Storage**: All analysis results are automatically saved to the `results/` folder for persistent storage and batch processing")
+                
+                # Download analysis results functionality
+                st.subheader("💾 Download Analysis Results")
+                
+                # Prepare comprehensive data for download
+                download_data = {
+                    "analysis_metadata": {
+                        "domain": result.get('URL'),
+                        "ip_address": result.get('IP_Address'),
+                        "analysis_timestamp": result.get('timestamp', 'N/A'),
+                        "analysis_version": "Provider Discovery Tool v3.0",
+                        "enhanced_confidence": result.get('Enhanced_Confidence'),
+                        "total_analysis_steps": len(result.get('analysis_steps_report', {}))
+                    },
+                    "detection_results": {
+                        "primary_provider": result.get('Primary_Provider'),
+                        "cdn_providers": result.get('CDN_Providers'),
+                        "dns_providers": result.get('DNS_Providers'), 
+                        "hosting_providers": result.get('Hosting_Providers'),
+                        "cloud_providers": result.get('Cloud_Providers'),
+                        "security_providers": result.get('Security_Providers')
+                    },
+                    "step_by_step_analysis": result.get('analysis_steps_report', {}),
+                    "enhanced_analysis_details": result.get('Enhanced_Analysis', {}),
+                    "security_findings": result.get('security_findings', []),
+                    "geographic_insights": result.get('geographic_insights', []),
+                    "bgp_insights": result.get('bgp_insights', []),
+                    "recommendations": result.get('Recommendations', []),
+                    "technical_details": {
+                        "confidence_factors": result.get('confidence_factors', []),
+                        "enhanced_confidence_factors": result.get('enhanced_confidence_factors', []),
+                        "analysis_methods": result.get('analysis_methods', []),
+                        "dns_chain": result.get('dns_chain'),
+                        "whois_data": result.get('whois_data')
+                    }
+                }
+                
+                # Format data for different download formats
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    # JSON download
+                    import json
+                    json_data = json.dumps(download_data, indent=2, ensure_ascii=False)
+                    st.download_button(
+                        label="📄 Download JSON",
+                        data=json_data,
+                        file_name=f"provider_analysis_{result.get('URL', 'unknown').replace('.', '_')}.json",
+                        mime="application/json"
+                    )
+                
+                with col2:
+                    # CSV download (simplified view)
+                    
+                    # Create CSV data
+                    csv_rows = []
+                    
+                    # Basic info
+                    csv_rows.append({
+                        'Category': 'Domain',
+                        'Key': 'URL',
+                        'Value': result.get('URL', 'N/A')
+                    })
+                    csv_rows.append({
+                        'Category': 'Network', 
+                        'Key': 'IP_Address',
+                        'Value': result.get('IP_Address', 'N/A')
+                    })
+                    # Fix confidence display
+                    confidence_value = result.get('Enhanced_Confidence', 0)
+                    if isinstance(confidence_value, (int, float)):
+                        confidence_display = f"{confidence_value}%"
+                    else:
+                        confidence_display = str(confidence_value)
+                    csv_rows.append({
+                        'Category': 'Confidence',
+                        'Key': 'Enhanced_Confidence',
+                        'Value': confidence_display
+                    })
+                    
+                    # Provider results
+                    provider_categories = {
+                        'Primary_Provider': 'Primary Provider',
+                        'CDN_Providers': 'CDN Providers',
+                        'DNS_Providers': 'DNS Providers',
+                        'Hosting_Providers': 'Hosting Providers',
+                        'Cloud_Providers': 'Cloud Providers'
+                    }
+                    
+                    for key, category in provider_categories.items():
+                        value = result.get(key, 'None')
+                        if isinstance(value, list):
+                            # Remove duplicates and join
+                            unique_values = list(dict.fromkeys([str(v) for v in value if v]))  # Preserve order, remove duplicates and empty values
+                            value = ', '.join(unique_values) if unique_values else 'None'
+                        elif not value or value == [] or value is None:
+                            value = 'None'
+                        # Clean value to prevent CSV formatting issues
+                        if isinstance(value, str):
+                            value = value.replace('\n', ' ').replace('\r', ' ').strip()
+                            if not value:  # If after cleaning the string is empty
+                                value = 'None'
+                        csv_rows.append({
+                            'Category': 'Providers',
+                            'Key': category,
+                            'Value': value
+                        })
+                    
+                    # Analysis steps summary
+                    steps_report = result.get('analysis_steps_report', {})
+                    for step_key, step_data in steps_report.items():
+                        step_name = step_data.get('step_name', step_key)
+                        status = step_data.get('status', 'unknown')
+                        confidence_impact = step_data.get('confidence_impact', 0)
+                        findings_count = len(step_data.get('findings', []))
+                        
+                        csv_rows.append({
+                            'Category': 'Analysis Steps',
+                            'Key': step_name,
+                            'Value': f"{status} | +{confidence_impact}% confidence | {findings_count} findings"
+                        })
+                    
+                    df = pd.DataFrame(csv_rows)
+                    csv_buffer = io.StringIO()
+                    df.to_csv(csv_buffer, index=False)
+                    
+                    st.download_button(
+                        label="📊 Download CSV",
+                        data=csv_buffer.getvalue(),
+                        file_name=f"provider_analysis_{result.get('URL', 'unknown').replace('.', '_')}.csv",
+                        mime="text/csv"
+                    )
+                
+                with col3:
+                    # TXT download (human-readable report)
+                    # Fix domain display
+                    domain_name = result.get('URL') or 'N/A'
+                    
+                    # Fix confidence display
+                    confidence_value = result.get('Enhanced_Confidence', 0)
+                    if isinstance(confidence_value, (int, float)):
+                        confidence_display = f"{confidence_value}%"
+                    else:
+                        confidence_display = str(confidence_value)
+                    
+                    # Helper function to format provider lists
+                    def format_providers(provider_list, none_value='None'):
+                        if not provider_list:
+                            return none_value
+                        if isinstance(provider_list, list):
+                            # Remove duplicates and empty values
+                            unique_providers = list(dict.fromkeys([str(p) for p in provider_list if p]))
+                            return ', '.join(unique_providers) if unique_providers else none_value
+                        return str(provider_list) if provider_list else none_value
+                    
+                    txt_report = f"""PROVIDER DISCOVERY TOOL v3.0 - ANALYSIS REPORT
+{'='*60}
+
+DOMAIN: {domain_name}
+IP ADDRESS: {result.get('IP_Address', 'N/A')}
+ANALYSIS TIMESTAMP: {result.get('timestamp', 'N/A')}
+ENHANCED CONFIDENCE: {confidence_display}
+
+PROVIDER DETECTION RESULTS:
+{'='*30}
+Primary Provider: {result.get('Primary_Provider', 'Unknown')}
+CDN Providers: {format_providers(result.get('CDN_Providers'))}
+DNS Providers: {format_providers(result.get('DNS_Providers'))}
+Hosting Providers: {format_providers(result.get('Hosting_Providers'))}
+Cloud Providers: {format_providers(result.get('Cloud_Providers'))}
+Security Providers: {format_providers(result.get('Security_Providers'))}
+
+STEP-BY-STEP ANALYSIS:
+{'='*25}"""
+                    
+                    # Add step details to TXT report
+                    steps_report = result.get('analysis_steps_report', {})
+                    for step_key, step_data in steps_report.items():
+                        step_name = step_data.get('step_name', step_key.replace('_', ' ').title())
+                        status = step_data.get('status', 'unknown')
+                        confidence_impact = step_data.get('confidence_impact', 0)
+                        findings = step_data.get('findings', [])
+                        methods = step_data.get('methods', [])
+                        
+                        txt_report += f"\n\n{step_name.upper()}:"
+                        txt_report += f"\n  Status: {status.title()}"
+                        txt_report += f"\n  Confidence Impact: +{confidence_impact}%"
+                        txt_report += f"\n  Methods Used: {', '.join(methods) if methods else 'None'}"
+                        if findings:
+                            txt_report += f"\n  Key Findings:"
+                            for finding in findings:
+                                # Clean finding text for better formatting
+                                clean_finding = str(finding).replace('\n', ' ').replace('\r', ' ').strip()
+                                txt_report += f"\n    • {clean_finding}"
+                        else:
+                            txt_report += f"\n  Key Findings: No specific findings"
+                    
+                    # Add recommendations
+                    recommendations = result.get('Recommendations', [])
+                    if recommendations:
+                        txt_report += f"\n\nRECOMMENDATIONS:\n{'='*15}"
+                        for i, rec in enumerate(recommendations, 1):
+                            # Clean recommendation text
+                            clean_rec = str(rec).replace('\n', ' ').replace('\r', ' ').strip()
+                            txt_report += f"\n{i}. {clean_rec}"
+                    else:
+                        txt_report += f"\n\nRECOMMENDATIONS:\n{'='*15}\nNo specific recommendations available."
+                    
+                    txt_report += f"\n\n{'='*60}\nReport generated by Provider Discovery Tool v3.0\n"
+                    
+                    # Generate safe filename for TXT
+                    safe_domain_txt = (domain_name or 'unknown').replace('.', '_').replace('/', '_').replace(':', '_')
+                    
+                    st.download_button(
+                        label="📝 Download TXT",
+                        data=txt_report,
+                        file_name=f"provider_analysis_{safe_domain_txt}.txt",
+                        mime="text/plain"
+                    )
+                
+                # Show file size information
+                json_size = len(json_data) / 1024  # KB
+                csv_size = len(csv_buffer.getvalue()) / 1024  # KB 
+                txt_size = len(txt_report) / 1024  # KB
+                
+                st.info(f"💡 **Download Options**: JSON ({json_size:.1f}KB) - complete data | CSV ({csv_size:.1f}KB) - spreadsheet format | TXT ({txt_size:.1f}KB) - human-readable report")
+                
+                # Show what's included in downloads
+                with st.expander("📦 What's included in downloads"):
+                    st.write("**All formats include:**")
+                    st.write("• Complete analysis metadata (domain, IP, timestamp, confidence)")
+                    st.write("• All 8 step-by-step analysis results")
+                    st.write("• Provider detection results (CDN, DNS, hosting, cloud)")
+                    st.write("• Security findings and recommendations")
+                    
+                    st.write("**JSON format additionally includes:**")
+                    st.write("• Complete technical details from all integrations")
+                    st.write("• Raw data from SSL, DNS, BGP, geographic, and threat analysis")
+                    st.write("• Full confidence factor breakdowns")
+                    st.write("• WHOIS data and DNS chain information")
                 
                 # Show basic technical details
                 st.subheader("🔧 Technical Details")

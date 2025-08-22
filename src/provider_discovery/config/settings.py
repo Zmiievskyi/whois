@@ -42,9 +42,9 @@ class Settings:
     vt_rate_limit_window: int = 60
     
     # Performance Settings
-    dns_timeout: int = 10
-    http_timeout: int = 10
-    whois_timeout: int = 15
+    dns_timeout: int = 15
+    http_timeout: int = 20
+    whois_timeout: int = 25
     
     # Feature Flags
     enable_dns_analysis: bool = True

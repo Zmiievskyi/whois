@@ -1,0 +1,772 @@
+{
+  "analysis_metadata": {
+    "domain": "arsenal.co.uk",
+    "ip_address": null,
+    "analysis_timestamp": "2025-08-22 16:54:50 UTC",
+    "analysis_version": "Provider Discovery Tool v3.0",
+    "enhanced_confidence": 100,
+    "total_analysis_steps": 8,
+    "backend_save_timestamp": "20250822_165507"
+  },
+  "detection_results": {
+    "primary_provider": "Safenames Datacentre",
+    "cdn_providers": [],
+    "dns_providers": [],
+    "hosting_providers": null,
+    "cloud_providers": null,
+    "security_providers": null
+  },
+  "step_by_step_analysis": {
+    "step_1_base_detection": {
+      "status": "completed",
+      "step_name": "Base Provider Detection",
+      "findings": [],
+      "confidence_impact": 15,
+      "methods": [
+        "HTTP Headers",
+        "IP Ranges",
+        "WHOIS",
+        "DNS Resolution"
+      ]
+    },
+    "step_2_ssl_analysis": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_3_enhanced_dns": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_4_geographic_intel": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_5_bgp_analysis": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_6_advanced_bgp_classification": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_7_threat_intelligence": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_8_cross_validation": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    }
+  },
+  "enhanced_analysis_details": {
+    "ssl_analysis": {
+      "domain": "arsenal.co.uk",
+      "certificate_info": {
+        "error": "timed out",
+        "domain": "arsenal.co.uk",
+        "port": 443,
+        "connection_successful": false
+      },
+      "provider_analysis": {
+        "error": "timed out"
+      },
+      "security_assessment": {
+        "error": "timed out"
+      },
+      "data_source": "ssl_analysis"
+    },
+    "enhanced_dns": {
+      "multi_resolver": {
+        "domain": "arsenal.co.uk",
+        "record_types": {
+          "A": {
+            "domain": "arsenal.co.uk",
+            "record_type": "A",
+            "resolver_results": {
+              "system": {
+                "success": true,
+                "records": [
+                  "217.19.248.132"
+                ],
+                "response_time": 0.0010471343994140625
+              }
+            },
+            "consensus": {
+              "agreed_records": [
+                "217.19.248.132"
+              ],
+              "consensus_score": 1.0
+            }
+          }
+        },
+        "resolver_reliability": {
+          "system": "available"
+        },
+        "dns_security": {
+          "status": "basic_check_completed"
+        },
+        "performance_metrics": {
+          "avg_response_time": 0.1
+        },
+        "anomalies": []
+      },
+      "doh_analysis": {
+        "success": true,
+        "records": [
+          "217.19.248.132"
+        ],
+        "response_time": false,
+        "authoritative": false,
+        "recursion_desired": true,
+        "recursion_available": true
+      },
+      "cross_validation": {
+        "domain_resolves": true,
+        "resolved_ip": "217.19.248.132",
+        "validation_status": "success"
+      }
+    },
+    "geographic_intelligence": {
+      "ip": "217.19.248.132",
+      "provider_results": {
+        "ipapi_com": {
+          "success": true,
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "region": "England",
+          "city": "Milton Keynes",
+          "latitude": 52.0304,
+          "longitude": -0.690275,
+          "timezone": "Europe/London",
+          "isp": "Safenames Datacentre",
+          "organization": "Safenames Ltd",
+          "asn": "60819",
+          "asn_name": "Safenames Ltd.",
+          "ip": "217.19.248.132",
+          "provider": "ipapi_com",
+          "raw_response": {
+            "status": "success",
+            "country": "United Kingdom",
+            "countryCode": "GB",
+            "region": "ENG",
+            "regionName": "England",
+            "city": "Milton Keynes",
+            "lat": 52.0304,
+            "lon": -0.690275,
+            "timezone": "Europe/London",
+            "isp": "Safenames Datacentre",
+            "org": "Safenames Ltd",
+            "as": "AS60819 Safenames Ltd.",
+            "query": "217.19.248.132"
+          }
+        },
+        "geojs_io": {
+          "success": true,
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "region": null,
+          "city": null,
+          "latitude": "51.4964",
+          "longitude": "-0.1224",
+          "timezone": "Europe/London",
+          "isp": null,
+          "organization": "Safenames Ltd.",
+          "asn": null,
+          "asn_name": null,
+          "ip": "217.19.248.132",
+          "provider": "geojs_io",
+          "raw_response": {
+            "continent_code": "EU",
+            "latitude": "51.4964",
+            "longitude": "-0.1224",
+            "accuracy": 200,
+            "country_code": "GB",
+            "timezone": "Europe/London",
+            "asn": 60819,
+            "organization": "AS60819 Safenames Ltd.",
+            "ip": "217.19.248.132",
+            "area_code": "0",
+            "organization_name": "Safenames Ltd.",
+            "country": "United Kingdom",
+            "country_code3": "GBR"
+          }
+        }
+      },
+      "consensus": {
+        "consensus_reached": true,
+        "consensus_data": {
+          "country": "United Kingdom",
+          "country_code": "GB",
+          "region": "England",
+          "city": "Milton Keynes",
+          "isp": "Safenames Datacentre",
+          "organization": "Safenames Ltd",
+          "asn": "60819"
+        },
+        "consensus_strength": {
+          "country": 1.0,
+          "country_code": 1.0,
+          "region": 1.0,
+          "city": 1.0,
+          "isp": 1.0,
+          "organization": 0.5,
+          "asn": 1.0
+        },
+        "successful_providers": 2,
+        "total_providers": 2
+      },
+      "confidence_score": 100
+    },
+    "bgp_analysis": {
+      "ip": "217.19.248.132",
+      "asn": 0,
+      "asn_name": "",
+      "asn_description": "",
+      "country_code": "",
+      "registry": "RIPE",
+      "prefixes": [
+        {
+          "prefix": "217.19.248.0/24",
+          "ip": "217.19.248.0",
+          "cidr": 24,
+          "asn": {
+            "asn": 60819,
+            "name": "SAFENAMES-AS",
+            "description": "Safenames Ltd.",
+            "country_code": "GB"
+          },
+          "name": "UK-SAFENAMES-20030131",
+          "description": "Safenames Ltd.",
+          "country_code": "GB"
+        }
+      ],
+      "data_source": "bgpview"
+    },
+    "hurricane_electric_bgp": {
+      "target": "217.19.248.132",
+      "target_type": "ip",
+      "ip_analysis": {
+        "ip": "217.19.248.132",
+        "asn": 60819,
+        "asn_name": "AS60819",
+        "prefix": "217.19.248.0/24",
+        "country": null,
+        "registry": null,
+        "allocation_date": null,
+        "description": null,
+        "organization": null,
+        "raw_data": {},
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/ip/217.19.248.132"
+      },
+      "asn_analysis": {
+        "asn": 60819,
+        "name": "Safenames Ltd.",
+        "description": null,
+        "country": null,
+        "organization": null,
+        "website": null,
+        "email": null,
+        "phone": null,
+        "prefixes_v4": [
+          "217.19.249.0/24",
+          "86.104.11.0/24",
+          "185.191.162.0/24",
+          "217.19.241.0/24",
+          "86.106.11.0/24",
+          "217.19.240.0/24",
+          "93.115.247.0/24",
+          "89.46.63.0/24",
+          "89.34.222.0/24",
+          "86.106.172.0/24",
+          "188.214.80.0/24",
+          "217.19.253.0/24",
+          "86.105.3.0/24",
+          "188.240.197.0/24",
+          "89.42.58.0/24",
+          "89.47.235.0/24",
+          "188.208.35.0/24",
+          "84.247.21.0/24",
+          "185.191.161.0/24",
+          "188.241.9.0/24",
+          "93.114.49.0/24",
+          "46.102.117.0/24",
+          "217.19.244.0/22",
+          "217.19.254.0/24",
+          "217.19.255.0/24",
+          "31.3.64.0/21",
+          "31.14.216.0/24",
+          "188.240.50.0/24",
+          "93.113.200.0/24",
+          "93.114.48.0/24",
+          "217.19.248.0/24",
+          "89.34.223.0/24",
+          "92.114.80.0/24",
+          "94.176.129.0/24",
+          "89.44.244.0/24",
+          "188.241.147.0/24",
+          "217.19.251.0/24",
+          "188.241.14.0/24",
+          "188.214.58.0/24",
+          "31.14.217.0/24",
+          "84.247.17.0/24",
+          "93.113.201.0/24",
+          "188.212.249.0/24",
+          "188.241.8.0/24",
+          "217.19.243.0/24",
+          "89.33.82.0/24",
+          "188.208.34.0/24",
+          "217.19.242.0/24",
+          "217.19.252.0/24",
+          "185.96.161.0/24",
+          "89.34.109.0/24",
+          "185.191.160.0/24",
+          "185.191.163.0/24",
+          "185.191.160.0/22",
+          "217.19.250.0/24",
+          "89.33.104.0/24",
+          "188.241.145.0/24",
+          "31.3.66.0/24",
+          "86.104.5.0/24",
+          "188.214.110.0/24",
+          "31.3.64.0/22",
+          "188.214.28.0/24"
+        ],
+        "prefixes_v6": [
+          "2a00:a900::/32",
+          "2a00:a900:8afe::/48",
+          "2a00:a900:6afe::/48",
+          "2a00:a900:7afe::/48"
+        ],
+        "peers": [
+          {
+            "asn": 19551,
+            "name": "AS19551",
+            "relationship": "peer"
+          },
+          {
+            "asn": 19551,
+            "name": "Incapsula Inc",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "Hurricane Electric LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 174,
+            "name": "AS174",
+            "relationship": "peer"
+          },
+          {
+            "asn": 174,
+            "name": "Cogent Communications",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "Level 3 Parent, LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "AS20473",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "The Constant Company, LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "AS20473",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "The Constant Company, LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "Level 3 Parent, LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "Hurricane Electric LLC",
+            "relationship": "peer"
+          },
+          {
+            "asn": 19551,
+            "name": "AS19551",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 174,
+            "name": "AS174",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "AS20473",
+            "relationship": "peer"
+          },
+          {
+            "asn": 20473,
+            "name": "AS20473",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 44354,
+            "name": "AS44354",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3549,
+            "name": "AS3549",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3549,
+            "name": "AS3549",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 3356,
+            "name": "AS3356",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2856,
+            "name": "AS2856",
+            "relationship": "peer"
+          },
+          {
+            "asn": 2856,
+            "name": "AS2856",
+            "relationship": "peer"
+          },
+          {
+            "asn": 5089,
+            "name": "AS5089",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 174,
+            "name": "AS174",
+            "relationship": "peer"
+          },
+          {
+            "asn": 5459,
+            "name": "AS5459",
+            "relationship": "peer"
+          },
+          {
+            "asn": 5089,
+            "name": "AS5089",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 174,
+            "name": "AS174",
+            "relationship": "peer"
+          },
+          {
+            "asn": 5459,
+            "name": "AS5459",
+            "relationship": "peer"
+          }
+        ],
+        "upstreams": [],
+        "downstreams": [],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/AS60819"
+      },
+      "prefix_analysis": {
+        "prefix": "217.19.248.0/24",
+        "asn": 60819,
+        "asn_name": "AS60819",
+        "description": null,
+        "country": null,
+        "registry": "Status",
+        "allocation_date": null,
+        "more_specific_routes": [],
+        "less_specific_routes": [
+          "217.19.240.0/20"
+        ],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/net/217.19.248.0/24"
+      },
+      "routing_insights": {
+        "routing_security": "unknown",
+        "prefix_specificity": "high",
+        "peering_diversity": "high",
+        "geographic_presence": "unknown",
+        "recommendations": []
+      },
+      "provider_classification": {
+        "provider_type": "unknown",
+        "provider_name": "Safenames Ltd.",
+        "confidence": 10,
+        "indicators": [
+          "High peer count (likely tier-1 or major provider)"
+        ]
+      }
+    },
+    "threat_intelligence": {
+      "domain": "arsenal.co.uk",
+      "domain_analysis": {
+        "domain": "arsenal.co.uk",
+        "reputation_score": 40,
+        "threat_level": "high",
+        "security_analysis": {
+          "urlvoid": {
+            "success": true,
+            "source": "urlvoid",
+            "data": {
+              "malicious_detections": 1,
+              "safety_indicators": [
+                "malware_detected"
+              ],
+              "risk_level": "high"
+            }
+          },
+          "safe_browsing": {
+            "success": true,
+            "source": "basic_dns_check",
+            "data": {
+              "dns_resolves": true,
+              "risk_assessment": "low",
+              "confidence": "low"
+            }
+          },
+          "dns_indicators": {
+            "mx_records": [
+              "eu-smtp-inbound-1.mimecast.com",
+              "eu-smtp-inbound-2.mimecast.com"
+            ],
+            "txt_records": [
+              "Target: 0ed1fe018a213f9168caf148e79b04f0f665b06da2",
+              "airtable-verification=fa611c5d5732da83cf02034c4a2546f3",
+              "apple-domain-verification=hfXJUVYGAAcHiXWT",
+              "m6j7jk8pkvb7tnqwwkcg894mjbb10xk9",
+              "ctgksccmsj7d2d7aqtr42mrqio",
+              "5tvugg26oet9u5jp5nvk83jnvs",
+              "835v257u4ntn5er6fgldi2uif3",
+              "amazonses:F0LBkMjRv4XiQePxGrG4P6wmYkv3Bqjrr8vBRwZCdq4=",
+              "docusign=b94d63fc-3300-4243-8186-b71fef539b9b",
+              "MS=ms26079523",
+              "adobe-idp-site-verification=f1cb47121847146380af7090a4353db484798d4317c2cd65939ac0750404639d",
+              "docusign=fc911e0c-05dc-4ec0-8623-1273c3677d86",
+              "5 Beware Wambles Revoir",
+              "have-i-been-pwned-verification=46da0f509735c89d982b89424242584d",
+              "google-site-verification=fw5b9H7yYWg-2vD9sw135I4Cg_H5NatqXxirbjRKivc",
+              "v=spf1 include:_spf.arsenal.co.uk mx include:europe.spf.ticketmaster.com include:production.spf.ticketmaster.com include:eu._netblocks.mimecast.com include:spf.mandrillapp.com   include:spf.protection.outlook.com include:em1597.arsenal.co.uk a:c.spf.service-now.com ~all",
+              "atlassian-domain-verification=h9f4hHObTdXZLgn6EKUC7q0PrIIvV8CrMxcffJ680YcrjCIQJmV5QeBtsKqNeYEE",
+              "google-site-verification=VLZ-IctRUJ4Pi9ehhKT8xE1eK4U0Tf8l0gBpR-O3bCQ",
+              "tt6n4elfqqk3g4kur8mlqqdgra",
+              "2ZzWWuitUPMGSr9i58pjEEwMt0qkhDsa2Be9IW35q5UCi2g4bAbAN59x/32rSXHlN09x3gfagVEKzYMuZkp5Wg=="
+            ],
+            "security_policies": {
+              "google_verified": true,
+              "spf": true
+            },
+            "suspicious_patterns": []
+          }
+        },
+        "pattern_analysis": {
+          "suspicious_indicators": [],
+          "risk_factors": [],
+          "domain_age_estimate": "unknown",
+          "structure_analysis": {
+            "total_length": 13,
+            "subdomain_count": 1,
+            "has_numbers": false,
+            "has_hyphens": false,
+            "entropy": 2.52
+          }
+        },
+        "recommendations": [
+          "⚠️ HIGH RISK: Exercise extreme caution",
+          "🔍 Perform additional security verification",
+          "🔐 Consider DMARC policy for email protection"
+        ]
+      },
+      "ip_analyses": {
+        "217.19.248.132": {
+          "ip": "217.19.248.132",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United Kingdom",
+            "isp": "Safenames Datacentre"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        }
+      },
+      "overall_threat_level": "high",
+      "security_recommendations": [
+        "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+        "⚠️ HIGH RISK: Exercise extreme caution",
+        "🔍 Perform additional security verification",
+        "🔐 Consider DMARC policy for email protection"
+      ],
+      "confidence_score": 100
+    },
+    "cross_validation": {
+      "provider_consensus": {},
+      "confidence_boosters": [],
+      "conflicting_data": [],
+      "validation_score": 0
+    },
+    "security_assessment": {},
+    "advanced_bgp_classification": {
+      "asn": 60819,
+      "ip": "217.19.248.132",
+      "classification": "END_CUSTOMER",
+      "confidence": 0.7625,
+      "evidence": [
+        "ml_enhanced",
+        "minimal_infrastructure_customer_pattern",
+        "small_prefix_count_0",
+        "customer_name_pattern_safenames-as - safenames ltd."
+      ],
+      "data_sources": [
+        "ripe_stat",
+        "bgpview"
+      ],
+      "business_type": null,
+      "customer_indicators": [],
+      "provider_indicators": [],
+      "vote_distribution": {
+        "END_CUSTOMER": 1.4500000000000002
+      },
+      "ml_features": {
+        "facility_count": 0,
+        "ix_count": 0,
+        "prefix_count": 0,
+        "has_provider_keywords": false,
+        "has_customer_keywords": true,
+        "peering_policy_score": 0,
+        "data_sources_count": 2
+      },
+      "enhancement": "ml_boosted_confidence"
+    }
+  },
+  "security_findings": [
+    "Threat Level: high (confidence: 100%)",
+    "Domain Reputation: 40/100",
+    "Security policies detected: 2",
+    "IP Reputation: 50/100",
+    "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+    "⚠️ HIGH RISK: Exercise extreme caution",
+    "🔍 Perform additional security verification"
+  ],
+  "geographic_insights": [
+    "Location: Milton Keynes, United Kingdom (confidence: 100%)",
+    "ISP: Safenames Datacentre",
+    "Organization: Safenames Ltd"
+  ],
+  "bgp_insights": [
+    "HE BGP: AS60819 - Safenames Ltd.",
+    "BGP Peers: 39",
+    "IPv4 Prefixes: 62",
+    "Peering Diversity: high"
+  ],
+  "recommendations": [
+    "⚠️ High security risk detected - review domain carefully",
+    "⚠️ Conflicting data detected - manual verification recommended",
+    "🎯 High confidence detection - results highly reliable"
+  ],
+  "technical_details": {
+    "confidence_factors": [],
+    "enhanced_confidence_factors": [
+      "DoH (DNS over HTTPS) analysis completed",
+      "BGP analysis completed with 4 insights",
+      "ASN classified as end customer - not a hosting provider",
+      "DNS security policies found: ['google_verified', 'spf']"
+    ],
+    "analysis_methods": [
+      "VirusTotal API",
+      "SSL Certificate Analysis",
+      "Enhanced DNS Analysis",
+      "Geographic Intelligence",
+      "Dual BGP Analysis",
+      "Advanced BGP Customer Classification",
+      "Threat Intelligence"
+    ],
+    "dns_chain": null,
+    "whois_data": null
+  }
+}

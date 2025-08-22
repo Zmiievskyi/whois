@@ -68,6 +68,14 @@ except ImportError:
     HurricaneElectricIntegration = None
     get_hurricane_electric_integration = None
 
+try:
+    from .advanced_bgp_classifier import AdvancedBGPClassifier, get_advanced_bgp_classifier
+    ADVANCED_BGP_CLASSIFIER_AVAILABLE = True
+except ImportError:
+    ADVANCED_BGP_CLASSIFIER_AVAILABLE = False
+    AdvancedBGPClassifier = None
+    get_advanced_bgp_classifier = None
+
 __all__ = [
     'BaseIntegration',
     'APIKeyIntegration',
@@ -95,5 +103,8 @@ __all__ = [
     'THREAT_INTEGRATION_AVAILABLE',
     'HurricaneElectricIntegration',
     'get_hurricane_electric_integration',
-    'HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE'
+    'HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE',
+    'AdvancedBGPClassifier',
+    'get_advanced_bgp_classifier',
+    'ADVANCED_BGP_CLASSIFIER_AVAILABLE'
 ]
