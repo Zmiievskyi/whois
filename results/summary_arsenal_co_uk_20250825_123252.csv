@@ -1,11 +1,11 @@
 Category,Key,Value
-Domain,URL,ovatic.nl
+Domain,URL,arsenal.co.uk
 Network,IP_Address,N/A
 Confidence,Enhanced_Confidence,100%
-Analysis,Timestamp,2025-08-22 17:23:22 UTC
-Providers,Primary Provider,Cloudflare
-Providers,CDN Providers,"Cloudflare, AS13335"
-Providers,DNS Providers,Cloudflare
+Analysis,Timestamp,2025-08-25 12:32:26 UTC
+Providers,Primary Provider,Safenames Datacentre
+Providers,CDN Providers,None
+Providers,DNS Providers,Safenames
 Providers,Hosting Providers,None
 Providers,Cloud Providers,None
 Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings

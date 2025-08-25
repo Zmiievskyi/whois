@@ -1058,9 +1058,37 @@ def main():
                 provider_info = f"**Origin**: {result['Origin_Provider']} | **CDN**: {result['CDN_Providers']}"
                 st.markdown(provider_info)
             
+            # Show intelligent DNS detection indicator
+            confidence_factors = result.get('Confidence_Factors', '')
+            if 'Intelligent DNS analysis' in confidence_factors and result['DNS_Providers'] != 'Unknown':
+                st.info(f"🧠 **INTELLIGENT DNS DETECTION**: {result['DNS_Providers']} (AI-powered analysis)")
+            elif result['DNS_Providers'] != 'Unknown':
+                st.write(f"🌐 **DNS Provider**: {result['DNS_Providers']}")
+            
             # Enhanced analysis details
             with st.expander("DETAILED_ANALYSIS"):
-                # Show Advanced BGP Classification details first
+                # Show DNS Intelligence Analysis first if available
+                confidence_factors = result.get('Confidence_Factors', '')
+                if 'Intelligent DNS analysis' in confidence_factors or 'Learning:' in confidence_factors:
+                    st.subheader("🧠 Intelligent DNS Detection")
+                    st.success("✨ **Advanced AI-powered DNS analysis was used for this domain**")
+                    
+                    # Extract intelligent DNS findings from confidence factors
+                    dns_findings = []
+                    if confidence_factors:
+                        for factor in confidence_factors.split('; '):
+                            if 'DNS analysis' in factor or 'NS record' in factor:
+                                dns_findings.append(factor)
+                    
+                    if dns_findings:
+                        st.write("**Intelligent Analysis Results:**")
+                        for finding in dns_findings:
+                            st.write(f"• {finding}")
+                    
+                    st.info("🎯 **How it works**: When DNS patterns aren't recognized, the system automatically analyzes WHOIS data, domain patterns, and IP information to identify the DNS provider intelligently.")
+                    st.write("---")
+                
+                # Show Advanced BGP Classification details
                 bgp_classification = result.get('Enhanced_Analysis', {}).get('advanced_bgp_classification', {})
                 if bgp_classification and 'error' not in bgp_classification:
                     st.subheader("🎯 Advanced BGP Classification")

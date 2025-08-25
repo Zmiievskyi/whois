@@ -252,7 +252,7 @@ class DNSAnalyzer:
 
     def identify_dns_provider(self, ns_domain: str) -> Optional[str]:
         """
-        Identify DNS provider from NS domain patterns
+        Intelligently identify DNS provider from NS domain patterns with fallback analysis
         
         Args:
             ns_domain: NS domain to analyze
@@ -265,6 +265,16 @@ class DNSAnalyzer:
             
         ns_lower = ns_domain.lower()
         
+        # First try known patterns
+        provider = self._check_known_patterns(ns_lower)
+        if provider:
+            return provider
+        
+        # If no pattern match, try intelligent analysis
+        return self._analyze_unknown_dns_provider(ns_domain)
+    
+    def _check_known_patterns(self, ns_lower: str) -> Optional[str]:
+        """Check against known DNS provider patterns"""
         dns_patterns = {
             'AWS Route53': [
                 r'awsdns-.*\.net$', r'awsdns-.*\.org$', r'awsdns-.*\.com$', r'awsdns-.*\.co\.uk$'
@@ -310,6 +320,178 @@ class DNSAnalyzer:
                     return provider
         
         return None
+    
+    def _analyze_unknown_dns_provider(self, ns_domain: str) -> Optional[str]:
+        """
+        Intelligent analysis for unknown DNS providers using WHOIS and domain analysis
+        
+        Args:
+            ns_domain: NS domain to analyze
+            
+        Returns:
+            DNS provider name or None
+        """
+        # Check cache first
+        cache_key = f"unknown_dns_provider:{ns_domain}"
+        cached_result = self.cache.get('dns', cache_key)
+        if cached_result:
+            self.logger.debug(f"Using cached DNS provider result for {ns_domain}: {cached_result}")
+            return cached_result
+        
+        provider = None
+        
+        try:
+            # Method 1: Extract domain root and analyze
+            domain_parts = ns_domain.split('.')
+            if len(domain_parts) >= 2:
+                root_domain = '.'.join(domain_parts[-2:])  # Get domain.tld
+                provider = self._analyze_domain_whois(root_domain)
+            
+            # Method 2: If no result, try IP-based analysis
+            if not provider:
+                provider = self._analyze_ns_ip(ns_domain)
+            
+            # Method 3: Extract company name from domain patterns
+            if not provider:
+                provider = self._extract_company_from_domain(ns_domain)
+            
+            # Cache the result (even if None) for 24 hours
+            self.cache.set('dns', cache_key, provider, ttl=86400)
+            
+            if provider:
+                self.logger.info(f"🔍 Intelligent DNS analysis: {ns_domain} -> {provider}")
+                # Optionally: add to learning dataset
+                self._add_to_learning_dataset(ns_domain, provider)
+            else:
+                self.logger.debug(f"Could not determine provider for unknown NS: {ns_domain}")
+                
+        except Exception as e:
+            self.logger.error(f"Error in intelligent DNS analysis for {ns_domain}: {e}")
+        
+        return provider
+    
+    def _analyze_domain_whois(self, domain: str) -> Optional[str]:
+        """Analyze domain WHOIS to find DNS provider"""
+        try:
+            import whois
+            whois_data = whois.whois(domain)
+            
+            # Extract organization/registrant information
+            org_fields = ['org', 'organization', 'registrant_organization', 'registrant']
+            for field in org_fields:
+                if hasattr(whois_data, field):
+                    value = getattr(whois_data, field)
+                    if value and isinstance(value, str):
+                        # Clean and normalize the organization name
+                        provider = self._normalize_provider_name(value)
+                        if provider:
+                            return provider
+            
+        except Exception as e:
+            self.logger.debug(f"WHOIS analysis failed for {domain}: {e}")
+        
+        return None
+    
+    def _analyze_ns_ip(self, ns_domain: str) -> Optional[str]:
+        """Analyze NS server IP to determine provider"""
+        try:
+            import socket
+            ip = socket.gethostbyname(ns_domain)
+            
+            # Try to get provider from IP using existing methods
+            if hasattr(self, 'ip_manager') and hasattr(self.ip_manager, 'get_provider_by_ip'):
+                provider = self.ip_manager.get_provider_by_ip(ip)
+                if provider:
+                    return provider
+            
+            # Try reverse DNS lookup
+            reverse_info = self.reverse_dns_lookup(ip)
+            if reverse_info and reverse_info.get('provider'):
+                return reverse_info['provider']
+                
+        except Exception as e:
+            self.logger.debug(f"IP analysis failed for {ns_domain}: {e}")
+        
+        return None
+    
+    def _extract_company_from_domain(self, ns_domain: str) -> Optional[str]:
+        """Extract company name from domain patterns"""
+        domain_lower = ns_domain.lower()
+        
+        # Common patterns in DNS server names
+        company_patterns = {
+            'dnsimple': 'DNSimple',
+            'easydns': 'EasyDNS', 
+            'dns.he.net': 'Hurricane Electric',
+            'zoneedit': 'ZoneEdit',
+            'everydns': 'EveryDNS',
+            'freedns': 'FreeDNS',
+            'afraid.org': 'FreeDNS',
+            'registrar-servers': 'Namecheap',
+            'domaincontrol': 'GoDaddy',
+            'parkingcrew': 'ParkingCrew',
+            'sedoparking': 'Sedo',
+            'idp365': 'Safenames'  # Our arsenal.co.uk case
+        }
+        
+        for pattern, provider in company_patterns.items():
+            if pattern in domain_lower:
+                return provider
+        
+        return None
+    
+    def _normalize_provider_name(self, org_name: str) -> Optional[str]:
+        """Normalize organization name to standard provider name"""
+        if not org_name:
+            return None
+        
+        org_lower = org_name.lower().strip()
+        
+        # Mapping of organization names to standardized provider names
+        name_mappings = {
+            'safenames ltd': 'Safenames',
+            'safenames limited': 'Safenames',
+            'amazon technologies': 'AWS',
+            'amazon.com': 'AWS',
+            'cloudflare': 'Cloudflare',
+            'google llc': 'Google',
+            'google inc': 'Google',
+            'microsoft corporation': 'Microsoft',
+            'digitalocean': 'DigitalOcean',
+            'ovh sas': 'OVH',
+            'hetzner online gmbh': 'Hetzner',
+            'linode': 'Linode',
+            'vultr holdings': 'Vultr'
+        }
+        
+        for pattern, provider in name_mappings.items():
+            if pattern in org_lower:
+                return provider
+        
+        # If no mapping, try to extract meaningful name
+        # Remove common suffixes
+        clean_name = org_lower
+        for suffix in [' ltd', ' limited', ' llc', ' inc', ' corporation', ' corp', ' gmbh', ' sas']:
+            clean_name = clean_name.replace(suffix, '')
+        
+        # Capitalize first letter of each word
+        if clean_name and len(clean_name) > 2:
+            return ' '.join(word.capitalize() for word in clean_name.split())
+        
+        return None
+    
+    def _add_to_learning_dataset(self, ns_domain: str, provider: str):
+        """Add discovered pattern to learning dataset for future improvements"""
+        try:
+            # This could be expanded to maintain a learning dataset
+            # For now, just log the discovery
+            self.logger.info(f"📚 Learning: {ns_domain} -> {provider}")
+            
+            # Future enhancement: save to a file or database for pattern analysis
+            # This could help automatically generate new patterns
+            
+        except Exception as e:
+            self.logger.error(f"Error adding to learning dataset: {e}")
 
     def identify_provider_from_domain(self, domain: str) -> Optional[str]:
         """

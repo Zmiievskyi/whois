@@ -2,16 +2,18 @@
   "analysis_metadata": {
     "domain": "arsenal.co.uk",
     "ip_address": null,
-    "analysis_timestamp": "2025-08-22 17:21:04 UTC",
+    "analysis_timestamp": "2025-08-25 12:32:26 UTC",
     "analysis_version": "Provider Discovery Tool v3.0",
     "enhanced_confidence": 100,
     "total_analysis_steps": 8,
-    "backend_save_timestamp": "20250822_172119"
+    "backend_save_timestamp": "20250825_123252"
   },
   "detection_results": {
     "primary_provider": "Safenames Datacentre",
     "cdn_providers": [],
-    "dns_providers": [],
+    "dns_providers": [
+      "Safenames"
+    ],
     "hosting_providers": null,
     "cloud_providers": null,
     "security_providers": null
@@ -20,7 +22,9 @@
     "step_1_base_detection": {
       "status": "completed",
       "step_name": "Base Provider Detection",
-      "findings": [],
+      "findings": [
+        "Detected 3 providers"
+      ],
       "confidence_impact": 15,
       "methods": [
         "HTTP Headers",
@@ -95,7 +99,7 @@
                 "records": [
                   "217.19.248.132"
                 ],
-                "response_time": 0.0006248950958251953
+                "response_time": 0.0013260841369628906
               }
             },
             "consensus": {
@@ -183,19 +187,19 @@
           "ip": "217.19.248.132",
           "provider": "geojs_io",
           "raw_response": {
-            "continent_code": "EU",
-            "latitude": "51.4964",
-            "longitude": "-0.1224",
-            "accuracy": 200,
-            "country_code": "GB",
-            "timezone": "Europe/London",
             "asn": 60819,
-            "organization": "AS60819 Safenames Ltd.",
-            "ip": "217.19.248.132",
-            "area_code": "0",
-            "organization_name": "Safenames Ltd.",
             "country": "United Kingdom",
-            "country_code3": "GBR"
+            "organization_name": "Safenames Ltd.",
+            "country_code": "GB",
+            "country_code3": "GBR",
+            "continent_code": "EU",
+            "organization": "AS60819 Safenames Ltd.",
+            "latitude": "51.4964",
+            "ip": "217.19.248.132",
+            "accuracy": 200,
+            "longitude": "-0.1224",
+            "timezone": "Europe/London",
+            "area_code": "0"
           }
         }
       },
@@ -276,74 +280,74 @@
         "email": null,
         "phone": null,
         "prefixes_v4": [
+          "188.241.14.0/24",
+          "89.44.244.0/24",
+          "188.241.147.0/24",
+          "217.19.243.0/24",
+          "84.247.21.0/24",
+          "217.19.244.0/22",
+          "188.214.58.0/24",
+          "92.114.80.0/24",
+          "86.106.172.0/24",
+          "86.106.11.0/24",
+          "84.247.17.0/24",
+          "89.34.109.0/24",
           "89.34.222.0/24",
           "185.191.160.0/22",
+          "31.3.64.0/22",
+          "185.191.160.0/24",
+          "185.191.161.0/24",
+          "188.208.34.0/24",
+          "188.214.80.0/24",
+          "217.19.241.0/24",
+          "89.33.82.0/24",
+          "31.14.216.0/24",
+          "93.114.48.0/24",
+          "31.3.66.0/24",
           "188.208.35.0/24",
+          "188.241.145.0/24",
+          "217.19.250.0/24",
+          "93.113.201.0/24",
+          "89.42.58.0/24",
+          "185.191.162.0/24",
+          "217.19.242.0/24",
+          "89.34.223.0/24",
+          "188.240.50.0/24",
+          "185.191.163.0/24",
+          "93.113.200.0/24",
+          "188.241.8.0/24",
           "217.19.254.0/24",
           "93.114.49.0/24",
-          "188.241.8.0/24",
-          "86.106.11.0/24",
-          "217.19.241.0/24",
-          "217.19.248.0/24",
-          "93.113.201.0/24",
-          "185.96.161.0/24",
-          "188.208.34.0/24",
-          "84.247.17.0/24",
-          "188.214.58.0/24",
-          "188.241.145.0/24",
-          "188.241.9.0/24",
-          "188.240.50.0/24",
-          "188.240.197.0/24",
-          "89.33.82.0/24",
-          "93.114.48.0/24",
-          "217.19.240.0/24",
-          "94.176.129.0/24",
-          "217.19.250.0/24",
-          "31.3.64.0/22",
-          "31.3.66.0/24",
-          "185.191.161.0/24",
-          "31.14.217.0/24",
-          "217.19.255.0/24",
-          "89.46.63.0/24",
-          "188.214.28.0/24",
-          "217.19.244.0/22",
-          "185.191.163.0/24",
-          "185.191.162.0/24",
-          "89.33.104.0/24",
           "93.115.247.0/24",
-          "188.212.249.0/24",
-          "86.104.5.0/24",
+          "217.19.251.0/24",
           "86.105.3.0/24",
-          "188.214.110.0/24",
-          "217.19.252.0/24",
-          "217.19.253.0/24",
-          "89.34.223.0/24",
-          "92.114.80.0/24",
-          "188.241.14.0/24",
-          "89.42.58.0/24",
-          "217.19.242.0/24",
-          "217.19.243.0/24",
-          "86.106.172.0/24",
-          "31.14.216.0/24",
-          "86.104.11.0/24",
-          "84.247.21.0/24",
-          "89.34.109.0/24",
-          "89.44.244.0/24",
-          "185.191.160.0/24",
-          "46.102.117.0/24",
-          "188.214.80.0/24",
-          "93.113.200.0/24",
-          "188.241.147.0/24",
+          "89.33.104.0/24",
+          "89.46.63.0/24",
+          "89.47.235.0/24",
           "31.3.64.0/21",
           "217.19.249.0/24",
-          "217.19.251.0/24",
-          "89.47.235.0/24"
+          "217.19.253.0/24",
+          "185.96.161.0/24",
+          "188.240.197.0/24",
+          "86.104.11.0/24",
+          "217.19.255.0/24",
+          "217.19.240.0/24",
+          "188.241.9.0/24",
+          "94.176.129.0/24",
+          "188.214.110.0/24",
+          "188.214.28.0/24",
+          "217.19.248.0/24",
+          "217.19.252.0/24",
+          "31.14.217.0/24",
+          "188.212.249.0/24",
+          "46.102.117.0/24",
+          "86.104.5.0/24"
         ],
         "prefixes_v6": [
-          "2a00:a900::/32",
+          "2a00:a900:6afe::/48",
           "2a00:a900:8afe::/48",
           "2a00:a900:7afe::/48",
-          "2a00:a900:6afe::/48"
+          "2a00:a900::/32"
         ],
         "peers": [
           {
@@ -357,16 +361,6 @@
             "relationship": "peer"
           },
           {
-            "asn": 6939,
-            "name": "AS6939",
-            "relationship": "peer"
-          },
-          {
-            "asn": 6939,
-            "name": "Hurricane Electric LLC",
-            "relationship": "peer"
-          },
-          {
             "asn": 174,
             "name": "AS174",
             "relationship": "peer"
@@ -374,6 +368,16 @@
           {
             "asn": 174,
             "name": "Cogent Communications",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "AS6939",
+            "relationship": "peer"
+          },
+          {
+            "asn": 6939,
+            "name": "Hurricane Electric LLC",
             "relationship": "peer"
           },
           {
@@ -432,13 +436,13 @@
             "relationship": "peer"
           },
           {
-            "asn": 6939,
-            "name": "AS6939",
+            "asn": 174,
+            "name": "AS174",
             "relationship": "peer"
           },
           {
-            "asn": 174,
-            "name": "AS174",
+            "asn": 6939,
+            "name": "AS6939",
             "relationship": "peer"
           },
           {
@@ -611,30 +615,30 @@
               "eu-smtp-inbound-1.mimecast.com"
             ],
             "txt_records": [
-              "5 Beware Wambles Revoir",
-              "docusign=b94d63fc-3300-4243-8186-b71fef539b9b",
-              "v=spf1 include:_spf.arsenal.co.uk mx include:europe.spf.ticketmaster.com include:production.spf.ticketmaster.com include:eu._netblocks.mimecast.com include:spf.mandrillapp.com   include:spf.protection.outlook.com include:em1597.arsenal.co.uk a:c.spf.service-now.com ~all",
-              "amazonses:F0LBkMjRv4XiQePxGrG4P6wmYkv3Bqjrr8vBRwZCdq4=",
-              "adobe-idp-site-verification=f1cb47121847146380af7090a4353db484798d4317c2cd65939ac0750404639d",
-              "google-site-verification=VLZ-IctRUJ4Pi9ehhKT8xE1eK4U0Tf8l0gBpR-O3bCQ",
               "docusign=fc911e0c-05dc-4ec0-8623-1273c3677d86",
+              "tt6n4elfqqk3g4kur8mlqqdgra",
+              "airtable-verification=fa611c5d5732da83cf02034c4a2546f3",
+              "5 Beware Wambles Revoir",
+              "google-site-verification=VLZ-IctRUJ4Pi9ehhKT8xE1eK4U0Tf8l0gBpR-O3bCQ",
+              "atlassian-domain-verification=h9f4hHObTdXZLgn6EKUC7q0PrIIvV8CrMxcffJ680YcrjCIQJmV5QeBtsKqNeYEE",
+              "adobe-idp-site-verification=f1cb47121847146380af7090a4353db484798d4317c2cd65939ac0750404639d",
+              "MS=ms26079523",
+              "have-i-been-pwned-verification=46da0f509735c89d982b89424242584d",
+              "2ZzWWuitUPMGSr9i58pjEEwMt0qkhDsa2Be9IW35q5UCi2g4bAbAN59x/32rSXHlN09x3gfagVEKzYMuZkp5Wg==",
               "google-site-verification=fw5b9H7yYWg-2vD9sw135I4Cg_H5NatqXxirbjRKivc",
               "ctgksccmsj7d2d7aqtr42mrqio",
-              "have-i-been-pwned-verification=46da0f509735c89d982b89424242584d",
-              "apple-domain-verification=hfXJUVYGAAcHiXWT",
+              "amazonses:F0LBkMjRv4XiQePxGrG4P6wmYkv3Bqjrr8vBRwZCdq4=",
               "5tvugg26oet9u5jp5nvk83jnvs",
-              "airtable-verification=fa611c5d5732da83cf02034c4a2546f3",
-              "atlassian-domain-verification=h9f4hHObTdXZLgn6EKUC7q0PrIIvV8CrMxcffJ680YcrjCIQJmV5QeBtsKqNeYEE",
+              "v=spf1 include:_spf.arsenal.co.uk mx include:europe.spf.ticketmaster.com include:production.spf.ticketmaster.com include:eu._netblocks.mimecast.com include:spf.mandrillapp.com   include:spf.protection.outlook.com include:em1597.arsenal.co.uk a:c.spf.service-now.com ~all",
+              "apple-domain-verification=hfXJUVYGAAcHiXWT",
               "m6j7jk8pkvb7tnqwwkcg894mjbb10xk9",
               "Target: 0ed1fe018a213f9168caf148e79b04f0f665b06da2",
-              "tt6n4elfqqk3g4kur8mlqqdgra",
-              "MS=ms26079523",
               "835v257u4ntn5er6fgldi2uif3",
-              "2ZzWWuitUPMGSr9i58pjEEwMt0qkhDsa2Be9IW35q5UCi2g4bAbAN59x/32rSXHlN09x3gfagVEKzYMuZkp5Wg=="
+              "docusign=b94d63fc-3300-4243-8186-b71fef539b9b"
             ],
             "security_policies": {
-              "spf": true,
-              "google_verified": true
+              "google_verified": true,
+              "spf": true
             },
             "suspicious_patterns": []
           }
@@ -685,43 +689,40 @@
       "confidence_score": 100
     },
     "cross_validation": {
-      "provider_consensus": {},
-      "confidence_boosters": [],
+      "provider_consensus": {
+        "safenames": {
+          "sources": [
+            "NS Records",
+            "NS Records",
+            "NS Records"
+          ],
+          "confidence_boost": 30
+        }
+      },
+      "confidence_boosters": [
+        "Safenames confirmed by 3 sources: NS Records, NS Records, NS Records"
+      ],
       "conflicting_data": [],
-      "validation_score": 0
+      "validation_score": 30
     },
     "security_assessment": {},
     "advanced_bgp_classification": {
       "asn": 60819,
       "ip": "217.19.248.132",
       "classification": "END_CUSTOMER",
-      "confidence": 0.7625,
+      "confidence": 0.75,
       "evidence": [
-        "ml_enhanced",
-        "customer_name_pattern_safenames-as - safenames ltd.",
-        "small_prefix_count_0",
-        "minimal_infrastructure_customer_pattern"
+        "small_prefix_count_0"
       ],
       "data_sources": [
-        "ripe_stat",
         "bgpview"
       ],
       "business_type": null,
       "customer_indicators": [],
       "provider_indicators": [],
       "vote_distribution": {
-        "END_CUSTOMER": 1.4500000000000002
-      },
-      "ml_features": {
-        "facility_count": 0,
-        "ix_count": 0,
-        "prefix_count": 0,
-        "has_provider_keywords": false,
-        "has_customer_keywords": true,
-        "peering_policy_score": 0,
-        "data_sources_count": 2
-      },
-      "enhancement": "ml_boosted_confidence"
+        "END_CUSTOMER": 0.75
+      }
     }
   },
   "security_findings": [
@@ -746,18 +747,22 @@
   ],
   "recommendations": [
     "⚠️ High security risk detected - review domain carefully",
-    "⚠️ Conflicting data detected - manual verification recommended",
     "🎯 High confidence detection - results highly reliable"
   ],
   "technical_details": {
-    "confidence_factors": [],
+    "confidence_factors": [
+      "NS record analysis identified DNS providers: Safenames"
+    ],
     "enhanced_confidence_factors": [
       "DoH (DNS over HTTPS) analysis completed",
       "BGP analysis completed with 4 insights",
       "ASN classified as end customer - not a hosting provider",
-      "DNS security policies found: ['spf', 'google_verified']"
+      "DNS security policies found: ['google_verified', 'spf']",
+      "Safenames confirmed by 3 sources: NS Records, NS Records, NS Records"
     ],
     "analysis_methods": [
+      "NS Record Analysis",
+      "VirusTotal API",
       "SSL Certificate Analysis",
       "Enhanced DNS Analysis",
       "Geographic Intelligence",
