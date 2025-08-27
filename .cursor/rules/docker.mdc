@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+docker buildx use multiplatform-builder
+
+
+docker buildx build --platform linux/amd64,linux/arm64 -t anton0509/provider_detector:v1.3 --push .

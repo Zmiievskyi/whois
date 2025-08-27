@@ -1,0 +1,755 @@
+{
+  "analysis_metadata": {
+    "domain": "cloudflare.com",
+    "ip_address": null,
+    "analysis_timestamp": "2025-08-27 13:08:38 UTC",
+    "analysis_version": "Provider Discovery Tool v3.0",
+    "enhanced_confidence": 92,
+    "total_analysis_steps": 9,
+    "backend_save_timestamp": "20250827_130843"
+  },
+  "detection_results": {
+    "primary_provider": "CloudFlare, Inc.",
+    "cdn_providers": [
+      "CloudFlare, Inc.",
+      "Cloudflare, Inc.",
+      "CLOUDFLARE"
+    ],
+    "dns_providers": [
+      "Cloudflare"
+    ],
+    "hosting_providers": null,
+    "cloud_providers": null,
+    "security_providers": null
+  },
+  "step_by_step_analysis": {
+    "step_1_base_detection": {
+      "status": "completed",
+      "step_name": "Base Provider Detection",
+      "findings": [
+        "Detected 5 providers"
+      ],
+      "confidence_impact": 15,
+      "methods": [
+        "HTTP Headers",
+        "IP Ranges",
+        "WHOIS",
+        "DNS Resolution"
+      ]
+    },
+    "step_2_ssl_analysis": {
+      "status": "completed",
+      "step_name": "SSL Certificate Analysis",
+      "findings": [
+        "SSL Grade: Unknown"
+      ],
+      "confidence_impact": 5,
+      "methods": [
+        "Certificate Authority Detection",
+        "Security Grading"
+      ]
+    },
+    "step_3_enhanced_dns": {
+      "status": "completed",
+      "step_name": "Enhanced DNS Analysis",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "Multi-Resolver DNS",
+        "DoH Validation"
+      ]
+    },
+    "step_4_geographic_intel": {
+      "status": "completed",
+      "step_name": "Geographic Intelligence",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "IP Geolocation",
+        "Provider Classification"
+      ]
+    },
+    "step_5_bgp_analysis": {
+      "status": "completed",
+      "step_name": "BGP Analysis",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "ASN Lookup",
+        "Routing Analysis"
+      ]
+    },
+    "step_6_advanced_bgp_classification": {
+      "status": "pending",
+      "findings": [],
+      "confidence_impact": 0
+    },
+    "step_7_threat_intelligence": {
+      "status": "completed",
+      "step_name": "Threat Intelligence",
+      "findings": [
+        "Threat Level: high"
+      ],
+      "confidence_impact": 0,
+      "methods": [
+        "Security Assessment",
+        "Reputation Analysis"
+      ]
+    },
+    "step_8_shodan_waf_analysis": {
+      "status": "completed",
+      "step_name": "Shodan Premium WAF Analysis",
+      "findings": [
+        "No direct WAF detected via Shodan",
+        "Cloud Providers: CLOUDFLARE",
+        "CDN Providers: CloudFlare, Inc., Cloudflare, Inc., CLOUDFLARE",
+        "WAF Providers: CLOUDFLARE",
+        "Technologies identified: 1",
+        "Security Score: 100/100",
+        "WAF indicators: 16",
+        "Geographic distribution: 4 locations",
+        "ASN networks: 2",
+        "No vulnerabilities detected",
+        "SSL Trust Score: 100/100",
+        "High data richness: 100/100",
+        "Comprehensive analysis: 10 hosts"
+      ],
+      "confidence_impact": 25,
+      "methods": [
+        "WAF Detection",
+        "Technology Stack Analysis",
+        "IP Security Analysis"
+      ]
+    },
+    "step_9_cross_validation": {
+      "status": "completed",
+      "step_name": "Cross-Validation & Final Analysis",
+      "findings": [
+        "Final Confidence Score: 92%",
+        "Provider Consensus: 10 sources"
+      ],
+      "confidence_impact": 10,
+      "methods": [
+        "Multi-Source Validation",
+        "Confidence Scoring",
+        "Provider Consensus"
+      ]
+    }
+  },
+  "enhanced_analysis_details": {
+    "ssl_analysis": {
+      "domain": "cloudflare.com",
+      "certificate_info": {
+        "subject_cn": "cloudflare.com",
+        "subject_org": "",
+        "issuer_cn": "WE1",
+        "issuer_org": "Google Trust Services",
+        "not_before": "2025-07-19T19:37:13",
+        "not_after": "2025-10-17T20:37:10",
+        "days_until_expiry": 51,
+        "is_expired": false,
+        "is_expiring_soon": false,
+        "subject_alt_names": [
+          "cloudflare.com",
+          "ns.cloudflare.com",
+          "*.ns.cloudflare.com",
+          "*.secondary.cloudflare.com",
+          "secondary.cloudflare.com"
+        ],
+        "serial_number": "80EE664577E771B11321C9885F25B0F4",
+        "version": 3,
+        "ca_info": {
+          "ca_name": "google_ca",
+          "ca_type": "Cloud CA",
+          "provider_hints": [
+            "Google Cloud",
+            "GCP"
+          ],
+          "automation_level": "High",
+          "issuer_cn": "we1",
+          "issuer_org": "google trust services"
+        },
+        "hosting_hints": {
+          "detected_providers": [
+            "cloudflare"
+          ],
+          "total_domains": 6,
+          "wildcard_domains": [
+            "*.ns.cloudflare.com",
+            "*.secondary.cloudflare.com"
+          ],
+          "subdomain_patterns": {}
+        },
+        "wildcard_cert": true,
+        "multi_domain_cert": true,
+        "cipher_suite": "TLS_AES_256_GCM_SHA384",
+        "protocol_version": "TLSv1.3",
+        "domain": "cloudflare.com",
+        "port": 443,
+        "connection_successful": true
+      },
+      "provider_analysis": {
+        "certificate_authority": "google_ca",
+        "ca_type": "Cloud CA",
+        "automation_level": "High",
+        "detected_hosting_providers": [
+          "cloudflare"
+        ],
+        "infrastructure_hints": [
+          "Wildcard certificate (likely CDN/load balancer)",
+          "Multi-domain certificate (shared hosting or CDN)"
+        ]
+      },
+      "security_assessment": {
+        "security_score": 100,
+        "security_grade": "A",
+        "issues": [],
+        "recommendations": [],
+        "protocol_version": "TLSv1.3",
+        "cipher_suite": "TLS_AES_256_GCM_SHA384",
+        "certificate_valid": true
+      },
+      "data_source": "ssl_analysis"
+    },
+    "enhanced_dns": {
+      "multi_resolver": {
+        "domain": "cloudflare.com",
+        "record_types": {
+          "A": {
+            "domain": "cloudflare.com",
+            "record_type": "A",
+            "resolver_results": {
+              "system": {
+                "success": true,
+                "records": [
+                  "104.16.132.229"
+                ],
+                "response_time": 0.0006611347198486328
+              }
+            },
+            "consensus": {
+              "agreed_records": [
+                "104.16.132.229"
+              ],
+              "consensus_score": 1.0
+            }
+          }
+        },
+        "resolver_reliability": {
+          "system": "available"
+        },
+        "dns_security": {
+          "status": "basic_check_completed"
+        },
+        "performance_metrics": {
+          "avg_response_time": 0.1
+        },
+        "anomalies": []
+      },
+      "doh_analysis": {
+        "success": true,
+        "records": [
+          "104.16.132.229",
+          "104.16.133.229"
+        ],
+        "response_time": false,
+        "authoritative": false,
+        "recursion_desired": true,
+        "recursion_available": true
+      },
+      "cross_validation": {
+        "domain_resolves": true,
+        "resolved_ip": "104.16.132.229",
+        "validation_status": "success"
+      }
+    },
+    "geographic_intelligence": {},
+    "bgp_analysis": {},
+    "hurricane_electric_bgp": {},
+    "threat_intelligence": {
+      "domain": "cloudflare.com",
+      "domain_analysis": {
+        "domain": "cloudflare.com",
+        "reputation_score": 35,
+        "threat_level": "critical",
+        "security_analysis": {
+          "urlvoid": {
+            "success": true,
+            "source": "urlvoid",
+            "data": {
+              "malicious_detections": 2,
+              "safety_indicators": [
+                "marked_as_safe",
+                "malware_detected",
+                "phishing_detected"
+              ],
+              "risk_level": "high"
+            }
+          },
+          "safe_browsing": {
+            "success": true,
+            "source": "basic_dns_check",
+            "data": {
+              "dns_resolves": true,
+              "risk_assessment": "low",
+              "confidence": "low"
+            }
+          },
+          "dns_indicators": {
+            "mx_records": [
+              "mailstream-east.mxrecord.io",
+              "mailstream-canary.mxrecord.io",
+              "mailstream-west.mxrecord.io",
+              "mailstream-central.mxrecord.mx"
+            ],
+            "txt_records": [
+              "_saml-domain-challenge.2dc00405-79cd-457b-b288-a119c6f0c7b7.71996d53-d178-4ba9-bef4-7f7e46edab74.cloudflare.com=1c8736fd-84b2-4197-985f-3fb2852f2457",
+              "logmein-verification-code=b3433c86-3823-4808-8a7e-58042469f654",
+              "_neqmkgaq1lq9it5s8qmetrhbnu121wb",
+              "google-site-verification=ZdlQZLBBAPkxeFTCM1rpiB_ibtGff_JF5KllNKwDR9I",
+              "cisco-ci-domain-verification=27e926884619804ef987ae4aa1c4168f6b152ada84f4c8bfc74eb2bd2912ad72",
+              "liveramp-site-verification=EhH1MqgwbndTWl1AN64hOTKz7hc1s80yUpchLbgpfY0",
+              "drift-domain-verification=f037808a26ae8b25bc13b1f1f2b4c3e0f78c03e67f24cefdd4ec520efa8e719f",
+              "facebook-domain-verification=h9mm6zopj6p2po54woa16m5bskm6oo",
+              "ZOOM_verify_7LFBvOO9SIigypFG2xRlMA",
+              "stripe-verification=5096d01ff2cf194285dd51cae18f24fa9c26dc928cebac3636d462b4c6925623",
+              "stripe-verification=bf1a94e6b16ace2502a4a7fff574a25c8a45291054960c883c59be39d1788db9",
+              "onetrust-domain-verification=bd5cd08a1e9644799fdb98ed7d60c9cb",
+              "docker-verification=c578e21c-34fb-4474-9b90-d55ee4cba10c",
+              "atlassian-domain-verification=WxxKyN9aLnjEsoOjUYI6T0bb5vcqmKzaIkC9Rx2QkNb751G3LL/cus8/ZDOgh8xB",
+              "asv=894f6d1f9f83bcf44e4b1bc40bc1c4aa",
+              "miro-verification=bdd7dfa0a49adfb43ad6ddfaf797633246c07356",
+              "status-page-domain-verification=r14frwljwbxs",
+              "v=spf1 ip4:199.15.212.0/22 ip4:173.245.48.0/20 include:_spf.google.com include:spf1.mcsv.net include:spf.mandrillapp.com include:mail.zendesk.com include:stspg-customer.com include:_spf.salesforce.com -all",
+              "MS=ms70274184",
+              "apple-domain-verification=DNnWJoArJobFJKhJ",
+              "google-site-verification=C7thfNeXVahkVhniiqTI1iSVnElKR_kBBtnEHkeGDlo",
+              "creatopy-domain-verification=97d2ca50-9b6f-4a21-9bdb-fbb630e4cec7"
+            ],
+            "security_policies": {
+              "google_verified": true,
+              "spf": true
+            },
+            "suspicious_patterns": []
+          }
+        },
+        "pattern_analysis": {
+          "suspicious_indicators": [],
+          "risk_factors": [],
+          "domain_age_estimate": "unknown",
+          "structure_analysis": {
+            "total_length": 14,
+            "subdomain_count": 0,
+            "has_numbers": false,
+            "has_hyphens": false,
+            "entropy": 3.12
+          }
+        },
+        "recommendations": [
+          "⚠️ CRITICAL: Avoid accessing this domain",
+          "🛡️ Block domain in firewall/DNS filter",
+          "🔐 Consider DMARC policy for email protection"
+        ]
+      },
+      "ip_analyses": {
+        "104.16.133.229": {
+          "ip": "104.16.133.229",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "Canada",
+            "isp": "Cloudflare, Inc."
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        },
+        "104.16.132.229": {
+          "ip": "104.16.132.229",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "Canada",
+            "isp": "Cloudflare, Inc."
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        }
+      },
+      "overall_threat_level": "high",
+      "security_recommendations": [
+        "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+        "⚠️ CRITICAL: Avoid accessing this domain",
+        "🛡️ Block domain in firewall/DNS filter",
+        "🔐 Consider DMARC policy for email protection"
+      ],
+      "confidence_score": 100
+    },
+    "cross_validation": {
+      "provider_consensus": {
+        "cloudflare": {
+          "sources": [
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "Shodan Provider Classification",
+            "Shodan CDN Classification",
+            "Shodan WAF Classification"
+          ],
+          "confidence_boost": 80
+        },
+        "cloudflare, inc.": {
+          "sources": [
+            "Shodan CDN Classification",
+            "Shodan CDN Classification"
+          ],
+          "confidence_boost": 20
+        }
+      },
+      "confidence_boosters": [
+        "Cloudflare confirmed by 8 sources: NS Records, NS Records, NS Records, NS Records, NS Records, Shodan Provider Classification, Shodan CDN Classification, Shodan WAF Classification",
+        "Cloudflare, Inc. confirmed by 2 sources: Shodan CDN Classification, Shodan CDN Classification"
+      ],
+      "conflicting_data": [],
+      "validation_score": 60
+    },
+    "security_assessment": {},
+    "shodan_analysis": {
+      "waf_detection": {
+        "success": true,
+        "domain": "cloudflare.com",
+        "query_used": "hostname:cloudflare.com http.waf",
+        "hosts_with_waf": 0,
+        "waf_detected": false,
+        "waf_type": "unknown",
+        "waf_indicators": [],
+        "confidence": 0,
+        "security_headers": [],
+        "raw_hosts": []
+      },
+      "technology_stack": {
+        "success": true,
+        "domain": "cloudflare.com",
+        "technologies": [
+          "cloudflare"
+        ],
+        "web_servers": {
+          "cloudflare": 3
+        },
+        "frameworks": {},
+        "cdn_providers": [],
+        "ssl_info": {
+          "subject": {
+            "CN": "cdnjs.cloudflare.com"
+          },
+          "issuer": {
+            "C": "US",
+            "CN": "WE1",
+            "O": "Google Trust Services"
+          },
+          "version": null,
+          "cipher": {
+            "version": "TLSv1.3",
+            "bits": 256,
+            "name": "TLS_AES_256_GCM_SHA384"
+          },
+          "trust_score": 70
+        },
+        "ports_services": {
+          "2083": [
+            "",
+            "",
+            ""
+          ],
+          "8080": [
+            "cloudflare"
+          ],
+          "443": [
+            "cloudflare"
+          ],
+          "2082": [
+            "",
+            ""
+          ],
+          "53": [
+            ""
+          ],
+          "8443": [
+            "cloudflare"
+          ],
+          "2087": [
+            ""
+          ]
+        },
+        "confidence": 24,
+        "provider_classification": {
+          "cloud_providers": [
+            "CLOUDFLARE"
+          ],
+          "cdn_providers": [
+            "CloudFlare, Inc.",
+            "Cloudflare, Inc.",
+            "CLOUDFLARE"
+          ],
+          "waf_providers": [
+            "CLOUDFLARE"
+          ],
+          "hosting_providers": [],
+          "confidence_indicators": [
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: Cloudflare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "Cloud provider detected: cloudflare",
+            "CDN tag found: CloudFlare, Inc.",
+            "Cloud provider detected: cloudflare",
+            "Primary organization: Cloudflare, Inc."
+          ],
+          "primary_infrastructure": "Cloudflare, Inc."
+        },
+        "security_assessment": {
+          "security_headers": {},
+          "ssl_configuration": {
+            "subject": {
+              "CN": "cdnjs.cloudflare.com"
+            },
+            "issuer": {
+              "C": "US",
+              "CN": "WE1",
+              "O": "Google Trust Services"
+            },
+            "version": null,
+            "cipher": {
+              "version": "TLSv1.3",
+              "bits": 256,
+              "name": "TLS_AES_256_GCM_SHA384"
+            }
+          },
+          "vulnerability_indicators": [],
+          "security_score": 100,
+          "recommendations": [
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Cloudflare protection detected",
+            "Strong security posture detected"
+          ],
+          "waf_indicators": [
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "Cloudflare WAF",
+            "WAF-like response: 403",
+            "Cloudflare WAF",
+            "WAF-like response: 403"
+          ],
+          "response_analysis": {
+            "status_code": 403,
+            "server": "cloudflare",
+            "security_headers_count": 0
+          }
+        },
+        "infrastructure_mapping": {
+          "geographic_distribution": {
+            "United States, San Francisco": 7,
+            "Finland, Helsinki": 1,
+            "Malaysia, Johor Bahru": 1,
+            "Germany, Munich": 1
+          },
+          "port_services": {
+            "2083": [
+              "Unknown",
+              "Unknown",
+              "Unknown"
+            ],
+            "8080": [
+              "CloudFlare"
+            ],
+            "443": [
+              "CloudFlare"
+            ],
+            "2082": [
+              "Unknown",
+              "Unknown"
+            ],
+            "53": [
+              "Unknown"
+            ],
+            "8443": [
+              "CloudFlare"
+            ],
+            "2087": [
+              "Unknown"
+            ]
+          },
+          "asn_analysis": {
+            "AS13335": "CloudFlare, Inc.",
+            "AS207569": "PSERVERS Enterprise Network"
+          },
+          "hosting_patterns": [
+            "cdn"
+          ],
+          "organization_analysis": {
+            "Cloudflare, Inc.": 8,
+            "PSERVERS Enterprise Network": 1,
+            "CloudFlare, Inc.": 1
+          },
+          "country_analysis": {
+            "United States": 7,
+            "Finland": 1,
+            "Malaysia": 1,
+            "Germany": 1
+          }
+        },
+        "vulnerability_analysis": {
+          "vulnerabilities_found": [],
+          "risk_score": 0,
+          "security_recommendations": [
+            "No vulnerabilities detected via Shodan"
+          ],
+          "outdated_software": [],
+          "severity_breakdown": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          }
+        },
+        "ssl_trust_analysis": {
+          "certificate_authorities": [
+            "we1"
+          ],
+          "trust_score": 100,
+          "ssl_configurations": [
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            },
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            },
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            },
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            }
+          ],
+          "recommendations": [],
+          "certificate_analysis": {
+            "subject": {
+              "CN": "cdnjs.cloudflare.com"
+            },
+            "issuer": {
+              "C": "US",
+              "CN": "WE1",
+              "O": "Google Trust Services"
+            },
+            "serial_number": 300273585133375292098128970883089983693,
+            "fingerprint": {
+              "sha256": "52cd3d83e55a57379fd90bebc3ea67b74cf17493b7c9e80be3e8cb2e7a94a278",
+              "sha1": "66d551e08ed72cd1e3985899229b73c46f32fdec"
+            }
+          }
+        },
+        "data_richness_score": 100,
+        "total_hosts_analyzed": 10
+      }
+    }
+  },
+  "security_findings": [
+    "Threat Level: high (confidence: 100%)",
+    "Domain Reputation: 35/100",
+    "Security policies detected: 2",
+    "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+    "⚠️ CRITICAL: Avoid accessing this domain",
+    "🛡️ Block domain in firewall/DNS filter",
+    "Technologies identified: 1 (Shodan Enhanced)",
+    "Shodan Security Score: 100/100",
+    "Shodan: Cloudflare protection detected",
+    "Shodan: Cloudflare protection detected",
+    "WAF indicators detected: 16",
+    "Vuln: No vulnerabilities detected via Shodan",
+    "SSL Trust Score: 100/100 (Shodan)"
+  ],
+  "geographic_insights": [
+    "Shodan: Primary location - United States, San Francisco"
+  ],
+  "bgp_insights": [],
+  "recommendations": [
+    "⚠️ High security risk detected - review domain carefully",
+    "🎯 High confidence detection - results highly reliable"
+  ],
+  "technical_details": {
+    "confidence_factors": [
+      "NS record analysis identified DNS providers: Cloudflare"
+    ],
+    "enhanced_confidence_factors": [
+      "DoH (DNS over HTTPS) analysis completed",
+      "DNS security policies found: ['google_verified', 'spf']",
+      "Shodan cloud provider: CLOUDFLARE",
+      "Shodan CDN detection: CloudFlare, Inc.",
+      "Shodan CDN detection: Cloudflare, Inc.",
+      "Shodan CDN detection: CLOUDFLARE",
+      "Shodan WAF provider: CLOUDFLARE",
+      "Shodan ASN mapping: 2 networks",
+      "Shodan hosting pattern: cdn",
+      "Shodan SSL CA: we1",
+      "Shodan data richness: 100/100",
+      "Shodan hosts analyzed: 10",
+      "Cloudflare confirmed by 8 sources: NS Records, NS Records, NS Records, NS Records, NS Records, Shodan Provider Classification, Shodan CDN Classification, Shodan WAF Classification",
+      "Cloudflare, Inc. confirmed by 2 sources: Shodan CDN Classification, Shodan CDN Classification"
+    ],
+    "analysis_methods": [
+      "NS Record Analysis",
+      "SSL Certificate Analysis",
+      "Enhanced DNS Analysis",
+      "Threat Intelligence",
+      "Shodan Enhanced Infrastructure Analysis"
+    ],
+    "dns_chain": null,
+    "whois_data": null
+  }
+}

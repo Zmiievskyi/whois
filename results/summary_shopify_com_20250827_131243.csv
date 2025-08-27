@@ -1,0 +1,54 @@
+Category,Key,Value
+Domain,URL,shopify.com
+Network,IP_Address,N/A
+Confidence,Enhanced_Confidence,92%
+Analysis,Timestamp,2025-08-27 13:12:38 UTC
+Providers,Primary Provider,CLOUDFLARE
+Providers,CDN Providers,"CLOUDFLARE, Shopify, Inc."
+Providers,DNS Providers,"Cloudflare, Data Redacted"
+Providers,Hosting Providers,None
+Providers,Cloud Providers,None
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,step_6_advanced_bgp_classification,pending | +0% confidence | 0 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +-228% confidence | 12 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
+,,
+=== SHODAN PREMIUM ANALYSIS DETAILS ===,,
+Shodan WAF,Detection Success,True
+Shodan WAF,WAF Detected,False
+Shodan Providers,Cloud Providers,"GCP, CLOUDFLARE"
+Shodan Providers,CDN Providers,"CLOUDFLARE, Shopify, Inc."
+Shodan Providers,WAF Providers,CLOUDFLARE
+Shodan Providers,Primary Infrastructure,"Shopify, Inc."
+Shodan Technology,Technologies Detected,2 technologies
+Shodan Technology,Technology List,"apache httpd, cloudflare"
+Shodan Technology,Web Servers,"cloudflare (x3), apache httpd 2.4.6 (x1)"
+Shodan Security,Security Score,0/100
+Shodan Security,WAF Indicators,8 indicators
+Shodan Security,Sample WAF Indicators,"Cloudflare WAF, WAF-like response: 403, Cloudflare WAF, WAF-like response: 403, Cloudflare WAF"
+Shodan Security,Security Headers,0 headers detected
+Shodan Security,Security Recommendations,6 recommendations
+Shodan Security,Primary Recommendation,Cloudflare protection detected
+Shodan Infrastructure,Geographic Locations,3 locations
+Shodan Infrastructure,Primary Location,"Canada, Ottawa (8 hosts)"
+Shodan Infrastructure,ASN Networks,3 networks
+Shodan Infrastructure,Primary ASN,AS396982 - Google LLC
+Shodan Infrastructure,Open Ports,7 ports detected
+Shodan Infrastructure,Hosting Patterns,"cdn, eol-product, cloud"
+Shodan Vulnerabilities,Vulnerabilities Found,154
+Shodan Vulnerabilities,Risk Score,100/100
+Shodan Vulnerabilities,Sample CVEs,"CVE-2014-0117, CVE-2017-7679, CVE-2017-9120"
+Shodan Vulnerabilities,Severity Breakdown,high: 154
+Shodan Vulnerabilities,Security Recommendations,Critical: Vulnerabilities detected - immediate patching required
+Shodan SSL,SSL Trust Score,80/100
+Shodan SSL,Certificate Authorities,"e5, r10, wr3"
+Shodan SSL,SSL Configurations,3 configurations
+Shodan SSL,Primary SSL Config,TLSv1.3 (256 bits)
+Shodan Quality,Data Richness Score,100/100
+Shodan Quality,Hosts Analyzed,10
+Shodan Quality,Analysis Confidence,40%

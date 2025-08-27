@@ -1,44 +1,31 @@
-version: '3.8'
-
 services:
-  provider-discovery:
-    build: .
+  app:
+    image: anton0509/provider_detector:v1.5
     ports:
       - "8501:8501"
-    environment:
-      - PYTHONUNBUFFERED=1
-      - PYTHONDONTWRITEBYTECODE=1
-      # DNS resolver configuration for intelligent DNS detection
-      - RESOLVE_TIMEOUT=10
-      - DNS_CACHE_TTL=3600
-      # Optional: Add your VirusTotal API key
-      # - VT_API_KEY=your_virustotal_api_key_here
     volumes:
-      # Persist analysis results
       - ./results:/app/results
-      # Persist cache for intelligent DNS learning
-      - ./cache:/app/cache
-      # Persist logs
-      - ./logs:/app/logs
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    dns:
-      # Use reliable DNS servers for better intelligent DNS analysis
-      - 8.8.8.8
-      - 1.1.1.1
+      - ./.env:/app/.env:ro
+    env_file:
+      - .env
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
     networks:
-      - provider-discovery-net
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8086:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./auth/.htpasswd:/etc/nginx/.htpasswd:ro
+    depends_on:
+      - app
+    networks:
+      - app-network
 
 networks:
-  provider-discovery-net:
+  app-network:
     driver: bridge
-
-volumes:
-  results:
-  cache:
-  logs:
