@@ -76,6 +76,14 @@ except ImportError:
     AdvancedBGPClassifier = None
     get_advanced_bgp_classifier = None
 
+try:
+    from .shodan import ShodanIntegration, get_shodan_integration
+    SHODAN_INTEGRATION_AVAILABLE = True
+except ImportError:
+    SHODAN_INTEGRATION_AVAILABLE = False
+    ShodanIntegration = None
+    get_shodan_integration = None
+
 __all__ = [
     'BaseIntegration',
     'APIKeyIntegration',
@@ -106,5 +114,8 @@ __all__ = [
     'HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE',
     'AdvancedBGPClassifier',
     'get_advanced_bgp_classifier',
-    'ADVANCED_BGP_CLASSIFIER_AVAILABLE'
+    'ADVANCED_BGP_CLASSIFIER_AVAILABLE',
+    'ShodanIntegration',
+    'get_shodan_integration',
+    'SHODAN_INTEGRATION_AVAILABLE'
 ]

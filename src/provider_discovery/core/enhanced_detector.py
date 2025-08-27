@@ -25,7 +25,8 @@ from ..integrations import (
     BGP_INTEGRATION_AVAILABLE, get_bgp_analysis_integration,
     THREAT_INTEGRATION_AVAILABLE, get_threat_intelligence_integration,
     HURRICANE_ELECTRIC_INTEGRATION_AVAILABLE, get_hurricane_electric_integration,
-    ADVANCED_BGP_CLASSIFIER_AVAILABLE, get_advanced_bgp_classifier
+    ADVANCED_BGP_CLASSIFIER_AVAILABLE, get_advanced_bgp_classifier,
+    SHODAN_INTEGRATION_AVAILABLE, get_shodan_integration
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,7 @@ class EnhancedProviderDetector(ProviderDetector):
         self.hurricane_electric = None
         self.threat_intel = None
         self.advanced_bgp_classifier = None
+        self.shodan_integration = None
         
         # Initialize available integrations
         self._initialize_free_integrations()
@@ -126,6 +128,17 @@ class EnhancedProviderDetector(ProviderDetector):
                 logger.info("✅ Advanced BGP Classifier integration loaded")
             except Exception as e:
                 logger.warning(f"⚠️ Advanced BGP Classifier integration failed: {e}")
+        
+        # Shodan Integration (Premium WAF Detection)
+        if SHODAN_INTEGRATION_AVAILABLE:
+            try:
+                self.shodan_integration = get_shodan_integration()
+                if self.shodan_integration and self.shodan_integration.is_enabled:
+                    logger.info("✅ Shodan Premium WAF integration loaded")
+                else:
+                    logger.info("⚠️ Shodan integration available but not configured (no API key)")
+            except Exception as e:
+                logger.warning(f"⚠️ Shodan integration failed: {e}")
     
     def _get_available_enhancements(self) -> List[str]:
         """Get list of available enhancements"""
@@ -137,6 +150,8 @@ class EnhancedProviderDetector(ProviderDetector):
         if self.hurricane_electric: enhancements.append("Hurricane Electric BGP")
         if self.threat_intel: enhancements.append("Threat Intelligence")
         if self.advanced_bgp_classifier: enhancements.append("Advanced BGP Classifier")
+        if self.shodan_integration and self.shodan_integration.is_enabled: 
+            enhancements.append("Shodan Premium WAF")
         return enhancements
     
     def detect_provider_comprehensive(self, headers: str, ip: str, whois_data: str, domain: str) -> Dict[str, Any]:
@@ -166,7 +181,7 @@ class EnhancedProviderDetector(ProviderDetector):
         if not result.get('URL') and domain:
             result['URL'] = domain
             
-        logger.info(f"✅ Step 1/8: Base detection completed")
+        logger.info(f"✅ Step 1/9: Base detection completed")
         
         # Initialize step-by-step analysis report
         result['analysis_steps_report'] = {
@@ -177,7 +192,8 @@ class EnhancedProviderDetector(ProviderDetector):
             'step_5_bgp_analysis': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
             'step_6_advanced_bgp_classification': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
             'step_7_threat_intelligence': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
-            'step_8_cross_validation': {'status': 'pending', 'findings': [], 'confidence_impact': 0}
+            'step_8_shodan_waf_analysis': {'status': 'pending', 'findings': [], 'confidence_impact': 0},
+            'step_9_cross_validation': {'status': 'pending', 'findings': [], 'confidence_impact': 0}
         }
         
         # Record Step 1 results
@@ -215,44 +231,50 @@ class EnhancedProviderDetector(ProviderDetector):
         
         # Layer 2: SSL Certificate Analysis
         if self.ssl_analyzer:
-            logger.info(f"📊 Step 2/8: Running SSL certificate analysis...")
+            logger.info(f"📊 Step 2/9: Running SSL certificate analysis...")
             result = self._enhance_with_ssl_analysis(result, domain)
-            logger.info(f"✅ Step 2/8: SSL analysis completed")
+            logger.info(f"✅ Step 2/9: SSL analysis completed")
         
         # Layer 3: Enhanced DNS Analysis
         if self.enhanced_dns:
-            logger.info(f"📊 Step 3/8: Running enhanced DNS analysis...")
+            logger.info(f"📊 Step 3/9: Running enhanced DNS analysis...")
             result = self._enhance_with_enhanced_dns(result, domain)
-            logger.info(f"✅ Step 3/8: DNS analysis completed")
+            logger.info(f"✅ Step 3/9: DNS analysis completed")
         
         # Layer 4: Geographic Intelligence
         if self.geo_intel and ip and 'failed' not in ip:
-            logger.info(f"📊 Step 4/8: Running geographic intelligence analysis...")
+            logger.info(f"📊 Step 4/9: Running geographic intelligence analysis...")
             result = self._enhance_with_geographic_intelligence(result, ip)
-            logger.info(f"✅ Step 4/8: Geographic analysis completed")
+            logger.info(f"✅ Step 4/9: Geographic analysis completed")
         
         # Layer 5: BGP Analysis (dual sources)
         if ip and 'failed' not in ip:
-            logger.info(f"📊 Step 5/8: Running BGP analysis...")
+            logger.info(f"📊 Step 5/9: Running BGP analysis...")
             result = self._enhance_with_bgp_analysis(result, ip)
-            logger.info(f"✅ Step 5/8: BGP analysis completed")
+            logger.info(f"✅ Step 5/9: BGP analysis completed")
         
         # Layer 6: Advanced BGP Customer Classification
         if self.advanced_bgp_classifier and ip and 'failed' not in ip:
-            logger.info(f"📊 Step 6/8: Running advanced BGP customer classification...")
+            logger.info(f"📊 Step 6/9: Running advanced BGP customer classification...")
             result = self._enhance_with_advanced_bgp_classification(result, ip)
-            logger.info(f"✅ Step 6/8: Advanced BGP classification completed")
+            logger.info(f"✅ Step 6/9: Advanced BGP classification completed")
         
         # Layer 7: Threat Intelligence Assessment
         if self.threat_intel:
-            logger.info(f"📊 Step 7/8: Running threat intelligence analysis...")
+            logger.info(f"📊 Step 7/9: Running threat intelligence analysis...")
             result = self._enhance_with_threat_intelligence(result, domain, ip)
-            logger.info(f"✅ Step 7/8: Threat intelligence analysis completed")
+            logger.info(f"✅ Step 7/9: Threat intelligence analysis completed")
         
-        # Layer 8: Cross-validation and confidence enhancement
-        logger.info(f"📊 Step 8/8: Running cross-validation and final calculations...")
+        # Layer 8: Shodan Premium WAF Analysis
+        if self.shodan_integration and self.shodan_integration.is_enabled:
+            logger.info(f"📊 Step 8/9: Running Shodan premium WAF analysis...")
+            result = self._enhance_with_shodan_analysis(result, domain, ip)
+            logger.info(f"✅ Step 8/9: Shodan WAF analysis completed")
+        
+        # Layer 9: Cross-validation and confidence enhancement
+        logger.info(f"📊 Step 9/9: Running cross-validation and final calculations...")
         result = self._perform_cross_validation(result)
-        logger.info(f"✅ Step 8/8: Cross-validation completed")
+        logger.info(f"✅ Step 9/9: Cross-validation completed")
         
         # Organize providers by role and determine primary provider
         if result.get('providers'):
@@ -272,11 +294,11 @@ class EnhancedProviderDetector(ProviderDetector):
         # Generate comprehensive recommendations
         result['Recommendations'] = self._generate_comprehensive_recommendations(result)
         
-        # Save analysis results to backend
-        self._save_analysis_to_backend(result, domain)
-        
         # Record all step results for comprehensive report
         self._record_all_step_results(result)
+        
+        # Save analysis results to backend
+        self._save_analysis_to_backend(result, domain)
         
         logger.info(f"✅ Comprehensive analysis completed for {domain}")
         return result
@@ -739,6 +761,216 @@ class EnhancedProviderDetector(ProviderDetector):
         
         return result
     
+    def _enhance_with_shodan_analysis(self, result: Dict, domain: str, ip: str) -> Dict:
+        """Enhanced Shodan analysis with comprehensive provider classification and security assessment"""
+        try:
+            logger.debug(f"🛡️ Enhanced Shodan analysis for {domain}")
+            
+            # Initialize Shodan analysis section
+            shodan_analysis = {}
+            
+            # WAF Detection (original functionality)
+            if domain:
+                waf_result = self.shodan_integration.detect_waf(domain)
+                shodan_analysis['waf_detection'] = waf_result
+                
+                if waf_result.get('success') and waf_result.get('waf_detected'):
+                    # Add WAF provider to results
+                    waf_type = waf_result.get('waf_type', 'Unknown WAF')
+                    confidence = waf_result.get('confidence', 0)
+                    
+                    # Add to providers with WAF role
+                    waf_provider = {
+                        'name': waf_type,
+                        'role': 'WAF',
+                        'confidence': 'High' if confidence > 80 else 'Medium' if confidence > 50 else 'Low',
+                        'source': 'Shodan Premium WAF',
+                        'evidence': f"WAF detected with {confidence}% confidence"
+                    }
+                    result['providers'].append(waf_provider)
+                    
+                    # Update security findings
+                    result['security_findings'].append(f"WAF Detected: {waf_type} (Shodan confidence: {confidence}%)")
+                    
+                    # Add to confidence factors
+                    result['enhanced_confidence_factors'].append(f"Shodan WAF detection: {waf_type}")
+            
+            # Enhanced Technology Stack Analysis
+            if domain:
+                tech_result = self.shodan_integration.get_technology_stack(domain)
+                shodan_analysis['technology_stack'] = tech_result
+                
+                if tech_result.get('success'):
+                    # Provider Classification Enhancement
+                    provider_classification = tech_result.get('provider_classification', {})
+                    
+                    # Add cloud providers
+                    cloud_providers = provider_classification.get('cloud_providers', [])
+                    for cloud in cloud_providers:
+                        cloud_provider = {
+                            'name': cloud,
+                            'role': 'Cloud',
+                            'confidence': 'High',
+                            'source': 'Shodan Provider Classification',
+                            'evidence': 'Detected via Shodan infrastructure analysis'
+                        }
+                        result['providers'].append(cloud_provider)
+                        result['enhanced_confidence_factors'].append(f"Shodan cloud provider: {cloud}")
+                    
+                    # Add CDN providers
+                    cdn_providers = provider_classification.get('cdn_providers', [])
+                    for cdn in cdn_providers:
+                        cdn_provider = {
+                            'name': cdn,
+                            'role': 'CDN',
+                            'confidence': 'High',
+                            'source': 'Shodan CDN Classification',
+                            'evidence': 'Detected via Shodan CDN analysis'
+                        }
+                        result['providers'].append(cdn_provider)
+                        result['enhanced_confidence_factors'].append(f"Shodan CDN detection: {cdn}")
+                    
+                    # Add WAF providers
+                    waf_providers = provider_classification.get('waf_providers', [])
+                    for waf in waf_providers:
+                        waf_provider = {
+                            'name': waf,
+                            'role': 'WAF',
+                            'confidence': 'High',
+                            'source': 'Shodan WAF Classification',
+                            'evidence': 'Detected via Shodan security analysis'
+                        }
+                        result['providers'].append(waf_provider)
+                        result['enhanced_confidence_factors'].append(f"Shodan WAF provider: {waf}")
+                    
+                    # Technology analysis
+                    technologies = tech_result.get('technologies', [])
+                    if technologies:
+                        result['security_findings'].append(f"Technologies identified: {len(technologies)} (Shodan Enhanced)")
+                    
+                    # Security Assessment Integration
+                    security_assessment = tech_result.get('security_assessment', {})
+                    if security_assessment:
+                        security_score = security_assessment.get('security_score', 0)
+                        if security_score > 0:
+                            result['security_findings'].append(f"Shodan Security Score: {security_score}/100")
+                        
+                        # Security recommendations
+                        recommendations = security_assessment.get('recommendations', [])
+                        for rec in recommendations[:2]:  # Add top 2 recommendations
+                            result['security_findings'].append(f"Shodan: {rec}")
+                        
+                        # WAF indicators from security analysis
+                        waf_indicators = security_assessment.get('waf_indicators', [])
+                        if waf_indicators:
+                            result['security_findings'].append(f"WAF indicators detected: {len(waf_indicators)}")
+                    
+                    # Infrastructure Mapping
+                    infrastructure_mapping = tech_result.get('infrastructure_mapping', {})
+                    if infrastructure_mapping:
+                        # Geographic insights
+                        geo_distribution = infrastructure_mapping.get('geographic_distribution', {})
+                        if geo_distribution:
+                            primary_location = list(geo_distribution.keys())[0] if geo_distribution else 'Unknown'
+                            result['geographic_insights'].append(f"Shodan: Primary location - {primary_location}")
+                        
+                        # ASN analysis
+                        asn_analysis = infrastructure_mapping.get('asn_analysis', {})
+                        if asn_analysis:
+                            result['enhanced_confidence_factors'].append(f"Shodan ASN mapping: {len(asn_analysis)} networks")
+                        
+                        # Hosting patterns
+                        hosting_patterns = infrastructure_mapping.get('hosting_patterns', [])
+                        for pattern in hosting_patterns[:3]:  # Add top 3 patterns
+                            result['enhanced_confidence_factors'].append(f"Shodan hosting pattern: {pattern}")
+                    
+                    # Vulnerability Analysis
+                    vulnerability_analysis = tech_result.get('vulnerability_analysis', {})
+                    if vulnerability_analysis:
+                        vulnerabilities_found = vulnerability_analysis.get('vulnerabilities_found', [])
+                        risk_score = vulnerability_analysis.get('risk_score', 0)
+                        
+                        if vulnerabilities_found:
+                            result['security_findings'].append(f"Vulnerabilities found: {len(vulnerabilities_found)} (Shodan)")
+                        
+                        if risk_score > 0:
+                            result['security_findings'].append(f"Shodan Risk Score: {risk_score}/100")
+                        
+                        # Security recommendations from vulnerability analysis
+                        vuln_recommendations = vulnerability_analysis.get('security_recommendations', [])
+                        for rec in vuln_recommendations[:2]:
+                            result['security_findings'].append(f"Vuln: {rec}")
+                    
+                    # SSL Trust Analysis
+                    ssl_trust_analysis = tech_result.get('ssl_trust_analysis', {})
+                    if ssl_trust_analysis:
+                        trust_score = ssl_trust_analysis.get('trust_score', 0)
+                        if trust_score > 0:
+                            result['security_findings'].append(f"SSL Trust Score: {trust_score}/100 (Shodan)")
+                        
+                        certificate_authorities = ssl_trust_analysis.get('certificate_authorities', [])
+                        if certificate_authorities:
+                            primary_ca = certificate_authorities[0] if certificate_authorities else 'Unknown'
+                            result['enhanced_confidence_factors'].append(f"Shodan SSL CA: {primary_ca}")
+                    
+                    # Data Richness Score
+                    data_richness_score = tech_result.get('data_richness_score', 0)
+                    total_hosts_analyzed = tech_result.get('total_hosts_analyzed', 0)
+                    
+                    if data_richness_score > 0:
+                        result['enhanced_confidence_factors'].append(f"Shodan data richness: {data_richness_score}/100")
+                    
+                    if total_hosts_analyzed > 0:
+                        result['enhanced_confidence_factors'].append(f"Shodan hosts analyzed: {total_hosts_analyzed}")
+            
+            # IP Analysis (enhanced)
+            if ip and 'failed' not in ip:
+                ip_result = self.shodan_integration.search_by_ip(ip)
+                shodan_analysis['ip_analysis'] = ip_result
+                
+                if ip_result.get('success'):
+                    host_info = ip_result.get('host_info', {})
+                    analysis = ip_result.get('analysis', {})
+                    
+                    # Provider classification from IP analysis
+                    cloud_provider = analysis.get('cloud_provider')
+                    if cloud_provider:
+                        cloud_provider_entry = {
+                            'name': cloud_provider,
+                            'role': 'Cloud',
+                            'confidence': 'High',
+                            'source': 'Shodan IP Analysis',
+                            'evidence': f"Detected via Shodan host analysis"
+                        }
+                        result['providers'].append(cloud_provider_entry)
+                        result['enhanced_confidence_factors'].append(f"Shodan IP cloud: {cloud_provider}")
+                    
+                    # Security analysis from IP
+                    security_score = analysis.get('security_score', 0)
+                    if security_score > 0:
+                        result['security_findings'].append(f"IP Security Score: {security_score}/100 (Shodan)")
+                    
+                    # Organization info
+                    org = host_info.get('org', '')
+                    if org and org != 'Unknown':
+                        result['enhanced_confidence_factors'].append(f"Shodan organization: {org}")
+            
+            # Store complete Shodan analysis
+            result['Enhanced_Analysis']['shodan_analysis'] = shodan_analysis
+            
+            # Update analysis methods
+            if 'analysis_methods' not in result:
+                result['analysis_methods'] = []
+            result['analysis_methods'].append('Shodan Enhanced Infrastructure Analysis')
+            
+            logger.debug(f"✅ Enhanced Shodan analysis completed successfully")
+            
+        except Exception as e:
+            logger.error(f"❌ Enhanced Shodan analysis failed: {e}")
+            result['Enhanced_Analysis']['shodan_analysis'] = {'error': str(e)}
+        
+        return result
+    
     def _perform_cross_validation(self, result: Dict) -> Dict:
         """Perform cross-validation between different data sources"""
         logger.debug("🔄 Performing cross-validation of results")
@@ -912,6 +1144,7 @@ class EnhancedProviderDetector(ProviderDetector):
             'bgp_analysis': False,
             'hurricane_electric': False,
             'threat_intelligence': False,
+            'shodan_integration': False,
             'total_available': 0,
             'integration_status': {}
         }
@@ -979,6 +1212,16 @@ class EnhancedProviderDetector(ProviderDetector):
             except Exception as e:
                 test_results['integration_status']['threat_intelligence'] = {'error': str(e)}
         
+        if self.shodan_integration:
+            try:
+                shodan_test = self.shodan_integration.test_connection()
+                test_results['shodan_integration'] = shodan_test.get('success', False)
+                test_results['integration_status']['shodan_integration'] = shodan_test
+                if test_results['shodan_integration']:
+                    test_results['total_available'] += 1
+            except Exception as e:
+                test_results['integration_status']['shodan_integration'] = {'error': str(e)}
+        
         return test_results
     
     def _record_all_step_results(self, result: Dict) -> None:
@@ -1018,7 +1261,12 @@ class EnhancedProviderDetector(ProviderDetector):
             self._record_step_results(result, 'step_7_threat_intelligence', 'Threat Intelligence', 
                                     'threat_intelligence', ['Security Assessment', 'Reputation Analysis'])
         
-        # Step 8: Cross-validation (always runs)
+        # Step 8: Shodan Premium WAF Analysis
+        if 'shodan_analysis' in result.get('Enhanced_Analysis', {}):
+            self._record_step_results(result, 'step_8_shodan_waf_analysis', 'Shodan Premium WAF Analysis', 
+                                    'shodan_analysis', ['WAF Detection', 'Technology Stack Analysis', 'IP Security Analysis'])
+        
+        # Step 9: Cross-validation (always runs)
         cross_validation_findings = []
         total_confidence = result.get('Enhanced_Confidence', 0)
         if total_confidence:
@@ -1028,7 +1276,7 @@ class EnhancedProviderDetector(ProviderDetector):
         if provider_consensus:
             cross_validation_findings.append(f"Provider Consensus: {provider_consensus} sources")
         
-        result['analysis_steps_report']['step_8_cross_validation'] = {
+        result['analysis_steps_report']['step_9_cross_validation'] = {
             'status': 'completed',
             'step_name': 'Cross-Validation & Final Analysis',
             'findings': cross_validation_findings,
@@ -1101,6 +1349,125 @@ class EnhancedProviderDetector(ProviderDetector):
                         threat_level = step_data['overall_threat_level']
                         findings.append(f"Threat Level: {threat_level}")
                         confidence_impact = 5 if threat_level == 'low' else 0
+                        
+                elif step_key == 'step_8_shodan_waf_analysis':
+                    confidence_impact = 5  # Base impact
+                    
+                    # WAF Detection Analysis
+                    if 'waf_detection' in step_data:
+                        waf_result = step_data['waf_detection']
+                        if waf_result.get('success') and waf_result.get('waf_detected'):
+                            waf_type = waf_result.get('waf_type', 'Unknown WAF')
+                            confidence = waf_result.get('confidence', 0)
+                            findings.append(f"WAF Detected: {waf_type} ({confidence}% confidence)")
+                            confidence_impact += 15  # High impact for premium WAF detection
+                        else:
+                            findings.append("No direct WAF detected via Shodan")
+                    
+                    # Enhanced Technology Stack Analysis
+                    if 'technology_stack' in step_data:
+                        tech_result = step_data['technology_stack']
+                        if tech_result.get('success'):
+                            # Provider Classification
+                            provider_classification = tech_result.get('provider_classification', {})
+                            
+                            cloud_providers = provider_classification.get('cloud_providers', [])
+                            if cloud_providers:
+                                findings.append(f"Cloud Providers: {', '.join(cloud_providers[:3])}")
+                                confidence_impact += len(cloud_providers) * 5
+                            
+                            cdn_providers = provider_classification.get('cdn_providers', [])
+                            if cdn_providers:
+                                findings.append(f"CDN Providers: {', '.join(cdn_providers[:3])}")
+                                confidence_impact += len(cdn_providers) * 8
+                            
+                            waf_providers = provider_classification.get('waf_providers', [])
+                            if waf_providers:
+                                findings.append(f"WAF Providers: {', '.join(waf_providers[:3])}")
+                                confidence_impact += len(waf_providers) * 12
+                            
+                            # Technology Analysis
+                            technologies = tech_result.get('technologies', [])
+                            if technologies:
+                                findings.append(f"Technologies identified: {len(technologies)}")
+                                confidence_impact += min(len(technologies), 5)
+                            
+                            # Security Assessment
+                            security_assessment = tech_result.get('security_assessment', {})
+                            if security_assessment:
+                                security_score = security_assessment.get('security_score', 0)
+                                if security_score > 0:
+                                    findings.append(f"Security Score: {security_score}/100")
+                                    confidence_impact += security_score // 20
+                                
+                                waf_indicators = security_assessment.get('waf_indicators', [])
+                                if waf_indicators:
+                                    findings.append(f"WAF indicators: {len(waf_indicators)}")
+                                    confidence_impact += len(waf_indicators) * 3
+                            
+                            # Infrastructure Mapping
+                            infrastructure_mapping = tech_result.get('infrastructure_mapping', {})
+                            if infrastructure_mapping:
+                                geo_distribution = infrastructure_mapping.get('geographic_distribution', {})
+                                if geo_distribution:
+                                    findings.append(f"Geographic distribution: {len(geo_distribution)} locations")
+                                
+                                asn_analysis = infrastructure_mapping.get('asn_analysis', {})
+                                if asn_analysis:
+                                    findings.append(f"ASN networks: {len(asn_analysis)}")
+                            
+                            # Vulnerability Analysis
+                            vulnerability_analysis = tech_result.get('vulnerability_analysis', {})
+                            if vulnerability_analysis:
+                                vulnerabilities_found = vulnerability_analysis.get('vulnerabilities_found', [])
+                                risk_score = vulnerability_analysis.get('risk_score', 0)
+                                
+                                if vulnerabilities_found:
+                                    findings.append(f"Vulnerabilities: {len(vulnerabilities_found)} found")
+                                    confidence_impact -= len(vulnerabilities_found) * 2  # Penalty
+                                elif risk_score == 0:
+                                    findings.append("No vulnerabilities detected")
+                                    confidence_impact += 3
+                            
+                            # SSL Trust Analysis
+                            ssl_trust_analysis = tech_result.get('ssl_trust_analysis', {})
+                            if ssl_trust_analysis:
+                                trust_score = ssl_trust_analysis.get('trust_score', 0)
+                                if trust_score > 0:
+                                    findings.append(f"SSL Trust Score: {trust_score}/100")
+                                    confidence_impact += trust_score // 25
+                            
+                            # Data Richness Score
+                            data_richness_score = tech_result.get('data_richness_score', 0)
+                            total_hosts_analyzed = tech_result.get('total_hosts_analyzed', 0)
+                            
+                            if data_richness_score > 70:
+                                findings.append(f"High data richness: {data_richness_score}/100")
+                                confidence_impact += 5
+                            elif data_richness_score > 0:
+                                findings.append(f"Data richness: {data_richness_score}/100")
+                                confidence_impact += 2
+                            
+                            if total_hosts_analyzed > 5:
+                                findings.append(f"Comprehensive analysis: {total_hosts_analyzed} hosts")
+                                confidence_impact += 3
+                    
+                    # IP Analysis Enhancement
+                    if 'ip_analysis' in step_data:
+                        ip_result = step_data['ip_analysis']
+                        if ip_result.get('success'):
+                            analysis = ip_result.get('analysis', {})
+                            cloud_provider = analysis.get('cloud_provider')
+                            if cloud_provider:
+                                findings.append(f"IP Cloud Provider: {cloud_provider}")
+                                confidence_impact += 8
+                            
+                            security_score = analysis.get('security_score', 0)
+                            if security_score > 0:
+                                findings.append(f"IP Security Score: {security_score}/100")
+                    
+                    # Cap confidence impact
+                    confidence_impact = min(confidence_impact, 25)
         
         # Record the step results
         result['analysis_steps_report'][step_key] = {
@@ -1224,6 +1591,182 @@ class EnhancedProviderDetector(ProviderDetector):
                     findings_count = len(step_data.get('findings', []))
                     
                     writer.writerow(['Analysis Steps', step_name, f"{status} | +{confidence_impact}% confidence | {findings_count} findings"])
+                
+                # Enhanced Shodan Analysis Details
+                shodan_analysis = result.get('Enhanced_Analysis', {}).get('shodan_analysis', {})
+                if shodan_analysis:
+                    writer.writerow(['', '', ''])  # Empty row for separation
+                    writer.writerow(['=== SHODAN PREMIUM ANALYSIS DETAILS ===', '', ''])
+                    
+                    # WAF Detection Details
+                    waf_detection = shodan_analysis.get('waf_detection', {})
+                    if waf_detection:
+                        writer.writerow(['Shodan WAF', 'Detection Success', waf_detection.get('success', False)])
+                        writer.writerow(['Shodan WAF', 'WAF Detected', waf_detection.get('waf_detected', False)])
+                        if waf_detection.get('waf_detected'):
+                            writer.writerow(['Shodan WAF', 'WAF Type', waf_detection.get('waf_type', 'Unknown')])
+                            writer.writerow(['Shodan WAF', 'Confidence', f"{waf_detection.get('confidence', 0)}%"])
+                        
+                        waf_indicators = waf_detection.get('waf_indicators', [])
+                        if waf_indicators:
+                            writer.writerow(['Shodan WAF', 'WAF Indicators', f"{len(waf_indicators)} indicators detected"])
+                    
+                    # Technology Stack Details
+                    tech_stack = shodan_analysis.get('technology_stack', {})
+                    if tech_stack and tech_stack.get('success'):
+                        
+                        # Provider Classification
+                        provider_classification = tech_stack.get('provider_classification', {})
+                        if provider_classification:
+                            cloud_providers = provider_classification.get('cloud_providers', [])
+                            if cloud_providers:
+                                writer.writerow(['Shodan Providers', 'Cloud Providers', ', '.join(cloud_providers)])
+                            
+                            cdn_providers = provider_classification.get('cdn_providers', [])
+                            if cdn_providers:
+                                # Remove duplicates while preserving order
+                                unique_cdn = list(dict.fromkeys(cdn_providers))
+                                writer.writerow(['Shodan Providers', 'CDN Providers', ', '.join(unique_cdn)])
+                            
+                            waf_providers = provider_classification.get('waf_providers', [])
+                            if waf_providers:
+                                writer.writerow(['Shodan Providers', 'WAF Providers', ', '.join(waf_providers)])
+                            
+                            hosting_providers = provider_classification.get('hosting_providers', [])
+                            if hosting_providers:
+                                writer.writerow(['Shodan Providers', 'Hosting Providers', ', '.join(hosting_providers)])
+                            
+                            primary_infra = provider_classification.get('primary_infrastructure', '')
+                            if primary_infra and primary_infra != 'unknown':
+                                writer.writerow(['Shodan Providers', 'Primary Infrastructure', primary_infra])
+                        
+                        # Technology Analysis
+                        technologies = tech_stack.get('technologies', [])
+                        if technologies:
+                            writer.writerow(['Shodan Technology', 'Technologies Detected', f"{len(technologies)} technologies"])
+                            writer.writerow(['Shodan Technology', 'Technology List', ', '.join(technologies[:10])])  # Limit to first 10
+                        
+                        web_servers = tech_stack.get('web_servers', {})
+                        if web_servers:
+                            server_list = [f"{k} (x{v})" for k, v in web_servers.items()]
+                            writer.writerow(['Shodan Technology', 'Web Servers', ', '.join(server_list)])
+                        
+                        frameworks = tech_stack.get('frameworks', {})
+                        if frameworks:
+                            framework_list = [f"{k} (x{v})" for k, v in frameworks.items()]
+                            writer.writerow(['Shodan Technology', 'Frameworks', ', '.join(framework_list)])
+                        
+                        # Security Assessment
+                        security_assessment = tech_stack.get('security_assessment', {})
+                        if security_assessment:
+                            security_score = security_assessment.get('security_score', 0)
+                            writer.writerow(['Shodan Security', 'Security Score', f"{security_score}/100"])
+                            
+                            waf_indicators = security_assessment.get('waf_indicators', [])
+                            if waf_indicators:
+                                writer.writerow(['Shodan Security', 'WAF Indicators', f"{len(waf_indicators)} indicators"])
+                                # Show first few indicators
+                                sample_indicators = waf_indicators[:5]
+                                writer.writerow(['Shodan Security', 'Sample WAF Indicators', ', '.join(sample_indicators)])
+                            
+                            security_headers = security_assessment.get('security_headers', {})
+                            writer.writerow(['Shodan Security', 'Security Headers', f"{len(security_headers)} headers detected"])
+                            
+                            recommendations = security_assessment.get('recommendations', [])
+                            if recommendations:
+                                writer.writerow(['Shodan Security', 'Security Recommendations', f"{len(recommendations)} recommendations"])
+                                # Show first recommendation
+                                if recommendations:
+                                    writer.writerow(['Shodan Security', 'Primary Recommendation', recommendations[0]])
+                        
+                        # Infrastructure Mapping
+                        infrastructure_mapping = tech_stack.get('infrastructure_mapping', {})
+                        if infrastructure_mapping:
+                            geo_distribution = infrastructure_mapping.get('geographic_distribution', {})
+                            if geo_distribution:
+                                writer.writerow(['Shodan Infrastructure', 'Geographic Locations', f"{len(geo_distribution)} locations"])
+                                # Show primary location
+                                if geo_distribution:
+                                    primary_location = list(geo_distribution.keys())[0]
+                                    location_count = geo_distribution[primary_location]
+                                    writer.writerow(['Shodan Infrastructure', 'Primary Location', f"{primary_location} ({location_count} hosts)"])
+                            
+                            asn_analysis = infrastructure_mapping.get('asn_analysis', {})
+                            if asn_analysis:
+                                writer.writerow(['Shodan Infrastructure', 'ASN Networks', f"{len(asn_analysis)} networks"])
+                                # Show primary ASN
+                                if asn_analysis:
+                                    primary_asn = list(asn_analysis.keys())[0]
+                                    asn_org = asn_analysis[primary_asn]
+                                    writer.writerow(['Shodan Infrastructure', 'Primary ASN', f"{primary_asn} - {asn_org}"])
+                            
+                            port_services = infrastructure_mapping.get('port_services', {})
+                            if port_services:
+                                writer.writerow(['Shodan Infrastructure', 'Open Ports', f"{len(port_services)} ports detected"])
+                                # Show common ports
+                                common_ports = [port for port in port_services.keys() if port in ['80', '443', '22', '25', '53', '993', '995']]
+                                if common_ports:
+                                    writer.writerow(['Shodan Infrastructure', 'Common Ports', ', '.join(common_ports)])
+                            
+                            hosting_patterns = infrastructure_mapping.get('hosting_patterns', [])
+                            if hosting_patterns:
+                                writer.writerow(['Shodan Infrastructure', 'Hosting Patterns', ', '.join(hosting_patterns)])
+                        
+                        # Vulnerability Analysis
+                        vulnerability_analysis = tech_stack.get('vulnerability_analysis', {})
+                        if vulnerability_analysis:
+                            vulnerabilities_found = vulnerability_analysis.get('vulnerabilities_found', [])
+                            risk_score = vulnerability_analysis.get('risk_score', 0)
+                            
+                            writer.writerow(['Shodan Vulnerabilities', 'Vulnerabilities Found', len(vulnerabilities_found)])
+                            writer.writerow(['Shodan Vulnerabilities', 'Risk Score', f"{risk_score}/100"])
+                            
+                            if vulnerabilities_found:
+                                # Show first few vulnerabilities
+                                sample_vulns = vulnerabilities_found[:3]
+                                writer.writerow(['Shodan Vulnerabilities', 'Sample CVEs', ', '.join(sample_vulns)])
+                            
+                            severity_breakdown = vulnerability_analysis.get('severity_breakdown', {})
+                            if any(severity_breakdown.values()):
+                                severity_summary = []
+                                for severity, count in severity_breakdown.items():
+                                    if count > 0:
+                                        severity_summary.append(f"{severity}: {count}")
+                                if severity_summary:
+                                    writer.writerow(['Shodan Vulnerabilities', 'Severity Breakdown', ', '.join(severity_summary)])
+                            
+                            vuln_recommendations = vulnerability_analysis.get('security_recommendations', [])
+                            if vuln_recommendations:
+                                writer.writerow(['Shodan Vulnerabilities', 'Security Recommendations', vuln_recommendations[0] if vuln_recommendations else 'None'])
+                        
+                        # SSL Trust Analysis
+                        ssl_trust_analysis = tech_stack.get('ssl_trust_analysis', {})
+                        if ssl_trust_analysis:
+                            trust_score = ssl_trust_analysis.get('trust_score', 0)
+                            writer.writerow(['Shodan SSL', 'SSL Trust Score', f"{trust_score}/100"])
+                            
+                            certificate_authorities = ssl_trust_analysis.get('certificate_authorities', [])
+                            if certificate_authorities:
+                                writer.writerow(['Shodan SSL', 'Certificate Authorities', ', '.join(certificate_authorities)])
+                            
+                            ssl_configurations = ssl_trust_analysis.get('ssl_configurations', [])
+                            if ssl_configurations:
+                                writer.writerow(['Shodan SSL', 'SSL Configurations', f"{len(ssl_configurations)} configurations"])
+                                # Show primary SSL version
+                                if ssl_configurations:
+                                    primary_ssl = ssl_configurations[0]
+                                    ssl_version = primary_ssl.get('version', 'Unknown')
+                                    ssl_bits = primary_ssl.get('bits', 0)
+                                    writer.writerow(['Shodan SSL', 'Primary SSL Config', f"{ssl_version} ({ssl_bits} bits)"])
+                        
+                        # Data Quality Metrics
+                        data_richness_score = tech_stack.get('data_richness_score', 0)
+                        total_hosts_analyzed = tech_stack.get('total_hosts_analyzed', 0)
+                        confidence = tech_stack.get('confidence', 0)
+                        
+                        writer.writerow(['Shodan Quality', 'Data Richness Score', f"{data_richness_score}/100"])
+                        writer.writerow(['Shodan Quality', 'Hosts Analyzed', total_hosts_analyzed])
+                        writer.writerow(['Shodan Quality', 'Analysis Confidence', f"{confidence}%"])
             
             # Store file paths in result for WebUI display
             result['backend_files'] = {

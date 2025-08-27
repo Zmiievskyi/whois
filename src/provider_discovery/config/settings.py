@@ -31,6 +31,11 @@ class Settings:
     censys_cache_ttl: int = 7200  # 2 hours (longer due to rate limits)
     censys_rate_limit: int = 10  # requests per minute (conservative)
     
+    # Shodan Configuration (Phase 3B: Premium WAF detection)
+    shodan_api_key: Optional[str] = None
+    shodan_cache_ttl: int = 14400  # 4 hours (very long due to cost)
+    shodan_rate_limit: int = 1  # requests per minute (very conservative)
+    
     # Application Settings
     app_debug: bool = False
     app_log_level: str = "INFO"
@@ -82,6 +87,11 @@ class Settings:
         self.censys_api_secret = os.getenv("CENSYS_API_SECRET", self.censys_api_secret)
         self.censys_cache_ttl = self._get_int_env("CENSYS_CACHE_TTL", self.censys_cache_ttl)
         self.censys_rate_limit = self._get_int_env("CENSYS_RATE_LIMIT", self.censys_rate_limit)
+        
+        # Load Shodan settings
+        self.shodan_api_key = os.getenv("SHODAN_API_KEY", self.shodan_api_key)
+        self.shodan_cache_ttl = self._get_int_env("SHODAN_CACHE_TTL", self.shodan_cache_ttl)
+        self.shodan_rate_limit = self._get_int_env("SHODAN_RATE_LIMIT", self.shodan_rate_limit)
         
         self.app_debug = self._get_bool_env("APP_DEBUG", self.app_debug)
         self.app_log_level = os.getenv("APP_LOG_LEVEL", self.app_log_level)
@@ -144,6 +154,13 @@ class Settings:
             len(self.censys_api_secret.strip()) > 0
         )
     
+    def is_shodan_enabled(self) -> bool:
+        """Check if Shodan integration should be enabled"""
+        return (
+            self.shodan_api_key is not None and 
+            len(self.shodan_api_key.strip()) > 0
+        )
+    
     def get_virustotal_config(self) -> Dict[str, Any]:
         """Get VirusTotal-specific configuration"""
         return {
@@ -162,6 +179,14 @@ class Settings:
             "api_secret": self.censys_api_secret,
             "cache_ttl": self.censys_cache_ttl,
             "rate_limit": self.censys_rate_limit,
+        }
+    
+    def get_shodan_config(self) -> Dict[str, Any]:
+        """Get Shodan-specific configuration"""
+        return {
+            "api_key": self.shodan_api_key,
+            "cache_ttl": self.shodan_cache_ttl,
+            "rate_limit": self.shodan_rate_limit,
         }
     
     def get_performance_config(self) -> Dict[str, int]:
@@ -248,6 +273,12 @@ def print_configuration_info(settings: Settings):
         masked_id = settings.censys_api_id[:8] + "..." + settings.censys_api_id[-4:]
         print(f"   API ID: {masked_id}")
         print(f"   Rate Limit: {settings.censys_rate_limit}/min")
+    
+    print(f"🔍 Shodan: {'✅ Enabled' if settings.is_shodan_enabled() else '❌ Disabled'}")
+    if settings.shodan_api_key:
+        masked_key = settings.shodan_api_key[:8] + "..." + settings.shodan_api_key[-4:]
+        print(f"   API Key: {masked_key}")
+        print(f"   Rate Limit: {settings.shodan_rate_limit}/min")
     
     print(f"🔍 DNS Analysis: {'✅ Enabled' if settings.enable_dns_analysis else '❌ Disabled'}")
     print(f"📊 Caching: {'✅ Enabled' if settings.enable_caching else '❌ Disabled'}")

@@ -454,10 +454,10 @@ def main():
     # Show current VirusTotal status in header
     if 'vt_enabled' in st.session_state:
         vt_header_status = "VirusTotal ON" if st.session_state.vt_enabled else "VirusTotal OFF"
-        module_count = "8 Modules" if st.session_state.vt_enabled else "7 Core Modules"
+        module_count = "9 Modules" if st.session_state.vt_enabled else "8 Core Modules"
     else:
         vt_header_status = "VirusTotal AUTO"
-        module_count = "7+ Modules"
+        module_count = "8+ Modules"
     
     st.markdown(f"**Multi-Layer Provider Detection - {module_count} | {vt_header_status}**")
     
@@ -474,10 +474,14 @@ def main():
         if hasattr(detector, 'advanced_bgp_classifier') and detector.advanced_bgp_classifier:
             working_count += 1
         
+        # Count Shodan Integration
+        if hasattr(detector, 'shodan_integration') and detector.shodan_integration and detector.shodan_integration.is_enabled:
+            working_count += 1
+        
         # Adjust total modules based on VirusTotal status
-        # Base: SSL, DNS, Geo, BGP, Hurricane Electric, Threat Intelligence, Advanced BGP = 7
+        # Base: SSL, DNS, Geo, BGP, Hurricane Electric, Threat Intelligence, Advanced BGP, Shodan = 8
         # VirusTotal is optional and should not count if disabled
-        total_modules = 7  # Core modules without VirusTotal
+        total_modules = 8  # Core modules without VirusTotal
         
         # Note: VirusTotal is considered bonus functionality, not core
         
@@ -507,7 +511,8 @@ def main():
                 'geographic_intelligence': 'GEO_INTELLIGENCE',
                 'bgp_analysis': 'BGP_ANALYSIS',
                 'hurricane_electric': 'BGP_FALLBACK',
-                'threat_intelligence': 'THREAT_INTEL'
+                'threat_intelligence': 'THREAT_INTEL',
+                'shodan_integration': 'SHODAN_PREMIUM_WAF'
             }
             
             for integration, name in integration_names.items():
@@ -523,6 +528,28 @@ def main():
                 else:
                     status_indicator = "[OFFLINE]"
                     status_text = ""
+                
+                # Special handling for Shodan to show credits
+                if integration == 'shodan_integration' and status:
+                    if hasattr(detector, 'shodan_integration') and detector.shodan_integration:
+                        try:
+                            account_info = detector.shodan_integration.get_account_info()
+                            if account_info.get('success'):
+                                credits = account_info.get('credits_remaining', 0)
+                                credit_status = account_info.get('credit_status', {})
+                                icon = credit_status.get('icon', '💳')
+                                
+                                if credits >= 100:
+                                    credit_display = f" ({credits} credits {icon})"
+                                elif credits > 0:
+                                    credit_display = f" ({credits} credits {icon})"
+                                else:
+                                    credit_display = f" (0 credits ❌)"
+                                    status_indicator = "[LIMITED]"
+                                
+                                status_text += credit_display
+                        except Exception:
+                            status_text += " (credits unknown)"
                 
                 st.markdown(f"`{status_indicator} {name}{status_text}`")
         
@@ -564,6 +591,60 @@ def main():
         ```
         [✓] VIRUSTOTAL_STATUS: {vt_status}
         ```
+        """)
+        
+        # Shodan Account Information (if enabled)
+        if detector and hasattr(detector, 'shodan_integration') and detector.shodan_integration and detector.shodan_integration.is_enabled:
+            try:
+                account_info = detector.shodan_integration.get_account_info()
+                if account_info.get('success'):
+                    credits = account_info.get('credits_remaining', 0)
+                    plan = account_info.get('plan', 'Unknown')
+                    credit_status = account_info.get('credit_status', {})
+                    
+                    st.markdown("**SHODAN PREMIUM ACCOUNT:**")
+                    
+                    # Credit status with color coding
+                    icon = credit_status.get('icon', '💳')
+                    message = credit_status.get('message', 'Status unknown')
+                    color = credit_status.get('color', 'gray')
+                    
+                    if color == 'green':
+                        st.success(f"{icon} **{credits}** Query Credits - {message}")
+                    elif color == 'orange':
+                        st.warning(f"{icon} **{credits}** Query Credits - {message}")
+                    elif color == 'red':
+                        st.error(f"{icon} **{credits}** Query Credits - {message}")
+                    else:
+                        st.info(f"{icon} **{credits}** Query Credits - {message}")
+                    
+                    # Plan information
+                    scan_credits = account_info.get('scan_credits', 0)
+                    st.markdown(f"""
+                    ```
+                    PLAN:          {plan.upper()}
+                    QUERY CREDITS: {credits:,}
+                    SCAN CREDITS:  {scan_credits:,}
+                    STATUS:        {credit_status.get('level', 'unknown').upper()}
+                    ```
+                    """)
+                    
+                    # Usage recommendations
+                    if credits < 50:
+                        st.error("⚠️ **LOW CREDITS WARNING**")
+                        st.markdown("Consider upgrading your Shodan plan for continued analysis.")
+                        st.markdown("[Upgrade Plan](https://account.shodan.io/billing)")
+                    elif credits < 100:
+                        st.warning("💡 **MODERATE USAGE**")
+                        st.markdown("Monitor credit usage for optimal analysis.")
+                else:
+                    st.warning("⚠️ **SHODAN API ERROR**")
+                    st.markdown(f"Cannot retrieve account info: {account_info.get('error', 'Unknown error')}")
+            except Exception as e:
+                st.error("❌ **SHODAN CONNECTION ISSUE**")
+                st.markdown(f"Error checking account: {str(e)}")
+        
+        st.markdown(f"""
         
         **SYSTEM CAPABILITIES:**
         ```
@@ -1029,15 +1110,15 @@ def main():
                 st.metric("CONFIDENCE", f"{enhanced_conf}%" if str(enhanced_conf).isdigit() else enhanced_conf)
             with col3:
                 enhanced_analysis = result.get('Enhanced_Analysis', {})
-                # Count all 7 integrations including Advanced BGP Classifier
+                # Count all 8 integrations including Shodan
                 main_integrations = ['ssl_analysis', 'enhanced_dns', 'geographic_intelligence', 
                                    'bgp_analysis', 'hurricane_electric_bgp', 'threat_intelligence',
-                                   'advanced_bgp_classification']
+                                   'advanced_bgp_classification', 'shodan_analysis']
                 working_count = sum(1 for key in main_integrations 
                                   if key in enhanced_analysis 
                                   and isinstance(enhanced_analysis[key], dict) 
                                   and 'error' not in enhanced_analysis[key])
-                st.metric("MODULES_ACTIVE", f"{working_count}/7")
+                st.metric("MODULES_ACTIVE", f"{working_count}/8")
                 st.metric("CDN_STATUS", result['CDN_Providers'])
             
             # Advanced BGP Classification Summary
@@ -1127,6 +1208,38 @@ def main():
                     for insight in customer_insights[:4]:
                         st.write(f"• {insight}")
                 
+                # Show Shodan WAF Analysis if available
+                shodan_analysis = result.get('Enhanced_Analysis', {}).get('shodan_analysis', {})
+                if shodan_analysis and 'error' not in shodan_analysis:
+                    st.subheader("🛡️ Shodan Premium WAF Analysis")
+                    
+                    waf_detection = shodan_analysis.get('waf_detection', {})
+                    if waf_detection.get('success') and waf_detection.get('waf_detected'):
+                        waf_type = waf_detection.get('waf_type', 'Unknown WAF')
+                        confidence = waf_detection.get('confidence', 0)
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric("WAF DETECTED", waf_type)
+                        with col2:
+                            st.metric("CONFIDENCE", f"{confidence}%")
+                        
+                        security_headers = waf_detection.get('security_headers', [])
+                        if security_headers:
+                            st.write(f"**Security Headers**: {len(security_headers)} detected")
+                    else:
+                        st.write("🔍 **No WAF detected** via Shodan analysis")
+                    
+                    # Technology stack info
+                    tech_stack = shodan_analysis.get('technology_stack', {})
+                    if tech_stack.get('success'):
+                        technologies = tech_stack.get('technologies', [])
+                        if technologies:
+                            st.write(f"**Technologies**: {len(technologies)} identified via Shodan")
+                elif shodan_analysis and 'error' in shodan_analysis:
+                    st.subheader("🛡️ Shodan Premium WAF Analysis")
+                    st.write(f"❌ **Shodan analysis failed**: {shodan_analysis['error']}")
+                
                 st.subheader("📊 All Integrations Status")
                 # Show enhanced analysis if available
                 enhanced_analysis = result.get('Enhanced_Analysis', {})
@@ -1145,7 +1258,7 @@ def main():
                         st.write(f"• {finding}")
                 
                 # Show comprehensive step-by-step analysis report
-                st.subheader("📋 Complete Analysis Report (8 Steps)")
+                st.subheader("📋 Complete Analysis Report (9 Steps)")
                 
                 steps_report = result.get('analysis_steps_report', {})
                 if steps_report:
@@ -1427,7 +1540,7 @@ STEP-BY-STEP ANALYSIS:
                 with st.expander("📦 What's included in downloads"):
                     st.write("**All formats include:**")
                     st.write("• Complete analysis metadata (domain, IP, timestamp, confidence)")
-                    st.write("• All 8 step-by-step analysis results")
+                    st.write("• All 9 step-by-step analysis results")
                     st.write("• Provider detection results (CDN, DNS, hosting, cloud)")
                     st.write("• Security findings and recommendations")
                     
