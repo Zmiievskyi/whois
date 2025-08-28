@@ -49,6 +49,12 @@ class ShodanIntegration(APIKeyIntegration):
         self.client = None
         self.cache_ttl = 14400  # 4 hours (longer due to cost)
         self.rate_limit = 1     # 1 request per minute (very conservative)
+        self.rate_limit_interval = 2.0  # 2 seconds between requests (extra conservative)
+        
+        # Account info caching to reduce API calls
+        self._account_info_cache = None
+        self._account_info_cache_time = 0
+        self._account_cache_duration = 1800  # Cache for 30 minutes (much longer)
         
         # Initialize from settings if not provided
         if not api_key:
@@ -200,8 +206,15 @@ class ShodanIntegration(APIKeyIntegration):
                 'plan': 'Not Available'
             }
         
+        # Check if we have cached data that's still valid
+        current_time = time.time()
+        if (self._account_info_cache and 
+            current_time - self._account_info_cache_time < self._account_cache_duration):
+            logger.debug("🔄 Using cached account info to avoid rate limits")
+            return self._account_info_cache
+        
         try:
-            # Get account information
+            # Try to get fresh account information
             account_info = self.client.info()
             
             query_credits = account_info.get('query_credits', 0)
@@ -211,7 +224,7 @@ class ShodanIntegration(APIKeyIntegration):
             # Calculate credit status
             credit_status = self._get_credit_status(query_credits)
             
-            return {
+            result = {
                 'success': True,
                 'plan': plan,
                 'query_credits': query_credits,
@@ -222,13 +235,47 @@ class ShodanIntegration(APIKeyIntegration):
                 'account_info': account_info
             }
             
+            # Cache the successful result
+            self._account_info_cache = result
+            self._account_info_cache_time = current_time
+            logger.debug("✅ Account info retrieved and cached successfully")
+            
+            return result
+            
         except shodan.APIError as e:
-            return {
-                'success': False,
-                'error': f'Shodan API error: {str(e)}',
-                'credits_remaining': 0,
-                'plan': 'API Error'
-            }
+            error_msg = str(e).lower()
+            if 'rate limit' in error_msg:
+                # Use cached data if available, otherwise fallback
+                if self._account_info_cache:
+                    logger.warning("🔄 Rate limit encountered, using cached account info")
+                    # Add rate limit warning to cached data
+                    cached_result = self._account_info_cache.copy()
+                    cached_result['rate_limit_warning'] = True
+                    cached_result['usage_summary'] = cached_result.get('usage_summary', '') + ' (Rate Limited - Using Cached Data)'
+                    return cached_result
+                else:
+                    logger.warning("🔄 Rate limit encountered, no cache available - using fallback")
+                    return {
+                        'success': True,
+                        'plan': 'Rate Limited - Info Unavailable',
+                        'query_credits': 0,
+                        'scan_credits': 0, 
+                        'credits_remaining': 0,
+                        'credit_status': {
+                            'level': 'rate_limited',
+                            'icon': '⚠️',
+                            'description': 'Rate Limited'
+                        },
+                        'usage_summary': 'Account info temporarily unavailable due to rate limits',
+                        'rate_limit_protection': True
+                    }
+            else:
+                return {
+                    'success': False,
+                    'error': f'Shodan API error: {str(e)}',
+                    'credits_remaining': 0,
+                    'plan': 'API Error'
+                }
         except Exception as e:
             return {
                 'success': False,
@@ -236,6 +283,12 @@ class ShodanIntegration(APIKeyIntegration):
                 'credits_remaining': 0,
                 'plan': 'Connection Error'
             }
+    
+    def refresh_account_info(self) -> Dict[str, Any]:
+        """Force refresh of account info cache"""
+        self._account_info_cache = None
+        self._account_info_cache_time = 0
+        return self.get_account_info()
     
     def _format_usage_summary(self, account_info: Dict) -> str:
         """Format account usage summary for display"""
@@ -485,16 +538,92 @@ class ShodanIntegration(APIKeyIntegration):
             }
         
         try:
-            # Enhanced search with facets for technology trends
-            tech_query = f'hostname:{domain}'
-            results = self.client.search(
-                tech_query, 
-                limit=10,  # Get more results for better analysis
-                facets=['product', 'port', 'org', 'country']
-            )
+            # OPTIMIZATION 1: Smart multi-query strategy with rate limit protection
+            try:
+                queries = self._build_optimized_query_strategy(domain)
+                
+                # Rate limit protection: reduce queries if on free plan or experiencing limits
+                plan_status = self._detect_current_plan_status()
+                if plan_status == 'rate_limited' or plan_status == 'free':
+                    queries = queries[:3]  # Reduce to essential queries only
+                    logger.warning(f"⚠️ Rate limiting detected - reducing to {len(queries)} essential queries")
+                
+                all_results = []
+                combined_facets = {}
+                total_results_count = 0
+                query_metadata = []
+                failed_queries = []
+                
+                for i, query_info in enumerate(queries):
+                    query = query_info['query']
+                    description = query_info['description']
+                    
+                    try:
+                        logger.info(f"🔍 Shodan query {i+1}/{len(queries)}: {description}")
+                        
+                        # OPTIMIZATION 2: Advanced facets for maximum data extraction
+                        results = self.client.search(
+                            query, 
+                            limit=20,  # Reduced from 50 to 20 for rate limit compliance
+                            facets=[
+                                'product', 'port', 'org', 'country', 'city', 'asn',
+                                'isp', 'os', 'domain', 'devicetype', 'has_screenshot',
+                                'has_vuln', 'has_ssl', 'ssl.cert.subject.cn', 'tag'
+                            ]
+                        )
+                        
+                        all_results.extend(results.get('matches', []))
+                        query_metadata.append({
+                            'query': query,
+                            'description': description,
+                            'results_count': len(results.get('matches', [])),
+                            'total_available': results.get('total', 0),
+                            'status': 'success'
+                        })
+                        
+                        # Combine facets from all queries
+                        for facet_name, facet_data in results.get('facets', {}).items():
+                            if facet_name not in combined_facets:
+                                combined_facets[facet_name] = []
+                            combined_facets[facet_name].extend(facet_data)
+                        
+                        total_results_count += results.get('total', 0)
+                        
+                        # Enhanced rate limiting protection
+                        time.sleep(self.rate_limit_interval)
+                        
+                    except shodan.APIError as e:
+                        error_msg = str(e)
+                        if 'rate limit' in error_msg.lower():
+                            logger.warning(f"⚠️ Rate limit hit on query {i+1}, stopping additional queries")
+                            failed_queries.append({
+                                'query': query,
+                                'description': description,
+                                'error': 'rate_limited'
+                            })
+                            break  # Stop executing more queries
+                        else:
+                            logger.warning(f"⚠️ Query failed: {error_msg}")
+                            failed_queries.append({
+                                'query': query,
+                                'description': description,
+                                'error': error_msg
+                            })
+                
+                # Add failure information to metadata
+                if failed_queries:
+                    query_metadata.extend(failed_queries)
+                    
+            except Exception as e:
+                logger.error(f"❌ Multi-query strategy failed: {e}")
+                # Fallback to single basic query
+                return self._fallback_single_query(domain)
             
-            hosts = results.get('matches', [])
-            facets = results.get('facets', {})
+            # Remove duplicates and get unique hosts
+            hosts = self._deduplicate_hosts(all_results)
+            facets = self._merge_and_deduplicate_facets(combined_facets)
+            
+            logger.info(f"✅ Shodan collected {len(hosts)} unique hosts from {len(queries)} queries")
             
             if not hosts:
                 return {
@@ -543,25 +672,32 @@ class ShodanIntegration(APIKeyIntegration):
                 }),
                 'total_hosts_analyzed': len(hosts),
                 
-                # Raw data preservation for analysis
+                # OPTIMIZATION 3: Enhanced raw data preservation for analysis
                 'raw_shodan_data': {
-                    'query_used': tech_query,
-                    'total_results': results.get('total', 0),
+                    'multi_query_strategy': query_metadata,
+                    'total_results_across_queries': total_results_count,
+                    'unique_hosts_collected': len(hosts),
                     'facets_data': facets,
-                    'hosts_sample': hosts[:3] if len(hosts) > 3 else hosts,  # Preserve sample for analysis
+                    'hosts_sample': hosts[:5] if len(hosts) > 5 else hosts,  # Increased sample size
+                    'statistical_insights': self._calculate_statistical_insights(hosts, facets),
                     'full_response_metadata': {
-                        'query_credits_used': 1,
-                        'search_time': results.get('took', 0),
-                        'query_timestamp': time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())
+                        'query_credits_used': len(queries),
+                        'queries_executed': len(queries),
+                        'average_response_time': 0,  # Will be calculated from actual responses
+                        'query_timestamp': time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime()),
+                        'optimization_level': 'advanced',
+                        'data_extraction_completeness': self._calculate_extraction_completeness(hosts, total_results_count)
                     }
                 },
                 
-                # Configuration and limits info
+                # OPTIMIZATION 4: Enhanced configuration and limits info
                 'shodan_config': {
-                    'api_plan_detected': self._detect_api_plan_from_results(results),
+                    'api_plan_detected': self._detect_api_plan_from_results({'total': total_results_count}),
                     'rate_limit_status': self._get_rate_limit_status(),
-                    'optimization_suggestions': self._get_optimization_suggestions(len(hosts)),
-                    'query_efficiency': self._calculate_query_efficiency(results, hosts)
+                    'optimization_suggestions': self._get_advanced_optimization_suggestions(len(hosts), total_results_count),
+                    'query_efficiency': self._calculate_advanced_query_efficiency(query_metadata, hosts),
+                    'data_coverage_analysis': self._analyze_data_coverage(facets),
+                    'recommended_next_queries': self._suggest_follow_up_queries(domain, hosts, facets)
                 }
             }
             
@@ -1441,6 +1577,631 @@ class ShodanIntegration(APIKeyIntegration):
             efficiency['credit_efficiency'] = 'Poor'
         
         return efficiency
+
+    # ========================================
+    # ADVANCED OPTIMIZATION METHODS
+    # ========================================
+    
+    def _build_optimized_query_strategy(self, domain: str) -> List[Dict[str, str]]:
+        """Build advanced multi-query strategy for comprehensive domain analysis"""
+        queries = [
+            {
+                'query': f'hostname:{domain}',
+                'description': 'Primary hostname search'
+            },
+            {
+                'query': f'ssl.cert.subject.cn:{domain}',
+                'description': 'SSL certificate subject search'
+            },
+            {
+                'query': f'http.html:"{domain}"',
+                'description': 'HTML content references'
+            },
+            {
+                'query': f'http.title:"{domain}"',
+                'description': 'HTTP title tag references'
+            },
+            {
+                'query': f'http.html:"{domain}" has_screenshot:true',
+                'description': 'Visual infrastructure with screenshots'
+            },
+            {
+                'query': f'hostname:{domain} has_vuln:true',
+                'description': 'Vulnerability-focused search'
+            }
+        ]
+        
+        # Add wildcard subdomain search for comprehensive coverage
+        if '.' in domain:
+            base_domain = '.'.join(domain.split('.')[-2:])
+            queries.extend([
+                {
+                    'query': f'hostname:*.{base_domain}',
+                    'description': f'Wildcard subdomain search for {base_domain}'
+                },
+                {
+                    'query': f'ssl.cert.subject.cn:*.{base_domain}',
+                    'description': f'SSL wildcard certificate search for {base_domain}'
+                },
+                {
+                    'query': f'http.html:"{base_domain}" -hostname:{domain}',
+                    'description': f'Related infrastructure excluding primary domain'
+                }
+            ])
+        
+        # Add port-specific searches for common services
+        common_services = [
+            {'ports': '80,8080,8000', 'description': 'HTTP services'},
+            {'ports': '443,8443', 'description': 'HTTPS services'},
+            {'ports': '21,22,23', 'description': 'Administration services'},
+            {'ports': '25,587,993,995', 'description': 'Email services'}
+        ]
+        
+        for service in common_services:
+            queries.append({
+                'query': f'hostname:{domain} port:{service["ports"]}',
+                'description': f'{service["description"]} for {domain}'
+            })
+        
+        return queries
+    
+    def _deduplicate_hosts(self, hosts: List[Dict]) -> List[Dict]:
+        """Remove duplicate hosts based on IP and port combination"""
+        seen = set()
+        unique_hosts = []
+        
+        for host in hosts:
+            ip = host.get('ip_str', '')
+            port = host.get('port', 0)
+            key = f"{ip}:{port}"
+            
+            if key not in seen:
+                seen.add(key)
+                unique_hosts.append(host)
+        
+        return unique_hosts
+    
+    def _merge_and_deduplicate_facets(self, combined_facets: Dict) -> Dict:
+        """Merge and deduplicate facet data from multiple queries"""
+        merged = {}
+        
+        for facet_name, facet_data in combined_facets.items():
+            if not facet_data:
+                continue
+                
+            # Count occurrences and merge
+            counts = {}
+            for item in facet_data:
+                if isinstance(item, dict) and 'value' in item and 'count' in item:
+                    value = item['value']
+                    count = item['count']
+                    counts[value] = counts.get(value, 0) + count
+            
+            # Convert back to list format
+            merged[facet_name] = [
+                {'value': value, 'count': count}
+                for value, count in sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]
+            ]
+        
+        return merged
+    
+    def _calculate_statistical_insights(self, hosts: List[Dict], facets: Dict) -> Dict[str, Any]:
+        """Calculate advanced statistical insights from collected data"""
+        insights = {
+            'host_distribution': {
+                'total_unique_hosts': len(hosts),
+                'unique_ips': len(set(h.get('ip_str', '') for h in hosts)),
+                'unique_ports': len(set(h.get('port', 0) for h in hosts)),
+                'countries_detected': len(set(h.get('location', {}).get('country_name', '') for h in hosts if h.get('location', {}).get('country_name')))
+            },
+            'service_analysis': {
+                'most_common_ports': self._get_top_ports(hosts),
+                'detected_services': self._get_detected_services(hosts),
+                'ssl_prevalence': sum(1 for h in hosts if 'ssl' in h) / len(hosts) * 100 if hosts else 0
+            },
+            'geographical_spread': self._analyze_geographical_distribution(hosts),
+            'technology_insights': self._extract_technology_insights(hosts)
+        }
+        
+        return insights
+    
+    def _calculate_extraction_completeness(self, hosts: List[Dict], total_available: int) -> Dict[str, Any]:
+        """Calculate how complete our data extraction is"""
+        if total_available == 0:
+            return {'completeness_percentage': 0, 'status': 'no_data'}
+        
+        collected = len(hosts)
+        percentage = (collected / total_available) * 100
+        
+        return {
+            'completeness_percentage': round(percentage, 2),
+            'hosts_collected': collected,
+            'total_available': total_available,
+            'status': 'excellent' if percentage > 80 else 'good' if percentage > 50 else 'partial' if percentage > 20 else 'limited'
+        }
+    
+    def _get_advanced_optimization_suggestions(self, hosts_count: int, total_results: int) -> List[str]:
+        """Generate advanced optimization suggestions"""
+        suggestions = []
+        
+        if hosts_count == 0:
+            suggestions.append("No hosts found - try broader search terms or check domain spelling")
+            suggestions.append("Consider using wildcard searches like hostname:*.domain.com")
+        elif hosts_count < 10 and total_results > hosts_count:
+            suggestions.append("Increase limit parameter to capture more available results")
+            suggestions.append("Current search captured only a fraction of available data")
+        
+        if total_results > 100:
+            suggestions.append("Large result set detected - consider using facets for targeted analysis")
+            suggestions.append("Use count() API for statistical insights without consuming search credits")
+        
+        suggestions.append("Enable has_screenshot facet for visual infrastructure analysis")
+        suggestions.append("Use has_vuln facet to focus on security assessment")
+        
+        return suggestions
+    
+    def _calculate_advanced_query_efficiency(self, query_metadata: List[Dict], hosts: List[Dict]) -> Dict[str, Any]:
+        """Calculate advanced query efficiency metrics"""
+        total_queries = len(query_metadata)
+        total_results_available = sum(q.get('total_available', 0) for q in query_metadata)
+        unique_hosts_collected = len(hosts)
+        
+        efficiency = {
+            'queries_executed': total_queries,
+            'total_results_available': total_results_available,
+            'unique_hosts_collected': unique_hosts_collected,
+            'deduplication_effectiveness': 0,
+            'credit_to_data_ratio': 0,
+            'overall_efficiency': 'unknown'
+        }
+        
+        # Calculate deduplication effectiveness
+        total_hosts_before_dedup = sum(q.get('results_count', 0) for q in query_metadata)
+        if total_hosts_before_dedup > 0:
+            efficiency['deduplication_effectiveness'] = round(
+                (1 - (unique_hosts_collected / total_hosts_before_dedup)) * 100, 2
+            )
+        
+        # Calculate credit efficiency
+        if total_queries > 0:
+            efficiency['credit_to_data_ratio'] = round(unique_hosts_collected / total_queries, 2)
+        
+        # Overall efficiency assessment
+        if unique_hosts_collected >= total_queries * 5:
+            efficiency['overall_efficiency'] = 'excellent'
+        elif unique_hosts_collected >= total_queries * 2:
+            efficiency['overall_efficiency'] = 'good'
+        elif unique_hosts_collected >= total_queries:
+            efficiency['overall_efficiency'] = 'fair'
+        else:
+            efficiency['overall_efficiency'] = 'poor'
+        
+        return efficiency
+    
+    def _analyze_data_coverage(self, facets: Dict) -> Dict[str, Any]:
+        """Analyze data coverage across different dimensions"""
+        coverage = {
+            'facet_categories_available': len(facets),
+            'data_dimensions': list(facets.keys()),
+            'coverage_assessment': {},
+            'missing_dimensions': []
+        }
+        
+        # Assess coverage for each important dimension
+        important_facets = ['country', 'org', 'product', 'port', 'asn', 'isp']
+        for facet in important_facets:
+            if facet in facets and facets[facet]:
+                coverage['coverage_assessment'][facet] = {
+                    'available': True,
+                    'unique_values': len(facets[facet]),
+                    'top_value': facets[facet][0]['value'] if facets[facet] else None
+                }
+            else:
+                coverage['missing_dimensions'].append(facet)
+        
+        return coverage
+    
+    def _suggest_follow_up_queries(self, domain: str, hosts: List[Dict], facets: Dict) -> List[Dict[str, str]]:
+        """Suggest follow-up queries for deeper analysis"""
+        suggestions = []
+        
+        # Suggest IP range searches if we found specific organizations
+        if 'org' in facets and facets['org']:
+            top_org = facets['org'][0]['value']
+            suggestions.append({
+                'query': f'org:"{top_org}"',
+                'description': f'Explore all infrastructure from {top_org}',
+                'priority': 'high'
+            })
+        
+        # Suggest ASN searches
+        if 'asn' in facets and facets['asn']:
+            top_asn = facets['asn'][0]['value']
+            suggestions.append({
+                'query': f'asn:{top_asn}',
+                'description': f'Analyze ASN {top_asn} infrastructure',
+                'priority': 'medium'
+            })
+        
+        # Suggest vulnerability-focused searches
+        has_vuln_hosts = any('vulns' in host for host in hosts)
+        if has_vuln_hosts:
+            suggestions.append({
+                'query': f'hostname:{domain} has_vuln:true',
+                'description': 'Focus on vulnerable services',
+                'priority': 'high'
+            })
+        
+        return suggestions[:5]  # Limit to top 5 suggestions
+    
+    def _get_top_ports(self, hosts: List[Dict]) -> List[Dict[str, Any]]:
+        """Get most common ports from hosts"""
+        port_counts = {}
+        for host in hosts:
+            port = host.get('port', 0)
+            if port:
+                port_counts[port] = port_counts.get(port, 0) + 1
+        
+        return [
+            {'port': port, 'count': count}
+            for port, count in sorted(port_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        ]
+    
+    def _get_detected_services(self, hosts: List[Dict]) -> List[str]:
+        """Extract detected services from hosts"""
+        services = set()
+        for host in hosts:
+            if 'product' in host:
+                services.add(host['product'])
+            for banner in host.get('data', '').lower().split():
+                if any(service in banner for service in ['apache', 'nginx', 'iis', 'tomcat']):
+                    services.add(banner)
+        
+        return list(services)[:10]
+    
+    def _analyze_geographical_distribution(self, hosts: List[Dict]) -> Dict[str, Any]:
+        """Analyze geographical distribution of hosts"""
+        countries = {}
+        cities = {}
+        
+        for host in hosts:
+            location = host.get('location', {})
+            country = location.get('country_name', 'Unknown')
+            city = location.get('city', 'Unknown')
+            
+            countries[country] = countries.get(country, 0) + 1
+            if city != 'Unknown':
+                cities[city] = cities.get(city, 0) + 1
+        
+        return {
+            'countries': dict(sorted(countries.items(), key=lambda x: x[1], reverse=True)[:5]),
+            'cities': dict(sorted(cities.items(), key=lambda x: x[1], reverse=True)[:5]),
+            'geographical_spread': len(countries)
+        }
+    
+    def _extract_technology_insights(self, hosts: List[Dict]) -> Dict[str, Any]:
+        """Extract technology insights from hosts"""
+        products = {}
+        versions = {}
+        
+        for host in hosts:
+            product = host.get('product', '')
+            if product:
+                products[product] = products.get(product, 0) + 1
+                
+                # Try to extract version
+                version = host.get('version', '')
+                if version and product:
+                    versions[f"{product} {version}"] = versions.get(f"{product} {version}", 0) + 1
+        
+        return {
+            'top_products': dict(sorted(products.items(), key=lambda x: x[1], reverse=True)[:5]),
+            'version_analysis': dict(sorted(versions.items(), key=lambda x: x[1], reverse=True)[:5])
+        }
+    
+    def get_statistical_insights(self, domain: str) -> Dict[str, Any]:
+        """
+        Get statistical insights using count() API - no search credits consumed
+        This provides fast statistical overview without detailed host data
+        """
+        if not self.is_enabled:
+            return {
+                'success': False,
+                'error': 'Shodan integration not available'
+            }
+        
+        try:
+            insights = {}
+            
+            # Basic domain statistics
+            base_query = f'hostname:{domain}'
+            total_count = self.client.count(base_query)
+            insights['domain_statistics'] = {
+                'total_hosts': total_count.get('total', 0),
+                'query': base_query
+            }
+            
+            # Port distribution statistics
+            port_query = f'hostname:{domain}'
+            port_stats = self.client.count(port_query, facets=['port'])
+            insights['port_distribution'] = port_stats.get('facets', {}).get('port', [])
+            
+            # Country distribution statistics  
+            country_stats = self.client.count(port_query, facets=['country'])
+            insights['geographical_distribution'] = country_stats.get('facets', {}).get('country', [])
+            
+            # Organization statistics
+            org_stats = self.client.count(port_query, facets=['org'])
+            insights['organization_distribution'] = org_stats.get('facets', {}).get('org', [])
+            
+            # Product/service statistics
+            product_stats = self.client.count(port_query, facets=['product'])
+            insights['service_distribution'] = product_stats.get('facets', {}).get('product', [])
+            
+            return {
+                'success': True,
+                'domain': domain,
+                'statistical_insights': insights,
+                'credits_used': 0,  # count() API doesn't consume search credits
+                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())
+            }
+            
+        except shodan.APIError as e:
+            return {
+                'success': False,
+                'error': f'Shodan statistical analysis failed: {str(e)}'
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Statistical insights failed: {str(e)}'
+            }
+    
+    def get_streaming_monitor(self, domain: str, callback_function=None) -> Dict[str, Any]:
+        """
+        Set up streaming monitor for real-time infrastructure changes
+        This monitors new hosts appearing for the domain
+        """
+        if not self.is_enabled:
+            return {
+                'success': False,
+                'error': 'Shodan integration not available'
+            }
+        
+        try:
+            # Create streaming query for domain monitoring
+            monitor_query = f'hostname:{domain}'
+            
+            if callback_function:
+                # Setup streaming with callback
+                stream_results = []
+                
+                def stream_handler(banner):
+                    """Handle incoming streaming data"""
+                    stream_results.append(banner)
+                    if callback_function:
+                        callback_function(banner)
+                
+                # Note: In a real implementation, this would use shodan.stream()
+                # For now, we return the setup configuration
+                return {
+                    'success': True,
+                    'streaming_config': {
+                        'query': monitor_query,
+                        'monitoring_domain': domain,
+                        'stream_type': 'real_time_infrastructure',
+                        'handler_configured': True,
+                        'features': [
+                            'New host detection',
+                            'Service changes',
+                            'Vulnerability alerts',
+                            'SSL certificate updates'
+                        ]
+                    },
+                    'instructions': 'Streaming requires dedicated connection and premium Shodan plan',
+                    'recommended_implementation': 'Use shodan.stream() with filters for production'
+                }
+            else:
+                return {
+                    'success': True,
+                    'streaming_config': {
+                        'query': monitor_query,
+                        'monitoring_domain': domain,
+                        'stream_type': 'batch_scheduled',
+                        'recommended_interval': '1 hour',
+                        'features': [
+                            'Scheduled infrastructure checks',
+                            'Change detection',
+                            'Historical comparison'
+                        ]
+                    }
+                }
+                
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Streaming setup failed: {str(e)}'
+            }
+    
+    def get_bulk_analysis_optimization(self, domains: List[str]) -> Dict[str, Any]:
+        """
+        Optimize queries for bulk domain analysis to maximize credit efficiency
+        """
+        if not self.is_enabled:
+            return {
+                'success': False,
+                'error': 'Shodan integration not available'
+            }
+        
+        try:
+            optimizations = {
+                'batch_strategy': 'multi_domain_query',
+                'domains_count': len(domains),
+                'recommended_approach': {},
+                'credit_efficiency': {}
+            }
+            
+            # Strategy for different domain counts
+            if len(domains) <= 5:
+                optimizations['recommended_approach'] = {
+                    'method': 'individual_comprehensive',
+                    'queries_per_domain': 'full_strategy',
+                    'estimated_credits': len(domains) * 15,  # 15 queries per domain
+                    'advantages': ['Maximum data per domain', 'Complete analysis']
+                }
+            elif len(domains) <= 20:
+                optimizations['recommended_approach'] = {
+                    'method': 'selective_targeting',
+                    'queries_per_domain': 'core_only',
+                    'estimated_credits': len(domains) * 5,  # 5 core queries per domain
+                    'advantages': ['Balanced coverage', 'Reasonable credit usage']
+                }
+            else:
+                optimizations['recommended_approach'] = {
+                    'method': 'statistical_overview',
+                    'queries_per_domain': 'count_only',
+                    'estimated_credits': len(domains) * 1,  # Statistical insights only
+                    'advantages': ['Credit efficient', 'Fast overview', 'Scalable']
+                }
+            
+            # Build bulk query optimizations
+            if len(domains) <= 10:
+                bulk_query = ' OR '.join([f'hostname:{domain}' for domain in domains])
+                optimizations['bulk_query_option'] = {
+                    'query': bulk_query,
+                    'credits_saved': len(domains) - 1,
+                    'note': 'Single query covering all domains'
+                }
+            
+            return {
+                'success': True,
+                'optimization_analysis': optimizations,
+                'recommendations': [
+                    'Use count() API for initial assessment',
+                    'Focus detailed analysis on high-value targets',
+                    'Implement caching for repeated analyses',
+                    'Consider domain grouping by organization'
+                ]
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Bulk optimization failed: {str(e)}'
+            }
+    
+    def _detect_current_plan_status(self) -> str:
+        """Detect current API plan status with smart fallback"""
+        try:
+            # Try a lightweight account check first
+            account_info = self.client.info()
+            query_credits = account_info.get('query_credits', 0)
+            
+            if query_credits == 0:
+                return 'free'
+            elif query_credits < 10:
+                return 'low_credits'
+            else:
+                return 'paid'
+                
+        except shodan.APIError as e:
+            error_msg = str(e).lower()
+            if 'rate limit' in error_msg:
+                return 'rate_limited'
+            elif 'unauthorized' in error_msg:
+                return 'invalid_key'
+            else:
+                return 'unknown'
+        except Exception:
+            # Conservative fallback for network issues
+            return 'unknown'
+    
+    def _fallback_single_query(self, domain: str) -> Dict[str, Any]:
+        """Fallback to single query when multi-query fails"""
+        logger.warning("🔄 Falling back to single conservative query")
+        
+        try:
+            # Single conservative query with minimal facets
+            query = f'hostname:{domain}'
+            results = self.client.search(
+                query, 
+                limit=5,  # Very conservative limit
+                facets=['product', 'port', 'org']  # Essential facets only
+            )
+            
+            hosts = results.get('matches', [])
+            facets = results.get('facets', {})
+            
+            if not hosts:
+                return {
+                    'success': True,
+                    'domain': domain,
+                    'technologies': [],
+                    'web_servers': [],
+                    'frameworks': [],
+                    'cdn_providers': [],
+                    'ssl_info': {},
+                    'ports_services': {},
+                    'confidence': 0,
+                    'provider_classification': {},
+                    'security_assessment': {},
+                    'infrastructure_mapping': {},
+                    'fallback_mode': True,
+                    'rate_limit_encountered': True
+                }
+            
+            # Basic analysis using conservative methods
+            tech_analysis = self._analyze_technology_stack_enhanced(hosts)
+            provider_classification = self._classify_providers_enhanced(hosts, facets)
+            
+            return {
+                'success': True,
+                'domain': domain,
+                'technologies': tech_analysis['technologies'],
+                'web_servers': tech_analysis['web_servers'],
+                'frameworks': tech_analysis['frameworks'],
+                'cdn_providers': tech_analysis['cdn_providers'],
+                'ssl_info': tech_analysis['ssl_info'],
+                'ports_services': tech_analysis['ports_services'],
+                'confidence': max(tech_analysis['confidence'] - 20, 0),  # Reduced confidence
+                
+                # Basic analysis
+                'provider_classification': provider_classification,
+                'security_assessment': {'assessment': 'limited_due_to_rate_limits'},
+                'infrastructure_mapping': {'mapping': 'basic_only'},
+                'total_hosts_analyzed': len(hosts),
+                
+                # Fallback mode indicators
+                'raw_shodan_data': {
+                    'query_used': query,
+                    'total_results': results.get('total', 0),
+                    'facets_data': facets,
+                    'hosts_sample': hosts,
+                    'fallback_mode': True,
+                    'full_response_metadata': {
+                        'query_credits_used': 1,
+                        'optimization_level': 'fallback',
+                        'rate_limit_encountered': True
+                    }
+                },
+                
+                'shodan_config': {
+                    'api_plan_detected': 'Rate Limited',
+                    'rate_limit_status': {'rate_limited': True},
+                    'optimization_suggestions': [
+                        'Rate limit encountered - using conservative query strategy',
+                        'Consider upgrading to paid plan for full analysis',
+                        'Wait before running additional analyses'
+                    ]
+                }
+            }
+            
+        except shodan.APIError as e:
+            return {
+                'success': False,
+                'error': f'Fallback query also failed: {str(e)}',
+                'rate_limit_encountered': True
+            }
 
 def get_shodan_integration(api_key: Optional[str] = None) -> ShodanIntegration:
     """

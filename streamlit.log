@@ -10,107 +10,88 @@
   $ xcode-select --install
   $ pip install watchdog
             
-2025-08-28 21:09:18,772 - INFO - 🚀 Starting analysis for URL: eskimi.com
-2025-08-28 21:09:18,773 - INFO - 📝 Extracted domain: eskimi.com
-2025-08-28 21:09:18,773 - INFO - 🌐 Step 1/5: Fetching headers...
-2025-08-28 21:09:19,361 - INFO - ✅ Headers fetched: 790 chars
-2025-08-28 21:09:19,361 - INFO - 🔍 Step 2/5: Resolving IP...
-2025-08-28 21:09:19,362 - INFO - ✅ IP resolved: 75.2.70.75
-2025-08-28 21:09:19,362 - INFO - 📋 Step 3/5: Getting WHOIS data...
-2025-08-28 21:09:19,983 - ERROR - WHOIS query failed for 75.2.70.75: No match for "AACB0A264E514DD48.AWSGLOBALACCELERATOR.COM".
->>> Last update of whois database: 2025-08-28T20:09:09Z <<<
-
-NOTICE: The expiration date displayed in this record is the date the
-registrar's sponsorship of the domain name registration in the registry is
-currently set to expire. This date does not necessarily reflect the expiration
-date of the domain name registrant's agreement with the sponsoring
-registrar.  Users may consult the sponsoring registrar's Whois database to
-view the registrar's reported date of expiration for this registration.
-
-TERMS OF USE: You are not authorized to access or query our Whois
-database through the use of electronic processes that are high-volume and
-automated except as reasonably necessary to register domain names or
-modify existing registrations; the Data in VeriSign Global Registry
-Services' ("VeriSign") Whois database is provided by VeriSign for
-information purposes only, and to assist persons in obtaining information
-about or related to a domain name registration record. VeriSign does not
-guarantee its accuracy. By submitting a Whois query, you agree to abide
-by the following terms of use: You agree that you may use this Data only
-for lawful purposes and that under no circumstances will you use this Data
-to: (1) allow, enable, or otherwise support the transmission of mass
-unsolicited, commercial advertising or solicitations via e-mail, telephone,
-or facsimile; or (2) enable high volume, automated, electronic processes
-that apply to VeriSign (or its computer systems). The compilation,
-repackaging, dissemination or other use of this Data is expressly
-prohibited without the prior written consent of VeriSign. You agree not to
-use electronic processes that are automated and high-volume to access or
-query the Whois database except as reasonably necessary to register
-domain names or modify existing registrations. VeriSign reserves the right
-to restrict your access to the Whois database in its sole discretion to ensure
-operational stability.  VeriSign may restrict or terminate your access to the
-Whois database for failure to abide by these terms of use. VeriSign
-reserves the right to modify these terms at any time.
-
-The Registry database contains ONLY .COM, .NET, .EDU domains and
-Registrars.
-
-2025-08-28 21:09:19,983 - INFO - ✅ WHOIS data fetched: 2323 chars
-2025-08-28 21:09:19,983 - INFO - 🚀 Step 4/5: Running enhanced provider detection (6 integrations)...
-2025-08-28 21:09:19,983 - INFO - 🔍 Starting comprehensive analysis for domain: eskimi.com
-2025-08-28 21:09:19,983 - INFO - 📊 Step 1/8: Running base provider detection...
-2025-08-28 21:09:21,098 - INFO - ✅ Step 1/9: Base detection completed
-2025-08-28 21:09:21,098 - INFO - 📊 Step 2/9: Running SSL certificate analysis...
-2025-08-28 21:09:21,189 - INFO - ✅ Step 2/9: SSL analysis completed
-2025-08-28 21:09:21,189 - INFO - 📊 Step 3/9: Running enhanced DNS analysis...
-2025-08-28 21:09:21,322 - INFO - ✅ Step 3/9: DNS analysis completed
-2025-08-28 21:09:21,322 - INFO - 📊 Step 4/9: Running geographic intelligence analysis...
-2025-08-28 21:09:21,658 - INFO - ✅ Step 4/9: Geographic analysis completed
-2025-08-28 21:09:21,658 - INFO - 📊 Step 5/9: Running BGP analysis...
-2025-08-28 21:09:27,677 - INFO - ✅ Step 5/9: BGP analysis completed
-2025-08-28 21:09:27,677 - INFO - 📊 Step 6/9: Running advanced BGP customer classification...
-2025-08-28 21:09:27,677 - INFO - ✅ Step 6/9: Advanced BGP classification completed
-2025-08-28 21:09:27,677 - INFO - 📊 Step 7/9: Running threat intelligence analysis...
-2025-08-28 21:09:28,471 - INFO - ✅ Step 7/9: Threat intelligence analysis completed
-2025-08-28 21:09:28,471 - INFO - 📊 Step 8/9: Running Shodan premium WAF analysis...
-2025-08-28 21:09:32,631 - INFO - ✅ Step 8/9: Shodan WAF analysis completed
-2025-08-28 21:09:32,631 - INFO - 📊 Step 9/9: Running cross-validation and final calculations...
-2025-08-28 21:09:32,631 - INFO - ✅ Step 9/9: Cross-validation completed
-2025-08-28 21:09:32,631 - INFO - ✅ Comprehensive analysis completed for eskimi.com
-2025-08-28 21:09:32,631 - INFO - ✅ Enhanced provider detection completed!
-2025-08-28 21:09:32,631 - INFO - 🔧 Debug: COMPREHENSIVE_ANALYSIS_AVAILABLE = True
-2025-08-28 21:09:32,631 - INFO - 🔍 Step 5/5: Running comprehensive analysis (Full DNS, Subdomains, Headers)...
-2025-08-28 21:09:32,631 - INFO - 🔍 Comprehensive Analysis integration initialized
-2025-08-28 21:09:32,631 - INFO - 🔍 Starting comprehensive analysis for eskimi.com
-2025-08-28 21:09:54,067 - INFO - ✅ Comprehensive analysis completed for eskimi.com
-2025-08-28 21:09:54,068 - INFO - ✅ Comprehensive analysis completed!
-2025-08-28 21:09:54,068 - INFO - 🔧 Debug: comprehensive_analysis_result keys: ['domain', 'timestamp', 'dns_records', 'subdomains', 'http_analysis', 'origin_detection', 'infrastructure_mapping', 'ssl_analysis', 'performance_metrics']
-2025-08-28 21:09:54,068 - INFO - 🔧 Debug: comprehensive_analysis_result size: 17596 chars
-2025-08-28 21:09:54,068 - INFO - 🔧 Debug: Attempting to save analysis results...
-2025-08-28 21:09:54,081 - INFO - 🔧 Debug: Imports successful
-2025-08-28 21:09:54,082 - INFO - Loading official IP ranges...
-2025-08-28 21:09:54,335 - INFO - ✓ Loaded 9024 AWS IP ranges
-2025-08-28 21:09:54,615 - INFO - ✓ Loaded 22 Cloudflare IP ranges
-2025-08-28 21:09:54,615 - INFO - ✅ VirusTotal API key configured successfully
-2025-08-28 21:09:54,615 - INFO - 🚀 Provider Detector initialized with all modules
-2025-08-28 21:09:54,615 - INFO - SSL Analysis integration initialized
-2025-08-28 21:09:54,615 - INFO - ✅ SSL Certificate Analysis integration loaded
-2025-08-28 21:09:54,615 - INFO - Enhanced DNS integration initialized with 1 resolvers
-2025-08-28 21:09:54,615 - INFO - ✅ Enhanced DNS integration loaded
-2025-08-28 21:09:54,615 - INFO - Geographic Intelligence integration initialized
-2025-08-28 21:09:54,615 - INFO - ✅ Geographic Intelligence integration loaded
-2025-08-28 21:09:54,615 - INFO - BGP Analysis integration initialized
-2025-08-28 21:09:54,615 - INFO - ✅ BGP Analysis integration loaded
-2025-08-28 21:09:54,615 - INFO - Hurricane Electric BGP integration initialized
-2025-08-28 21:09:54,615 - INFO - ✅ Hurricane Electric BGP integration loaded
-2025-08-28 21:09:54,615 - INFO - Threat Intelligence integration initialized
-2025-08-28 21:09:54,615 - INFO - ✅ Threat Intelligence integration loaded
-2025-08-28 21:09:54,615 - INFO - Advanced BGP Classifier initialized
-2025-08-28 21:09:54,615 - INFO - ✅ Advanced BGP Classifier integration loaded
-2025-08-28 21:09:54,615 - INFO - Shodan client initialized successfully
-2025-08-28 21:09:54,615 - INFO - ✅ Shodan Premium WAF integration loaded
-2025-08-28 21:09:54,615 - INFO - 🚀 Enhanced Provider Detector initialized with all FREE integrations
-2025-08-28 21:09:54,615 - INFO - ✅ Available enhancements: ['SSL Analysis', 'Enhanced DNS', 'Geographic Intelligence', 'BGP Analysis', 'Hurricane Electric BGP', 'Threat Intelligence', 'Advanced BGP Classifier', 'Shodan Premium WAF']
-2025-08-28 21:09:54,615 - INFO - 🔧 Debug: Detector instance created
-2025-08-28 21:09:54,617 - INFO - 🔧 Debug: Combined result created with 259260 chars
-2025-08-28 21:09:54,624 - INFO - ✅ Analysis results saved to backend: analysis_eskimi_com_20250828_210954.json, summary_eskimi_com_20250828_210954.csv
-2025-08-28 21:09:54,625 - INFO - ✅ Analysis results saved to backend: analysis_eskimi_com_20250828_210954.json, summary_eskimi_com_20250828_210954.csv
+2025-08-28 21:34:38,575 - INFO - 🚀 Starting analysis for URL: arsenal.co.uk
+2025-08-28 21:34:38,576 - INFO - 📝 Extracted domain: arsenal.co.uk
+2025-08-28 21:34:38,576 - INFO - 🌐 Step 1/5: Fetching headers...
+2025-08-28 21:34:48,638 - WARNING - First attempt failed for https://arsenal.co.uk, trying fallback: HTTPSConnectionPool(host='arsenal.co.uk', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x12504f790>, 'Connection to arsenal.co.uk timed out. (connect timeout=10)'))
+2025-08-28 21:34:58,644 - ERROR - Header fetch failed for https://arsenal.co.uk: HTTPSConnectionPool(host='arsenal.co.uk', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x12504f160>, 'Connection to arsenal.co.uk timed out. (connect timeout=10)'))
+2025-08-28 21:34:58,645 - INFO - ✅ Headers fetched: 265 chars
+2025-08-28 21:34:58,645 - INFO - 🔍 Step 2/5: Resolving IP...
+2025-08-28 21:34:58,646 - INFO - ✅ IP resolved: 217.19.248.132
+2025-08-28 21:34:58,646 - INFO - 📋 Step 3/5: Getting WHOIS data...
+2025-08-28 21:34:59,676 - INFO - ✅ WHOIS data fetched: 1332 chars
+2025-08-28 21:34:59,676 - INFO - 🚀 Step 4/5: Running enhanced provider detection (6 integrations)...
+2025-08-28 21:34:59,676 - INFO - 🔍 Starting comprehensive analysis for domain: arsenal.co.uk
+2025-08-28 21:34:59,676 - INFO - 📊 Step 1/8: Running base provider detection...
+2025-08-28 21:35:00,731 - INFO - 🔍 Intelligent DNS analysis: dns3.idp365.net -> Safenames
+2025-08-28 21:35:00,731 - INFO - 📚 Learning: dns3.idp365.net -> Safenames
+2025-08-28 21:35:01,236 - INFO - 🔍 Intelligent DNS analysis: dns1.idp365.net -> Safenames
+2025-08-28 21:35:01,236 - INFO - 📚 Learning: dns1.idp365.net -> Safenames
+2025-08-28 21:35:01,756 - INFO - 🔍 Intelligent DNS analysis: dns2.idp365.net -> Safenames
+2025-08-28 21:35:01,756 - INFO - 📚 Learning: dns2.idp365.net -> Safenames
+2025-08-28 21:35:01,905 - INFO - ✅ Step 1/9: Base detection completed
+2025-08-28 21:35:01,905 - INFO - 📊 Step 2/9: Running SSL certificate analysis...
+2025-08-28 21:35:11,916 - ERROR - Failed to get SSL certificate for arsenal.co.uk:443: timed out
+2025-08-28 21:35:11,917 - INFO - ✅ Step 2/9: SSL analysis completed
+2025-08-28 21:35:11,917 - INFO - 📊 Step 3/9: Running enhanced DNS analysis...
+2025-08-28 21:35:12,071 - INFO - ✅ Step 3/9: DNS analysis completed
+2025-08-28 21:35:12,071 - INFO - 📊 Step 4/9: Running geographic intelligence analysis...
+2025-08-28 21:35:12,418 - INFO - ✅ Step 4/9: Geographic analysis completed
+2025-08-28 21:35:12,419 - INFO - 📊 Step 5/9: Running BGP analysis...
+2025-08-28 21:35:15,296 - INFO - ✅ Step 5/9: BGP analysis completed
+2025-08-28 21:35:15,296 - INFO - 📊 Step 6/9: Running advanced BGP customer classification...
+2025-08-28 21:35:16,670 - INFO - ✅ Step 6/9: Advanced BGP classification completed
+2025-08-28 21:35:16,670 - INFO - 📊 Step 7/9: Running threat intelligence analysis...
+2025-08-28 21:35:17,286 - INFO - ✅ Step 7/9: Threat intelligence analysis completed
+2025-08-28 21:35:17,287 - INFO - 📊 Step 8/9: Running Shodan premium WAF analysis...
+2025-08-28 21:35:21,175 - INFO - ✅ Step 8/9: Shodan WAF analysis completed
+2025-08-28 21:35:21,176 - INFO - 📊 Step 9/9: Running cross-validation and final calculations...
+2025-08-28 21:35:21,176 - INFO - ✅ Step 9/9: Cross-validation completed
+2025-08-28 21:35:21,176 - INFO - ✅ Comprehensive analysis completed for arsenal.co.uk
+2025-08-28 21:35:21,176 - INFO - ✅ Enhanced provider detection completed!
+2025-08-28 21:35:21,176 - INFO - 🔧 Debug: COMPREHENSIVE_ANALYSIS_AVAILABLE = True
+2025-08-28 21:35:21,176 - INFO - 🔍 Step 5/5: Running comprehensive analysis (Full DNS, Subdomains, Headers)...
+2025-08-28 21:35:21,176 - INFO - 🔍 Comprehensive Analysis integration initialized
+2025-08-28 21:35:21,176 - INFO - 🔍 Starting comprehensive analysis for arsenal.co.uk
+2025-08-28 21:35:53,471 - INFO - ✅ Comprehensive analysis completed for arsenal.co.uk
+2025-08-28 21:35:53,471 - INFO - ✅ Comprehensive analysis completed!
+2025-08-28 21:35:53,471 - INFO - 🔧 Debug: comprehensive_analysis_result keys: ['domain', 'timestamp', 'dns_records', 'subdomains', 'http_analysis', 'origin_detection', 'infrastructure_mapping', 'ssl_analysis', 'performance_metrics']
+2025-08-28 21:35:53,472 - INFO - 🔧 Debug: comprehensive_analysis_result size: 12726 chars
+2025-08-28 21:35:53,472 - INFO - 🔧 Debug: Attempting to save analysis results...
+2025-08-28 21:35:53,493 - INFO - 🔧 Debug: Imports successful
+2025-08-28 21:35:53,494 - INFO - Loading official IP ranges...
+2025-08-28 21:35:53,857 - INFO - ✓ Loaded 9024 AWS IP ranges
+2025-08-28 21:35:54,129 - INFO - ✓ Loaded 22 Cloudflare IP ranges
+2025-08-28 21:35:54,129 - INFO - ✅ VirusTotal API key configured successfully
+2025-08-28 21:35:54,130 - INFO - 🚀 Provider Detector initialized with all modules
+2025-08-28 21:35:54,130 - INFO - SSL Analysis integration initialized
+2025-08-28 21:35:54,130 - INFO - ✅ SSL Certificate Analysis integration loaded
+2025-08-28 21:35:54,130 - INFO - Enhanced DNS integration initialized with 1 resolvers
+2025-08-28 21:35:54,130 - INFO - ✅ Enhanced DNS integration loaded
+2025-08-28 21:35:54,131 - INFO - Geographic Intelligence integration initialized
+2025-08-28 21:35:54,131 - INFO - ✅ Geographic Intelligence integration loaded
+2025-08-28 21:35:54,131 - INFO - BGP Analysis integration initialized
+2025-08-28 21:35:54,131 - INFO - ✅ BGP Analysis integration loaded
+2025-08-28 21:35:54,131 - INFO - Hurricane Electric BGP integration initialized
+2025-08-28 21:35:54,131 - INFO - ✅ Hurricane Electric BGP integration loaded
+2025-08-28 21:35:54,131 - INFO - Threat Intelligence integration initialized
+2025-08-28 21:35:54,131 - INFO - ✅ Threat Intelligence integration loaded
+2025-08-28 21:35:54,131 - INFO - Advanced BGP Classifier initialized
+2025-08-28 21:35:54,131 - INFO - ✅ Advanced BGP Classifier integration loaded
+2025-08-28 21:35:54,131 - INFO - Shodan client initialized successfully
+2025-08-28 21:35:54,131 - INFO - ✅ Shodan Premium WAF integration loaded
+2025-08-28 21:35:54,131 - INFO - 🚀 Enhanced Provider Detector initialized with all FREE integrations
+2025-08-28 21:35:54,131 - INFO - ✅ Available enhancements: ['SSL Analysis', 'Enhanced DNS', 'Geographic Intelligence', 'BGP Analysis', 'Hurricane Electric BGP', 'Threat Intelligence', 'Advanced BGP Classifier', 'Shodan Premium WAF']
+2025-08-28 21:35:54,131 - INFO - 🔧 Debug: Detector instance created
+2025-08-28 21:35:54,134 - INFO - 🔧 Debug: Combined result created with 76002 chars
+2025-08-28 21:35:54,141 - INFO - ✅ Analysis results saved to backend: analysis_arsenal_co_uk_20250828_213554.json, summary_arsenal_co_uk_20250828_213554.csv
+2025-08-28 21:35:54,141 - INFO - ✅ Analysis results saved to backend: analysis_arsenal_co_uk_20250828_213554.json, summary_arsenal_co_uk_20250828_213554.csv
+🔧 Attempting to import from: src
+✅ Comprehensive Analysis module loaded successfully!
+🔧 Module path: provider_discovery.integrations.comprehensive_analysis
+🔧 Final status: COMPREHENSIVE_ANALYSIS_AVAILABLE = True
+🔧 Attempting to import from: src
+✅ Comprehensive Analysis module loaded successfully!
+🔧 Module path: provider_discovery.integrations.comprehensive_analysis
+🔧 Final status: COMPREHENSIVE_ANALYSIS_AVAILABLE = True
+  Stopping...

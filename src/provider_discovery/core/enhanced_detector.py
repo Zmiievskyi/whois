@@ -1518,20 +1518,20 @@ class EnhancedProviderDetector(ProviderDetector):
             backend_data = {
                 "analysis_metadata": {
                     "domain": result.get('URL', domain),
-                    "ip_address": result.get('IP_Address'),
+                    "ip_address": result.get('IP_Address') or result.get('ip') or result.get('IP') or 'N/A',
                     "analysis_timestamp": result.get('timestamp'),
-                    "analysis_version": "Provider Discovery Tool v3.0",
+                    "analysis_version": "Provider Discovery Tool v4.0",
                     "enhanced_confidence": result.get('Enhanced_Confidence'),
                     "total_analysis_steps": len(result.get('analysis_steps_report', {})),
                     "backend_save_timestamp": timestamp
                 },
                 "detection_results": {
                     "primary_provider": result.get('Primary_Provider'),
-                    "cdn_providers": result.get('CDN_Providers'),
-                    "dns_providers": result.get('DNS_Providers'), 
-                    "hosting_providers": result.get('Hosting_Providers'),
-                    "cloud_providers": result.get('Cloud_Providers'),
-                    "security_providers": result.get('Security_Providers')
+                    "cdn_providers": _parse_provider_list(result.get('CDN_Providers')),
+                    "dns_providers": _parse_provider_list(result.get('DNS_Providers')), 
+                    "hosting_providers": _parse_provider_list(result.get('Hosting_Providers')),
+                    "cloud_providers": _parse_provider_list(result.get('Cloud_Providers')),
+                    "security_providers": _parse_provider_list(result.get('Security_Providers'))
                 },
                 "step_by_step_analysis": result.get('analysis_steps_report', {}),
                 "enhanced_analysis_details": result.get('Enhanced_Analysis', {}),
@@ -1636,6 +1636,94 @@ class EnhancedProviderDetector(ProviderDetector):
                     # Technology Stack Details
                     tech_stack = shodan_analysis.get('technology_stack', {})
                     if tech_stack and tech_stack.get('success'):
+                        
+                        # NEW: Multi-Query Strategy Results
+                        raw_shodan_data = tech_stack.get('raw_shodan_data', {})
+                        if raw_shodan_data:
+                            writer.writerow(['', '', ''])  # Separator
+                            writer.writerow(['=== SHODAN OPTIMIZATION ANALYTICS ===', '', ''])
+                            
+                            # Multi-query strategy metrics
+                            multi_query_strategy = raw_shodan_data.get('multi_query_strategy', [])
+                            if multi_query_strategy:
+                                writer.writerow(['Shodan Optimization', 'Queries Executed', len(multi_query_strategy)])
+                                writer.writerow(['Shodan Optimization', 'Total Results Available', raw_shodan_data.get('total_results_across_queries', 0)])
+                                writer.writerow(['Shodan Optimization', 'Unique Hosts Collected', raw_shodan_data.get('unique_hosts_collected', 0)])
+                                
+                                # Query breakdown
+                                for i, query_info in enumerate(multi_query_strategy[:5]):  # Show top 5 queries
+                                    writer.writerow(['Shodan Queries', f'Query {i+1}', f"{query_info.get('description', 'Unknown')} ({query_info.get('results_count', 0)} results)"])
+                            
+                            # Statistical insights
+                            statistical_insights = raw_shodan_data.get('statistical_insights', {})
+                            if statistical_insights:
+                                writer.writerow(['', '', ''])  # Separator
+                                writer.writerow(['=== SHODAN STATISTICAL INSIGHTS ===', '', ''])
+                                
+                                # Host distribution
+                                host_dist = statistical_insights.get('host_distribution', {})
+                                if host_dist:
+                                    writer.writerow(['Shodan Statistics', 'Total Unique Hosts', host_dist.get('total_unique_hosts', 0)])
+                                    writer.writerow(['Shodan Statistics', 'Unique IP Addresses', host_dist.get('unique_ips', 0)])
+                                    writer.writerow(['Shodan Statistics', 'Unique Ports', host_dist.get('unique_ports', 0)])
+                                    writer.writerow(['Shodan Statistics', 'Countries Detected', host_dist.get('countries_detected', 0)])
+                                
+                                # Service analysis
+                                service_analysis = statistical_insights.get('service_analysis', {})
+                                if service_analysis:
+                                    writer.writerow(['Shodan Statistics', 'SSL Prevalence', f"{service_analysis.get('ssl_prevalence', 0):.1f}%"])
+                                    
+                                    most_common_ports = service_analysis.get('most_common_ports', [])
+                                    if most_common_ports:
+                                        top_ports = ', '.join([f"{p.get('port')}({p.get('count')})" for p in most_common_ports[:3]])
+                                        writer.writerow(['Shodan Statistics', 'Top Ports', top_ports])
+                                
+                                # Geographical spread
+                                geo_spread = statistical_insights.get('geographical_spread', {})
+                                if geo_spread:
+                                    countries = geo_spread.get('countries', {})
+                                    if countries:
+                                        top_countries = ', '.join([f"{country}({count})" for country, count in list(countries.items())[:3]])
+                                        writer.writerow(['Shodan Statistics', 'Top Countries', top_countries])
+                            
+                            # Data extraction completeness
+                            metadata = raw_shodan_data.get('full_response_metadata', {})
+                            if metadata:
+                                writer.writerow(['', '', ''])  # Separator
+                                writer.writerow(['=== SHODAN EFFICIENCY METRICS ===', '', ''])
+                                writer.writerow(['Shodan Efficiency', 'Optimization Level', metadata.get('optimization_level', 'standard')])
+                                writer.writerow(['Shodan Efficiency', 'Credits Used', metadata.get('query_credits_used', 1)])
+                                
+                                completeness = metadata.get('data_extraction_completeness', {})
+                                if completeness:
+                                    writer.writerow(['Shodan Efficiency', 'Data Completeness', f"{completeness.get('completeness_percentage', 0):.1f}% ({completeness.get('status', 'unknown')})"])
+                        
+                        # Advanced configuration insights
+                        shodan_config = tech_stack.get('shodan_config', {})
+                        if shodan_config:
+                            writer.writerow(['', '', ''])  # Separator
+                            writer.writerow(['=== SHODAN CONFIGURATION ===', '', ''])
+                            writer.writerow(['Shodan Config', 'API Plan Detected', shodan_config.get('api_plan_detected', 'Unknown')])
+                            
+                            # Query efficiency
+                            query_efficiency = shodan_config.get('query_efficiency', {})
+                            if query_efficiency:
+                                writer.writerow(['Shodan Config', 'Overall Efficiency', query_efficiency.get('overall_efficiency', 'unknown')])
+                                writer.writerow(['Shodan Config', 'Credit to Data Ratio', query_efficiency.get('credit_to_data_ratio', 0)])
+                            
+                            # Optimization suggestions
+                            optimization_suggestions = shodan_config.get('optimization_suggestions', [])
+                            if optimization_suggestions:
+                                writer.writerow(['Shodan Config', 'Optimization Tips', f"{len(optimization_suggestions)} suggestions available"])
+                                for i, suggestion in enumerate(optimization_suggestions[:3]):  # Show top 3
+                                    writer.writerow(['Shodan Config', f'Tip {i+1}', suggestion])
+                            
+                            # Recommended next queries
+                            next_queries = shodan_config.get('recommended_next_queries', [])
+                            if next_queries:
+                                writer.writerow(['Shodan Config', 'Follow-up Queries', f"{len(next_queries)} queries recommended"])
+                                for i, query_rec in enumerate(next_queries[:2]):  # Show top 2
+                                    writer.writerow(['Shodan Config', f'Next Query {i+1}', f"{query_rec.get('description', 'Unknown')} (Priority: {query_rec.get('priority', 'medium')})"])
                         
                         # Provider Classification
                         provider_classification = tech_stack.get('provider_classification', {})
@@ -1841,6 +1929,31 @@ class EnhancedProviderDetector(ProviderDetector):
 
 # Singleton instance
 _enhanced_detector = None
+
+def _parse_provider_list(provider_data) -> list:
+    """Convert provider data (string or list) to list for JSON output"""
+    if not provider_data:
+        return []
+    
+    # If it's already a list, return it (but clean it)
+    if isinstance(provider_data, list):
+        # Filter out None, empty strings, and placeholder values
+        cleaned = [str(p).strip() for p in provider_data if p and str(p).strip() not in ['None', 'Unknown', 'N/A', '']]
+        return cleaned
+    
+    # If it's a string, handle it
+    if isinstance(provider_data, str):
+        if provider_data in ['None', 'Unknown', 'N/A', '']:
+            return []
+        # Split by comma and clean up
+        providers = [p.strip() for p in provider_data.split(',') if p.strip() and p.strip() not in ['None', 'Unknown', 'N/A']]
+        return providers
+    
+    # For any other type, try to convert to string first
+    try:
+        return _parse_provider_list(str(provider_data))
+    except:
+        return []
 
 def get_enhanced_provider_detector(vt_api_key: Optional[str] = None) -> EnhancedProviderDetector:
     """Get singleton enhanced provider detector instance"""

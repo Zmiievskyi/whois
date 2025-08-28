@@ -49,7 +49,7 @@ print(f"🔧 Final status: COMPREHENSIVE_ANALYSIS_AVAILABLE = {COMPREHENSIVE_ANA
 
 # Page configuration
 st.set_page_config(
-    page_title="Provider Discovery Tool v3.0",
+    page_title="Provider Discovery Tool v4.0",
     page_icon="⚫",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -412,6 +412,7 @@ def process_single_url(url, progress_callback=None):
     """Process single URL with Phase 2A enhanced DNS analysis"""
     # Enable logging for debugging FIRST
     import logging
+    from datetime import datetime
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
     
@@ -437,7 +438,7 @@ def process_single_url(url, progress_callback=None):
     whois_data = detector.get_whois(ip) if ip else ""
     logger.info(f"✅ WHOIS data fetched: {len(whois_data)} chars")
     
-    # Enhanced Provider Detection System v3.0 with 6 integrations
+    # Enhanced Provider Detection System v4.0 with 6 integrations
     logger.info(f"🚀 Step 4/5: Running enhanced provider detection (6 integrations)...")
     enhanced_result = detect_provider(headers, ip, whois_data, domain)
     logger.info(f"✅ Enhanced provider detection completed!")
@@ -468,6 +469,9 @@ def process_single_url(url, progress_callback=None):
     hosting_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Hosting', 'Host']]
     cloud_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Cloud', 'Cloud Provider']]
     
+    # Debug: Check IP value before creating result
+    logger.info(f"🔧 Debug: IP value before result creation: {ip}")
+    
     result = {
         'URL': url,
         'IP_Address': ip or 'N/A',
@@ -485,7 +489,10 @@ def process_single_url(url, progress_callback=None):
         'DNS_Analysis': enhanced_result.get('dns_analysis', {}),
         'TTL_Analysis': enhanced_result.get('ttl_analysis', {}),
         'Enhanced_Analysis': enhanced_result.get('Enhanced_Analysis', {}),
-        'Comprehensive_Analysis': comprehensive_analysis_result
+        'Comprehensive_Analysis': comprehensive_analysis_result,
+        'Enhanced_Confidence': enhanced_result.get('Enhanced_Confidence', 100),
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC'),
+        'analysis_steps_report': enhanced_result.get('analysis_steps_report', {})
     }
     
     # Save analysis results to backend (moved here after comprehensive analysis)
@@ -500,6 +507,7 @@ def process_single_url(url, progress_callback=None):
         
         # Create combined result for saving  
         combined_result = {
+            **result,  # Original result with IP_Address, URL, providers
             **enhanced_result,  # All enhanced detection results
             'Comprehensive_Analysis': comprehensive_analysis_result  # Add comprehensive analysis
         }
@@ -527,15 +535,15 @@ def main():
     # Get detector instance
     detector = get_detector_instance()
     
-    st.title("PROVIDER DISCOVERY TOOL v3.0")
+    st.title("PROVIDER DISCOVERY TOOL v4.0")
     
     # Show current VirusTotal status in header
     if 'vt_enabled' in st.session_state:
         vt_header_status = "VirusTotal ON" if st.session_state.vt_enabled else "VirusTotal OFF"
-        module_count = "9 Modules" if st.session_state.vt_enabled else "8 Core Modules"
+        module_count = "10 Modules" if st.session_state.vt_enabled else "9 Core Modules"
     else:
         vt_header_status = "VirusTotal AUTO"
-        module_count = "8+ Modules"
+        module_count = "9+ Modules"
     
     st.markdown(f"**Multi-Layer Provider Detection - {module_count} | {vt_header_status}**")
     
@@ -556,10 +564,14 @@ def main():
         if hasattr(detector, 'shodan_integration') and detector.shodan_integration and detector.shodan_integration.is_enabled:
             working_count += 1
         
+        # Count Comprehensive Analysis
+        if COMPREHENSIVE_ANALYSIS_AVAILABLE:
+            working_count += 1
+        
         # Adjust total modules based on VirusTotal status
-        # Base: SSL, DNS, Geo, BGP, Hurricane Electric, Threat Intelligence, Advanced BGP, Shodan = 8
-        # VirusTotal is optional and should not count if disabled
-        total_modules = 8  # Core modules without VirusTotal
+        # Base: SSL, DNS, Geo, BGP, Hurricane Electric, Threat Intelligence, Advanced BGP, Shodan, Comprehensive Analysis = 9
+        # VirusTotal is optional 10th module
+        total_modules = 10  # Core modules (9) + Comprehensive Analysis (1)
         
         # Note: VirusTotal is considered bonus functionality, not core
         
@@ -576,7 +588,7 @@ def main():
     
     # Sidebar with information
     with st.sidebar:
-        st.header("SYSTEM v3.0")
+        st.header("SYSTEM v4.0")
         
         # Integration status
         if detector:
@@ -865,7 +877,7 @@ def main():
             """)
         else:
             st.warning("""
-            **❌ VirusTotal DISABLED** - System operates with 7 core modules
+            **❌ VirusTotal DISABLED** - System operates with 9 core modules
             
             **Recommended for:**
             - CSV batch processing (no rate limits)
@@ -909,7 +921,7 @@ def main():
             st.info("""
             ✅ **VirusTotal is DISABLED** - Optimal configuration for batch processing!
             
-            **Fast processing:** No rate limits, all 7 core modules active  
+            **Fast processing:** No rate limits, all 9 core modules active  
             **Estimated time:** ~2-3 seconds per domain
             """)
         
@@ -1190,7 +1202,7 @@ def main():
                                   if key in enhanced_analysis 
                                   and isinstance(enhanced_analysis[key], dict) 
                                   and 'error' not in enhanced_analysis[key])
-                st.metric("MODULES_ACTIVE", f"{working_count}/8")
+                st.metric("MODULES_ACTIVE", f"{working_count}/10")
                 st.metric("CDN_STATUS", result['CDN_Providers'])
             
             # Advanced BGP Classification Summary
@@ -1442,7 +1454,7 @@ def main():
                         "domain": result.get('URL'),
                         "ip_address": result.get('IP_Address'),
                         "analysis_timestamp": result.get('timestamp', 'N/A'),
-                        "analysis_version": "Provider Discovery Tool v3.0",
+                        "analysis_version": "Provider Discovery Tool v4.0",
                         "enhanced_confidence": result.get('Enhanced_Confidence'),
                         "total_analysis_steps": len(result.get('analysis_steps_report', {}))
                     },
@@ -1588,7 +1600,7 @@ def main():
                             return ', '.join(unique_providers) if unique_providers else none_value
                         return str(provider_list) if provider_list else none_value
                     
-                    txt_report = f"""PROVIDER DISCOVERY TOOL v3.0 - ANALYSIS REPORT
+                    txt_report = f"""PROVIDER DISCOVERY TOOL v4.0 - ANALYSIS REPORT
 {'='*60}
 
 DOMAIN: {domain_name}
@@ -1641,7 +1653,7 @@ STEP-BY-STEP ANALYSIS:
                     else:
                         txt_report += f"\n\nRECOMMENDATIONS:\n{'='*15}\nNo specific recommendations available."
                     
-                    txt_report += f"\n\n{'='*60}\nReport generated by Provider Discovery Tool v3.0\n"
+                    txt_report += f"\n\n{'='*60}\nReport generated by Provider Discovery Tool v4.0\n"
                     
                     # Generate safe filename for TXT
                     safe_domain_txt = (domain_name or 'unknown').replace('.', '_').replace('/', '_').replace(':', '_')

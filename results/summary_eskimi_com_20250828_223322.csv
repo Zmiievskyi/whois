@@ -1,0 +1,88 @@
+Category,Key,Value
+Domain,URL,eskimi.com
+Network,IP_Address,99.83.190.102
+Confidence,Enhanced_Confidence,100%
+Analysis,Timestamp,2025-08-28 22:32:07 UTC
+Providers,Primary Provider,AWS
+Providers,CDN Providers,"Cloudflare, AWS"
+Providers,DNS Providers,Cloudflare
+Providers,Hosting Providers,AWS
+Providers,Cloud Providers,"AWS, AS16509, GCP"
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Advanced BGP Classification,completed | +19% confidence | 1 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +-113% confidence | 13 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
+,,
+=== SHODAN PREMIUM ANALYSIS DETAILS ===,,
+Shodan WAF,Detection Success,True
+Shodan WAF,WAF Detected,False
+,,
+=== SHODAN OPTIMIZATION ANALYTICS ===,,
+Shodan Optimization,Queries Executed,13
+Shodan Optimization,Total Results Available,361
+Shodan Optimization,Unique Hosts Collected,34
+Shodan Queries,Query 1,Primary hostname search (20 results)
+Shodan Queries,Query 2,SSL certificate subject search (20 results)
+Shodan Queries,Query 3,HTML content references (2 results)
+Shodan Queries,Query 4,HTTP title tag references (0 results)
+Shodan Queries,Query 5,Visual infrastructure with screenshots (0 results)
+,,
+=== SHODAN STATISTICAL INSIGHTS ===,,
+Shodan Statistics,Total Unique Hosts,34
+Shodan Statistics,Unique IP Addresses,29
+Shodan Statistics,Unique Ports,5
+Shodan Statistics,Countries Detected,6
+Shodan Statistics,SSL Prevalence,76.5%
+Shodan Statistics,Top Ports,"443(25), 22(3), 80(3)"
+Shodan Statistics,Top Countries,"Germany(12), United States(11), Netherlands(5)"
+,,
+=== SHODAN EFFICIENCY METRICS ===,,
+Shodan Efficiency,Optimization Level,advanced
+Shodan Efficiency,Credits Used,13
+Shodan Efficiency,Data Completeness,9.4% (limited)
+,,
+=== SHODAN CONFIGURATION ===,,
+Shodan Config,API Plan Detected,Paid Plan (High limits detected)
+Shodan Config,Overall Efficiency,good
+Shodan Config,Credit to Data Ratio,2.62
+Shodan Config,Optimization Tips,4 suggestions available
+Shodan Config,Tip 1,Large result set detected - consider using facets for targeted analysis
+Shodan Config,Tip 2,Use count() API for statistical insights without consuming search credits
+Shodan Config,Tip 3,Enable has_screenshot facet for visual infrastructure analysis
+Shodan Config,Follow-up Queries,3 queries recommended
+Shodan Config,Next Query 1,Explore all infrastructure from Google LLC (Priority: high)
+Shodan Config,Next Query 2,Analyze ASN as7979 infrastructure (Priority: medium)
+Shodan Providers,Cloud Providers,GCP
+Shodan Providers,Primary Infrastructure,Google LLC
+Shodan Technology,Technologies Detected,5 technologies
+Shodan Technology,Technology List,"openssh, remote desktop protocol, nginx, apache httpd, jenkins"
+Shodan Technology,Web Servers,"nginx (x13), apache httpd 2.4.59 (x1), nginx 1.26.2 (x1)"
+Shodan Security,Security Score,100/100
+Shodan Security,WAF Indicators,1 indicators
+Shodan Security,Sample WAF Indicators,WAF-like response: 403
+Shodan Security,Security Headers,0 headers detected
+Shodan Security,Security Recommendations,2 recommendations
+Shodan Security,Primary Recommendation,Vulnerabilities detected - immediate patching required
+Shodan Infrastructure,Geographic Locations,8 locations
+Shodan Infrastructure,Primary Location,"Germany, Falkenstein (12 hosts)"
+Shodan Infrastructure,ASN Networks,7 networks
+Shodan Infrastructure,Primary ASN,AS15169 - Google LLC
+Shodan Infrastructure,Open Ports,5 ports detected
+Shodan Infrastructure,Hosting Patterns,"cloud, self-signed, eol-product"
+Shodan Vulnerabilities,Vulnerabilities Found,78
+Shodan Vulnerabilities,Risk Score,100/100
+Shodan Vulnerabilities,Sample CVEs,"CVE-2016-20012, CVE-2021-36368, CVE-2025-26465"
+Shodan Vulnerabilities,Severity Breakdown,high: 78
+Shodan Vulnerabilities,Security Recommendations,Critical: Vulnerabilities detected - immediate patching required
+Shodan SSL,SSL Trust Score,100/100
+Shodan SSL,Certificate Authorities,"geotrust tls rsa ca g1, e5, ops.eskimi.com, win-ad-eu-fsn.ops.eskimi.com, sectigo rsa domain validation secure server ca"
+Shodan SSL,SSL Configurations,26 configurations
+Shodan SSL,Primary SSL Config,TLSv1.3 (256 bits)
+Shodan Quality,Data Richness Score,100/100
+Shodan Quality,Hosts Analyzed,34
+Shodan Quality,Analysis Confidence,64%

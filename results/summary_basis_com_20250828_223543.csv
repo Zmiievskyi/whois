@@ -1,0 +1,88 @@
+Category,Key,Value
+Domain,URL,basis.com
+Network,IP_Address,141.193.213.10
+Confidence,Enhanced_Confidence,100%
+Analysis,Timestamp,2025-08-28 22:34:39 UTC
+Providers,Primary Provider,"Cloudflare London, LLC"
+Providers,CDN Providers,"Cloudflare, AWS"
+Providers,DNS Providers,"Cloudflare, Domains By Proxy"
+Providers,Hosting Providers,AWS
+Providers,Cloud Providers,"AS209242, AWS, GCP"
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Advanced BGP Classification,completed | +17% confidence | 1 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +-1887% confidence | 11 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
+,,
+=== SHODAN PREMIUM ANALYSIS DETAILS ===,,
+Shodan WAF,Detection Success,True
+Shodan WAF,WAF Detected,False
+,,
+=== SHODAN OPTIMIZATION ANALYTICS ===,,
+Shodan Optimization,Queries Executed,13
+Shodan Optimization,Total Results Available,203
+Shodan Optimization,Unique Hosts Collected,46
+Shodan Queries,Query 1,Primary hostname search (20 results)
+Shodan Queries,Query 2,SSL certificate subject search (16 results)
+Shodan Queries,Query 3,HTML content references (8 results)
+Shodan Queries,Query 4,HTTP title tag references (0 results)
+Shodan Queries,Query 5,Visual infrastructure with screenshots (0 results)
+,,
+=== SHODAN STATISTICAL INSIGHTS ===,,
+Shodan Statistics,Total Unique Hosts,46
+Shodan Statistics,Unique IP Addresses,28
+Shodan Statistics,Unique Ports,15
+Shodan Statistics,Countries Detected,4
+Shodan Statistics,SSL Prevalence,56.5%
+Shodan Statistics,Top Ports,"443(15), 80(12), 22(3)"
+Shodan Statistics,Top Countries,"United States(27), Russian Federation(13), Brazil(5)"
+,,
+=== SHODAN EFFICIENCY METRICS ===,,
+Shodan Efficiency,Optimization Level,advanced
+Shodan Efficiency,Credits Used,13
+Shodan Efficiency,Data Completeness,22.7% (partial)
+,,
+=== SHODAN CONFIGURATION ===,,
+Shodan Config,API Plan Detected,Paid Plan (High limits detected)
+Shodan Config,Overall Efficiency,good
+Shodan Config,Credit to Data Ratio,3.54
+Shodan Config,Optimization Tips,4 suggestions available
+Shodan Config,Tip 1,Large result set detected - consider using facets for targeted analysis
+Shodan Config,Tip 2,Use count() API for statistical insights without consuming search credits
+Shodan Config,Tip 3,Enable has_screenshot facet for visual infrastructure analysis
+Shodan Config,Follow-up Queries,3 queries recommended
+Shodan Config,Next Query 1,Explore all infrastructure from JSC IOT (Priority: high)
+Shodan Config,Next Query 2,Analyze ASN as29182 infrastructure (Priority: medium)
+Shodan Providers,Cloud Providers,"AWS, GCP"
+Shodan Providers,Primary Infrastructure,JSC IOT
+Shodan Technology,Technologies Detected,7 technologies
+Shodan Technology,Technology List,"openssh, microsoft rpc endpoint mapper, microsoft iis httpd, nginx, apache httpd, aws elb, exim smtpd"
+Shodan Technology,Web Servers,"microsoft iis httpd 10.0 (x1), apache httpd 2.4.29 (x2), nginx 1.25.5 (x2), apache httpd 2.4.6 (x2), nginx 1.18.0 (x1), nginx 1.14.0 (x1), apache httpd 2.4.54 (x6), apache httpd 2.4.52 (x2)"
+Shodan Security,Security Score,0/100
+Shodan Security,WAF Indicators,1 indicators
+Shodan Security,Sample WAF Indicators,WAF-like response: 403
+Shodan Security,Security Headers,0 headers detected
+Shodan Security,Security Recommendations,2 recommendations
+Shodan Security,Primary Recommendation,Vulnerabilities detected - immediate patching required
+Shodan Infrastructure,Geographic Locations,7 locations
+Shodan Infrastructure,Primary Location,"United States, Boardman (16 hosts)"
+Shodan Infrastructure,ASN Networks,8 networks
+Shodan Infrastructure,Primary ASN,"AS33182 - HostDime.com, Inc."
+Shodan Infrastructure,Open Ports,15 ports detected
+Shodan Infrastructure,Hosting Patterns,"cloud, self-signed, eol-product, starttls"
+Shodan Vulnerabilities,Vulnerabilities Found,961
+Shodan Vulnerabilities,Risk Score,100/100
+Shodan Vulnerabilities,Sample CVEs,"CVE-2019-0196, CVE-2013-4365, CVE-2022-28330"
+Shodan Vulnerabilities,Severity Breakdown,high: 961
+Shodan Vulnerabilities,Security Recommendations,Critical: Vulnerabilities detected - immediate patching required
+Shodan SSL,SSL Trust Score,100/100
+Shodan SSL,Certificate Authorities,"wr3, r13, gk-basis.com, amazon rsa 2048 m02, geotrust rsa ca 2018, amazon rsa 2048 m03, amazon rsa 2048 m04, r10, example.com, globalsign gcc r6 alphassl ca 2023, r3"
+Shodan SSL,SSL Configurations,26 configurations
+Shodan SSL,Primary SSL Config,TLSv1.3 (256 bits)
+Shodan Quality,Data Richness Score,100/100
+Shodan Quality,Hosts Analyzed,46
+Shodan Quality,Analysis Confidence,100%

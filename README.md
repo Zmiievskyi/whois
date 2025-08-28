@@ -1,4 +1,4 @@
-# 🚀 Enhanced Provider Discovery Tool - v3.0
+# 🚀 Enhanced Provider Discovery Tool - v4.0
 
 **Advanced Multi-Layer CDN/Hosting Provider Detection with 6 FREE Data Sources**
 
