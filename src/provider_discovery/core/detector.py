@@ -573,29 +573,83 @@ class ProviderDetector:
             'CDN_Providers': [],
             'WAF_Providers': [],
             'LB_Providers': [],
-            'DNS_Providers': []
+            'DNS_Providers': [],
+            'Hosting_Providers': [],
+            'Cloud_Providers': [],
+            'Security_Providers': []
         }
         
         for provider in providers:
             name = provider['name']
             role = provider['role']
             
+            # Multi-role provider mapping - some providers can serve multiple roles
+            multi_role_providers = {
+                'Cloudflare': ['CDN', 'Security', 'DNS'],
+                'AWS': ['Cloud', 'CDN', 'Hosting'],
+                'Google': ['Cloud', 'CDN'],
+                'Microsoft': ['Cloud', 'CDN'],
+                'Akamai': ['CDN', 'Security'],
+                'WPEngine': ['Hosting', 'CDN']
+            }
+            
+            # Check if this provider should be added to multiple categories
+            provider_roles = multi_role_providers.get(name, [role])
+            
+            for provider_role in provider_roles:
+                if provider_role == 'Origin' and not organized['Origin_Provider']:
+                    organized['Origin_Provider'] = name
+                elif provider_role == 'CDN' and name not in organized['CDN_Providers']:
+                    organized['CDN_Providers'].append(name)
+                elif provider_role in ['WAF', 'Security'] and name not in organized['WAF_Providers']:
+                    organized['WAF_Providers'].append(name)
+                    # Also add to Security_Providers for new category
+                    if name not in organized['Security_Providers']:
+                        organized['Security_Providers'].append(name)
+                elif provider_role == 'Load Balancer' and name not in organized['LB_Providers']:
+                    organized['LB_Providers'].append(name)
+                elif provider_role == 'DNS' and name not in organized['DNS_Providers']:
+                    # Clean the name to remove trailing commas and duplicates
+                    clean_name = name.strip().rstrip(',')
+                    if clean_name and clean_name not in organized['DNS_Providers']:
+                        organized['DNS_Providers'].append(clean_name)
+                elif provider_role in ['Hosting', 'Host'] and name not in organized['Hosting_Providers']:
+                    organized['Hosting_Providers'].append(name)
+                elif provider_role in ['Cloud', 'Cloud Provider'] and name not in organized['Cloud_Providers']:
+                    organized['Cloud_Providers'].append(name)
+            
+            # Also handle the original role assignment
             if role == 'Origin' and not organized['Origin_Provider']:
                 organized['Origin_Provider'] = name
             elif role == 'CDN' and name not in organized['CDN_Providers']:
                 organized['CDN_Providers'].append(name)
             elif role in ['WAF', 'Security'] and name not in organized['WAF_Providers']:
                 organized['WAF_Providers'].append(name)
+                if name not in organized['Security_Providers']:
+                    organized['Security_Providers'].append(name)
             elif role == 'Load Balancer' and name not in organized['LB_Providers']:
                 organized['LB_Providers'].append(name)
             elif role == 'DNS' and name not in organized['DNS_Providers']:
-                organized['DNS_Providers'].append(name)
+                clean_name = name.strip().rstrip(',')
+                if clean_name and clean_name not in organized['DNS_Providers']:
+                    organized['DNS_Providers'].append(clean_name)
+            elif role in ['Hosting', 'Host'] and name not in organized['Hosting_Providers']:
+                organized['Hosting_Providers'].append(name)
+            elif role in ['Cloud', 'Cloud Provider'] and name not in organized['Cloud_Providers']:
+                organized['Cloud_Providers'].append(name)
         
-        # Determine primary provider (prefer Origin, then first CDN)
+        # Remove any empty strings or None values
+        for key in organized:
+            if isinstance(organized[key], list):
+                organized[key] = [item for item in organized[key] if item and str(item).strip()]
+        
+        # Determine primary provider (prefer Origin, then first CDN, then first Cloud)
         if organized['Origin_Provider']:
             organized['Primary_Provider'] = organized['Origin_Provider']
         elif organized['CDN_Providers']:
             organized['Primary_Provider'] = organized['CDN_Providers'][0]
+        elif organized['Cloud_Providers']:
+            organized['Primary_Provider'] = organized['Cloud_Providers'][0]
         elif organized['DNS_Providers']:
             organized['Primary_Provider'] = organized['DNS_Providers'][0]
         

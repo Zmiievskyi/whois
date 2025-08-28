@@ -6,4 +6,10 @@ alwaysApply: true
 docker buildx use multiplatform-builder
 
 
-docker buildx build --platform linux/amd64,linux/arm64 -t anton0509/provider_detector:v1.3 --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t anton0509/provider_detector:v1.7 --push .
+
+# bitbucked
+git push bitbucket main
+
+# github
+git push origin main

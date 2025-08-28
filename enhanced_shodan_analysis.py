@@ -114,6 +114,22 @@ class EnhancedShodanAnalyzer:
             'imperva': ['imperva', 'incapsula']
         }
         
+        hosting_providers = {
+            'wpengine': ['wpengine', 'wp engine'],
+            'godaddy': ['godaddy', 'go daddy'],
+            'bluehost': ['bluehost'],
+            'hostgator': ['hostgator'],
+            'dreamhost': ['dreamhost'],
+            'siteground': ['siteground'],
+            'hostdime': ['hostdime'],
+            'namecheap': ['namecheap'],
+            'ovh': ['ovh', 'ovhcloud'],
+            'ionos': ['ionos', '1&1'],
+            'greengeeks': ['greengeeks'],
+            'a2hosting': ['a2hosting'],
+            'inmotion': ['inmotionhosting', 'inmotion']
+        }
+        
         # Analyze hosts for provider indicators
         for host in hosts:
             org = (host.get('org') or '').lower()
@@ -138,6 +154,17 @@ class EnhancedShodanAnalyzer:
                     classification['cdn_providers'].add(provider.upper())
                     if provider in ['imperva', 'cloudflare']:
                         classification['waf_providers'].add(provider.upper())
+            
+            # Check for hosting providers
+            for provider, patterns in hosting_providers.items():
+                if any(pattern in org or pattern in isp for pattern in patterns):
+                    classification['hosting_providers'].add(provider.upper())
+                    classification['confidence_indicators'].append(f"Hosting provider detected: {provider}")
+            
+            # Special case: WPEngine is often found as organization
+            if 'wpengine' in org or 'wp engine' in org:
+                classification['hosting_providers'].add('WPEngine')
+                classification['confidence_indicators'].append("Hosting provider detected: wpengine")
         
         # Use facet data for primary infrastructure determination
         org_facets = facets.get('org', [])

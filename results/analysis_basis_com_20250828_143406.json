@@ -1,0 +1,2495 @@
+{
+  "analysis_metadata": {
+    "domain": "basis.com",
+    "ip_address": null,
+    "analysis_timestamp": "2025-08-28 14:33:55 UTC",
+    "analysis_version": "Provider Discovery Tool v3.0",
+    "enhanced_confidence": 100,
+    "total_analysis_steps": 9,
+    "backend_save_timestamp": "20250828_143406"
+  },
+  "detection_results": {
+    "primary_provider": "Cloudflare London, LLC",
+    "cdn_providers": [
+      "Cloudflare",
+      "AWS"
+    ],
+    "dns_providers": [
+      "Cloudflare",
+      "Domains By Proxy"
+    ],
+    "hosting_providers": [
+      "AWS"
+    ],
+    "cloud_providers": [
+      "AS209242",
+      "GCP",
+      "AWS"
+    ],
+    "security_providers": [
+      "Cloudflare"
+    ]
+  },
+  "step_by_step_analysis": {
+    "step_1_base_detection": {
+      "status": "completed",
+      "step_name": "Base Provider Detection",
+      "findings": [
+        "Detected 8 providers"
+      ],
+      "confidence_impact": 15,
+      "methods": [
+        "HTTP Headers",
+        "IP Ranges",
+        "WHOIS",
+        "DNS Resolution"
+      ]
+    },
+    "step_2_ssl_analysis": {
+      "status": "completed",
+      "step_name": "SSL Certificate Analysis",
+      "findings": [
+        "SSL Grade: Unknown"
+      ],
+      "confidence_impact": 5,
+      "methods": [
+        "Certificate Authority Detection",
+        "Security Grading"
+      ]
+    },
+    "step_3_enhanced_dns": {
+      "status": "completed",
+      "step_name": "Enhanced DNS Analysis",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "Multi-Resolver DNS",
+        "DoH Validation"
+      ]
+    },
+    "step_4_geographic_intel": {
+      "status": "completed",
+      "step_name": "Geographic Intelligence",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "IP Geolocation",
+        "Provider Classification"
+      ]
+    },
+    "step_5_bgp_analysis": {
+      "status": "completed",
+      "step_name": "BGP Analysis",
+      "findings": [],
+      "confidence_impact": 0,
+      "methods": [
+        "ASN Lookup",
+        "Routing Analysis"
+      ]
+    },
+    "step_6_advanced_bgp_classification": {
+      "status": "completed",
+      "step_name": "Advanced BGP Classification",
+      "findings": [
+        "Customer Type: CLOUD_PROVIDER (88.0% confidence)"
+      ],
+      "confidence_impact": 17,
+      "methods": [
+        "Customer Type Detection",
+        "ML Enhancement"
+      ]
+    },
+    "step_7_threat_intelligence": {
+      "status": "completed",
+      "step_name": "Threat Intelligence",
+      "findings": [
+        "Threat Level: high"
+      ],
+      "confidence_impact": 0,
+      "methods": [
+        "Security Assessment",
+        "Reputation Analysis"
+      ]
+    },
+    "step_8_shodan_waf_analysis": {
+      "status": "completed",
+      "step_name": "Shodan Premium WAF Analysis",
+      "findings": [
+        "No direct WAF detected via Shodan",
+        "Cloud Providers: GCP, AWS",
+        "Technologies identified: 4",
+        "Geographic distribution: 5 locations",
+        "ASN networks: 4",
+        "Vulnerabilities: 172 found",
+        "SSL Trust Score: 100/100",
+        "High data richness: 83/100",
+        "Comprehensive analysis: 10 hosts",
+        "IP Security Score: 50/100"
+      ],
+      "confidence_impact": -313,
+      "methods": [
+        "WAF Detection",
+        "Technology Stack Analysis",
+        "IP Security Analysis"
+      ]
+    },
+    "step_9_cross_validation": {
+      "status": "completed",
+      "step_name": "Cross-Validation & Final Analysis",
+      "findings": [
+        "Final Confidence Score: 100%",
+        "Provider Consensus: 13 sources"
+      ],
+      "confidence_impact": 10,
+      "methods": [
+        "Multi-Source Validation",
+        "Confidence Scoring",
+        "Provider Consensus"
+      ]
+    }
+  },
+  "enhanced_analysis_details": {
+    "ssl_analysis": {
+      "domain": "basis.com",
+      "certificate_info": {
+        "subject_cn": "basis.com",
+        "subject_org": "",
+        "issuer_cn": "E6",
+        "issuer_org": "Let's Encrypt",
+        "not_before": "2025-07-10T23:58:22",
+        "not_after": "2025-10-08T23:58:21",
+        "days_until_expiry": 41,
+        "is_expired": false,
+        "is_expiring_soon": false,
+        "subject_alt_names": [
+          "basis.com"
+        ],
+        "serial_number": "0684888151DC6D462D768C55089E1DB1FB7E",
+        "version": 3,
+        "ca_info": {
+          "ca_name": "lets_encrypt",
+          "ca_type": "Free CA",
+          "provider_hints": [
+            "Self-managed",
+            "Cloud-native"
+          ],
+          "automation_level": "High",
+          "issuer_cn": "e6",
+          "issuer_org": "let's encrypt"
+        },
+        "hosting_hints": {
+          "detected_providers": [],
+          "total_domains": 2,
+          "wildcard_domains": [],
+          "subdomain_patterns": {}
+        },
+        "wildcard_cert": false,
+        "multi_domain_cert": false,
+        "cipher_suite": "TLS_AES_256_GCM_SHA384",
+        "protocol_version": "TLSv1.3",
+        "domain": "basis.com",
+        "port": 443,
+        "connection_successful": true
+      },
+      "provider_analysis": {
+        "certificate_authority": "lets_encrypt",
+        "ca_type": "Free CA",
+        "automation_level": "High",
+        "detected_hosting_providers": [],
+        "infrastructure_hints": [
+          "Let's Encrypt (automated, likely cloud-native)"
+        ]
+      },
+      "security_assessment": {
+        "security_score": 100,
+        "security_grade": "A",
+        "issues": [],
+        "recommendations": [],
+        "protocol_version": "TLSv1.3",
+        "cipher_suite": "TLS_AES_256_GCM_SHA384",
+        "certificate_valid": true
+      },
+      "data_source": "ssl_analysis"
+    },
+    "enhanced_dns": {
+      "multi_resolver": {
+        "domain": "basis.com",
+        "record_types": {
+          "A": {
+            "domain": "basis.com",
+            "record_type": "A",
+            "resolver_results": {
+              "system": {
+                "success": true,
+                "records": [
+                  "141.193.213.11"
+                ],
+                "response_time": 0.0005297660827636719
+              }
+            },
+            "consensus": {
+              "agreed_records": [
+                "141.193.213.11"
+              ],
+              "consensus_score": 1.0
+            }
+          }
+        },
+        "resolver_reliability": {
+          "system": "available"
+        },
+        "dns_security": {
+          "status": "basic_check_completed"
+        },
+        "performance_metrics": {
+          "avg_response_time": 0.1
+        },
+        "anomalies": []
+      },
+      "doh_analysis": {
+        "success": true,
+        "records": [
+          "141.193.213.10",
+          "141.193.213.11"
+        ],
+        "response_time": false,
+        "authoritative": false,
+        "recursion_desired": true,
+        "recursion_available": true
+      },
+      "cross_validation": {
+        "domain_resolves": true,
+        "resolved_ip": "141.193.213.11",
+        "validation_status": "success"
+      }
+    },
+    "geographic_intelligence": {
+      "ip": "141.193.213.11",
+      "provider_results": {
+        "ipapi_com": {
+          "success": true,
+          "country": "United States",
+          "country_code": "US",
+          "region": "Texas",
+          "city": "Austin",
+          "latitude": 30.2681,
+          "longitude": -97.7462,
+          "timezone": "America/Chicago",
+          "isp": "Cloudflare London, LLC",
+          "organization": "WPEngine, Inc.",
+          "asn": "209242",
+          "asn_name": "Cloudflare London, LLC",
+          "ip": "141.193.213.11",
+          "provider": "ipapi_com",
+          "raw_response": {
+            "status": "success",
+            "country": "United States",
+            "countryCode": "US",
+            "region": "TX",
+            "regionName": "Texas",
+            "city": "Austin",
+            "lat": 30.2681,
+            "lon": -97.7462,
+            "timezone": "America/Chicago",
+            "isp": "Cloudflare London, LLC",
+            "org": "WPEngine, Inc.",
+            "as": "AS209242 Cloudflare London, LLC",
+            "query": "141.193.213.11"
+          }
+        },
+        "geojs_io": {
+          "success": true,
+          "country": "United States",
+          "country_code": "US",
+          "region": null,
+          "city": null,
+          "latitude": "37.751",
+          "longitude": "-97.822",
+          "timezone": "America/Chicago",
+          "isp": null,
+          "organization": "Cloudflare London, LLC",
+          "asn": null,
+          "asn_name": null,
+          "ip": "141.193.213.11",
+          "provider": "geojs_io",
+          "raw_response": {
+            "organization": "AS209242 Cloudflare London, LLC",
+            "ip": "141.193.213.11",
+            "area_code": "0",
+            "organization_name": "Cloudflare London, LLC",
+            "country_code": "US",
+            "country_code3": "USA",
+            "continent_code": "NA",
+            "asn": 209242,
+            "latitude": "37.751",
+            "longitude": "-97.822",
+            "accuracy": 1000,
+            "timezone": "America/Chicago",
+            "country": "United States"
+          }
+        }
+      },
+      "consensus": {
+        "consensus_reached": true,
+        "consensus_data": {
+          "country": "United States",
+          "country_code": "US",
+          "region": "Texas",
+          "city": "Austin",
+          "isp": "Cloudflare London, LLC",
+          "organization": "WPEngine, Inc.",
+          "asn": "209242"
+        },
+        "consensus_strength": {
+          "country": 1.0,
+          "country_code": 1.0,
+          "region": 1.0,
+          "city": 1.0,
+          "isp": 1.0,
+          "organization": 0.5,
+          "asn": 1.0
+        },
+        "successful_providers": 2,
+        "total_providers": 2
+      },
+      "confidence_score": 100
+    },
+    "bgp_analysis": {
+      "ip": "141.193.213.11",
+      "asn": 0,
+      "asn_name": "",
+      "asn_description": "",
+      "country_code": "",
+      "registry": null,
+      "prefixes": [
+        {
+          "prefix": "141.193.213.0/24",
+          "ip": "141.193.213.0",
+          "cidr": 24,
+          "asn": {
+            "asn": 209242,
+            "name": "CLOUDFLARESPECTRUM",
+            "description": "Cloudflare, Inc.",
+            "country_code": "US"
+          },
+          "name": "NON-RIPE-NCC-MANAGED-ADDRESS-BLOCK",
+          "description": "IPv4 address block not managed by the RIPE NCC",
+          "country_code": "EU"
+        }
+      ],
+      "data_source": "bgpview"
+    },
+    "hurricane_electric_bgp": {
+      "target": "141.193.213.11",
+      "target_type": "ip",
+      "ip_analysis": {
+        "ip": "141.193.213.11",
+        "asn": 209242,
+        "asn_name": "AS209242",
+        "prefix": "141.193.213.0/24",
+        "country": null,
+        "registry": null,
+        "allocation_date": null,
+        "description": null,
+        "organization": null,
+        "raw_data": {},
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/ip/141.193.213.11"
+      },
+      "asn_analysis": {
+        "asn": 209242,
+        "name": "Cloudflare London, LLC",
+        "description": null,
+        "country": null,
+        "organization": null,
+        "website": null,
+        "email": null,
+        "phone": null,
+        "prefixes_v4": [
+          "156.238.14.0/23",
+          "204.93.210.0/24",
+          "154.197.75.0/24",
+          "192.133.11.0/24",
+          "203.89.5.0/24",
+          "195.26.229.0/24",
+          "155.46.167.0/24",
+          "199.33.232.0/24",
+          "94.140.0.0/24",
+          "154.197.121.0/24",
+          "154.84.16.0/21",
+          "170.114.78.0/24",
+          "185.148.106.0/24",
+          "213.219.247.0/24",
+          "203.24.109.0/24",
+          "172.83.76.0/24",
+          "156.243.246.0/24",
+          "194.152.44.0/24",
+          "176.124.223.0/24",
+          "195.13.54.0/23",
+          "93.152.234.0/24",
+          "167.68.11.0/24",
+          "193.33.87.0/24",
+          "95.214.178.0/23",
+          "154.219.2.0/23",
+          "203.29.52.0/24",
+          "193.233.132.0/24",
+          "154.198.173.0/24",
+          "102.132.188.0/24",
+          "93.114.64.0/23",
+          "108.165.216.0/24",
+          "200.73.67.0/24",
+          "45.194.53.0/24",
+          "23.145.232.0/24",
+          "162.44.208.0/23",
+          "103.172.110.0/23",
+          "45.80.111.0/24",
+          "203.17.126.0/24",
+          "195.28.191.0/24",
+          "83.118.226.0/23",
+          "130.108.253.0/24",
+          "194.59.5.0/24",
+          "104.239.72.0/24",
+          "198.177.57.0/24",
+          "45.142.120.0/24",
+          "103.116.7.0/24",
+          "154.197.64.0/24",
+          "89.116.250.0/24",
+          "147.78.140.0/24",
+          "193.227.99.0/24",
+          "45.80.108.0/24",
+          "104.254.140.0/24",
+          "45.159.216.0/22",
+          "159.246.55.0/24",
+          "185.135.44.0/24",
+          "23.145.152.0/24",
+          "154.85.8.0/22",
+          "194.36.49.0/24",
+          "5.182.34.0/24",
+          "72.52.113.0/24",
+          "199.33.233.0/24",
+          "31.22.116.0/24",
+          "208.42.188.0/24",
+          "89.117.112.0/24",
+          "23.167.152.0/24",
+          "203.23.103.0/24",
+          "89.116.180.0/24",
+          "23.247.163.0/24",
+          "203.29.53.0/24",
+          "178.211.142.0/24",
+          "162.44.118.0/23",
+          "194.53.53.0/24",
+          "167.1.149.0/24",
+          "194.36.216.0/24",
+          "154.51.129.0/24",
+          "193.16.63.0/24",
+          "216.205.52.0/24",
+          "27.50.49.0/24",
+          "195.85.59.0/24",
+          "223.27.176.0/23",
+          "167.1.150.0/24",
+          "89.116.161.0/24",
+          "104.234.239.0/24",
+          "167.68.4.0/24",
+          "203.19.222.0/24",
+          "174.136.134.0/24",
+          "141.193.213.0/24",
+          "154.197.80.0/24",
+          "8.12.10.0/24",
+          "156.237.4.0/23",
+          "194.1.194.0/24",
+          "92.243.75.0/24",
+          "155.46.213.0/24",
+          "154.51.160.0/24",
+          "203.24.103.0/24",
+          "45.80.110.0/24",
+          "91.209.253.0/24",
+          "160.153.0.0/24",
+          "194.36.217.0/24",
+          "209.222.114.0/24",
+          "185.148.105.0/24",
+          "212.239.86.0/24",
+          "194.36.218.0/24",
+          "130.108.121.0/24",
+          "203.13.32.0/24",
+          "103.169.142.0/24",
+          "69.89.0.0/20",
+          "66.94.32.0/22",
+          "92.60.74.0/24",
+          "195.250.46.0/24",
+          "167.1.181.0/24",
+          "77.74.228.0/24",
+          "216.120.180.0/23",
+          "65.205.150.0/24",
+          "77.75.199.0/24",
+          "151.243.128.0/22",
+          "216.198.53.0/24",
+          "193.124.224.0/24",
+          "203.34.28.0/24",
+          "172.83.72.0/24",
+          "5.226.181.0/24",
+          "184.174.80.0/24",
+          "139.64.234.0/24",
+          "62.169.155.0/24",
+          "203.23.104.0/24",
+          "176.126.206.0/23",
+          "45.81.58.0/24",
+          "136.143.138.0/24",
+          "216.154.208.0/20",
+          "45.67.214.0/24",
+          "164.77.28.0/24",
+          "74.205.180.0/24",
+          "89.207.18.0/24",
+          "170.114.52.0/24",
+          "154.84.24.0/22",
+          "154.84.14.0/23",
+          "164.77.29.0/24",
+          "23.145.248.0/24",
+          "164.38.155.0/24",
+          "208.77.35.0/24",
+          "64.69.24.0/23",
+          "198.202.211.0/24",
+          "91.193.58.0/23",
+          "23.141.168.0/24",
+          "192.65.217.0/24",
+          "5.182.85.0/24",
+          "130.108.104.0/23",
+          "103.11.212.0/24",
+          "130.108.73.0/24",
+          "103.112.176.0/24",
+          "104.36.195.0/24",
+          "103.133.1.0/24",
+          "154.197.88.0/24",
+          "154.83.22.0/23",
+          "141.11.194.0/23",
+          "198.177.56.0/24",
+          "193.233.21.0/24",
+          "185.162.228.0/23",
+          "188.42.145.0/24",
+          "178.213.76.0/24",
+          "66.81.247.0/24",
+          "114.129.43.0/24",
+          "91.195.110.0/24",
+          "154.94.8.0/23",
+          "103.245.229.0/24",
+          "45.95.241.0/24",
+          "185.162.230.0/23",
+          "86.38.214.0/24",
+          "154.83.30.0/23",
+          "209.222.115.0/24",
+          "77.37.33.0/24",
+          "193.162.35.0/24",
+          "204.62.141.0/24",
+          "88.216.66.0/23",
+          "45.150.115.0/24",
+          "185.193.28.0/23",
+          "66.94.39.0/24",
+          "185.174.138.0/24",
+          "188.164.158.0/23",
+          "83.118.224.0/23",
+          "196.13.241.0/24",
+          "93.115.102.0/24",
+          "103.160.204.0/24",
+          "138.5.248.0/24",
+          "185.251.82.0/23",
+          "203.6.66.0/24",
+          "195.85.23.0/24",
+          "203.29.54.0/23",
+          "27.50.48.0/24",
+          "154.197.108.0/24",
+          "162.44.32.0/22",
+          "203.30.188.0/22",
+          "104.129.164.0/22",
+          "188.42.89.0/24",
+          "141.11.202.0/23",
+          "154.62.129.0/24",
+          "195.189.177.0/24",
+          "154.194.12.0/24",
+          "193.9.49.0/24",
+          "140.99.233.0/24",
+          "167.1.148.0/24",
+          "69.48.218.0/24",
+          "154.83.2.0/24",
+          "5.182.84.0/24",
+          "185.176.24.0/24",
+          "188.42.88.0/24",
+          "5.10.244.0/22",
+          "31.12.75.0/24",
+          "68.169.48.0/20",
+          "74.204.59.0/24",
+          "66.45.118.0/24",
+          "89.116.46.0/24",
+          "154.202.89.0/24",
+          "139.64.235.0/24",
+          "208.77.33.0/24",
+          "102.177.189.0/24",
+          "193.17.206.0/24",
+          "154.218.15.0/24",
+          "46.254.92.0/24",
+          "77.105.163.0/24",
+          "193.67.144.0/24",
+          "167.68.5.0/24",
+          "45.85.118.0/23",
+          "154.92.9.0/24",
+          "185.193.30.0/23",
+          "154.211.8.0/24",
+          "45.142.255.0/24",
+          "25.129.196.0/23",
+          "203.28.9.0/24",
+          "66.94.40.0/21",
+          "168.100.6.0/24",
+          "5.226.179.0/24",
+          "23.180.136.0/24",
+          "170.114.45.0/24",
+          "213.241.198.0/24",
+          "185.176.26.0/24",
+          "203.23.106.0/24",
+          "89.47.56.0/23",
+          "195.245.221.0/24",
+          "94.247.142.0/24",
+          "185.159.247.0/24",
+          "185.221.160.0/24",
+          "62.72.166.0/24",
+          "203.6.74.0/24",
+          "203.32.120.0/23",
+          "102.177.176.0/24",
+          "185.38.135.0/24",
+          "195.28.190.0/24",
+          "196.207.45.0/24",
+          "159.112.235.0/24",
+          "192.236.26.0/24",
+          "181.214.1.0/24",
+          "213.182.199.0/24",
+          "199.33.231.0/24",
+          "203.55.107.0/24",
+          "203.24.108.0/24",
+          "23.145.136.0/24",
+          "74.49.214.0/23",
+          "156.225.72.0/24",
+          "92.243.74.0/24",
+          "23.179.248.0/24",
+          "5.175.141.0/24",
+          "194.26.68.0/24",
+          "45.131.208.0/22",
+          "203.28.8.0/24",
+          "203.168.128.0/22",
+          "199.5.242.0/24",
+          "45.8.211.0/24",
+          "216.120.131.0/24",
+          "154.197.65.0/24",
+          "176.53.144.0/24",
+          "205.233.181.0/24",
+          "45.149.12.0/24",
+          "195.82.109.0/24",
+          "199.181.197.0/24",
+          "194.36.219.0/24",
+          "92.53.188.0/22",
+          "185.148.107.0/24",
+          "77.232.140.0/24",
+          "203.22.241.0/24",
+          "103.79.228.0/23",
+          "193.124.18.0/24",
+          "25.129.198.0/23",
+          "103.204.13.0/24",
+          "25.26.27.0/24",
+          "91.124.127.0/24",
+          "185.18.250.0/24",
+          "154.219.5.0/24",
+          "45.153.7.0/24",
+          "194.169.194.0/24",
+          "185.209.154.0/24",
+          "45.202.113.0/24",
+          "66.225.252.0/24",
+          "170.114.46.0/24",
+          "172.83.73.0/24",
+          "188.244.122.0/24",
+          "213.109.205.0/24",
+          "156.252.2.0/23",
+          "147.185.161.0/24",
+          "185.135.9.0/24",
+          "185.207.92.0/24",
+          "46.8.199.0/24",
+          "46.202.30.0/24",
+          "199.33.230.0/24",
+          "194.39.112.0/21",
+          "46.254.93.0/24",
+          "108.165.152.0/24",
+          "203.22.223.0/24",
+          "45.205.0.0/24",
+          "80.93.202.0/24",
+          "162.120.94.0/24",
+          "14.102.228.0/23",
+          "31.43.179.0/24",
+          "209.46.30.0/24",
+          "66.94.36.0/23",
+          "202.82.250.0/24",
+          "23.178.112.0/24",
+          "192.152.138.0/24",
+          "45.12.30.0/23",
+          "91.199.81.0/24",
+          "103.245.228.0/24",
+          "103.15.85.0/24",
+          "203.24.102.0/24",
+          "103.11.214.0/24",
+          "170.176.152.0/24",
+          "216.198.54.0/24",
+          "25.25.25.0/24",
+          "208.100.60.0/24",
+          "156.238.18.0/23",
+          "199.60.103.0/24",
+          "156.239.152.0/22",
+          "203.34.80.0/24",
+          "103.121.59.0/24",
+          "66.81.255.0/24",
+          "91.192.106.0/23",
+          "185.170.166.0/24",
+          "188.164.248.0/24",
+          "194.113.223.0/24",
+          "45.131.4.0/22",
+          "185.148.104.0/24",
+          "185.59.218.0/24",
+          "66.94.38.0/24",
+          "195.13.44.0/23",
+          "185.7.190.0/23",
+          "204.68.111.0/24",
+          "207.189.149.0/24",
+          "45.135.235.0/24",
+          "185.238.228.0/24",
+          "194.36.55.0/24",
+          "103.19.144.0/23",
+          "167.68.42.0/24",
+          "44.31.142.0/24",
+          "154.206.12.0/24"
+        ],
+        "prefixes_v6": [
+          "2407:30c0:183::/48",
+          "2602:f830::/48",
+          "2a06:9ac0::/32",
+          "2620:78:200f::/48",
+          "2a08:600::/48",
+          "2a07:180::/32",
+          "2001:503:ff41::/48",
+          "2a03:f940::/48",
+          "2001:503:ff42::/48",
+          "2606:2c0:20::/48",
+          "2606:ae80:10::/48",
+          "2a14:7ac0::/48",
+          "2407:30c0:180::/48",
+          "2a08:600:ee::/47",
+          "2620:132:1000::/48",
+          "2620:117:bfb0::/44",
+          "2407:30c0:181::/48",
+          "2400:c760:a::/48",
+          "2606:54c1::/46",
+          "2407:30c0:182::/48",
+          "2602:80c:cf::/48",
+          "2a08:600:e0::/47",
+          "2606:2c0:21::/48",
+          "2001:df7:6e80::/48",
+          "2001:503:ff43::/48",
+          "2a08:600:ff::/48",
+          "2a05:7880::/32",
+          "2001:503:ff40::/48",
+          "2606:2c40::/48"
+        ],
+        "peers": [
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "Cloudflare, Inc.",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "Cloudflare, Inc.",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          },
+          {
+            "asn": 13335,
+            "name": "AS13335",
+            "relationship": "peer"
+          }
+        ],
+        "upstreams": [],
+        "downstreams": [],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/AS209242"
+      },
+      "prefix_analysis": {
+        "prefix": "141.193.213.0/24",
+        "asn": 209242,
+        "asn_name": "AS209242",
+        "description": null,
+        "country": null,
+        "registry": "Status",
+        "allocation_date": null,
+        "more_specific_routes": [],
+        "less_specific_routes": [],
+        "source": "hurricane_electric",
+        "url": "https://bgp.he.net/net/141.193.213.0/24"
+      },
+      "routing_insights": {
+        "routing_security": "unknown",
+        "prefix_specificity": "high",
+        "peering_diversity": "medium",
+        "geographic_presence": "unknown",
+        "recommendations": []
+      },
+      "provider_classification": {
+        "provider_type": "cdn",
+        "provider_name": "Cloudflare London, LLC",
+        "confidence": 100,
+        "indicators": [
+          "Cloudflare CDN",
+          "Large prefix count (likely major provider)"
+        ]
+      }
+    },
+    "threat_intelligence": {
+      "domain": "basis.com",
+      "domain_analysis": {
+        "domain": "basis.com",
+        "reputation_score": 40,
+        "threat_level": "high",
+        "security_analysis": {
+          "urlvoid": {
+            "success": true,
+            "source": "urlvoid",
+            "data": {
+              "malicious_detections": 1,
+              "safety_indicators": [
+                "malware_detected"
+              ],
+              "risk_level": "high"
+            }
+          },
+          "safe_browsing": {
+            "success": true,
+            "source": "basic_dns_check",
+            "data": {
+              "dns_resolves": true,
+              "risk_assessment": "low",
+              "confidence": "low"
+            }
+          },
+          "dns_indicators": {
+            "mx_records": [
+              "us-smtp-inbound-2.mimecast.com",
+              "us-smtp-inbound-1.mimecast.com"
+            ],
+            "txt_records": [
+              "pardot75412=8576dc7b5ae47758ac25253a0fcf3a2baae93d7eef3e47019ac46295f71b595c",
+              "ZOOM_verify_3flZzgbKET466IBykLAeOs",
+              "MS=ms30633070",
+              "google-site-verification=3Ro4k15nMMJkuhAo_L8dRa20IIqNd2czApxLhvSBFgA",
+              "_acjibthqi4wx2pmr4aya1rb6vegi8cz",
+              "v=spf1 ip4:207.198.113.97 include:us._netblocks.mimecast.com include:mail.zendesk.com include:spf.protection.outlook.com include:mailsenders.netsuite.com include:_spf.salesforce.com include:et._spf.pardot.com -all",
+              "5v4rxmlxnp0vzl3sl3qv7hhl22pzn7dh",
+              "lucid-verification=fY28Ify6Vw61",
+              "sending_domain75412=7ad51695666b4e144b5821da69a6e0581caa0162452147c939d43efe4de8d58e",
+              "0ed1fe018a7382dc1828454caab657c00eb7a10dd4",
+              "atlassian-domain-verification=oTEYo8dEk0qnIhqdTbLmkjzBw8ZcPJoUZaom0Hikuih1bAWru6tDN35Zao10VkJC",
+              "onetrust-domain-verification=9142fdc254454fc99f813837153980c4",
+              "google-site-verification=_VSHtlE-wlOtcVb3Hv1KJhlUehvS4gzn_qQGRXVCZgo",
+              "adobe-idp-site-verification=3b4c348560a72277c9b08378bba24698f29171140471b698135cb15418c3a4c1",
+              "google-site-verification=Vuj2W3d3dGcHlmdUisrjMy5LDBul5iYa-uhdFqLN8dA",
+              "liveramp-site-verification=H9kR9kNxa4zj0N2fKcb_mC9aKOVWfuO0eVJU2bvnECw"
+            ],
+            "security_policies": {
+              "google_verified": true,
+              "spf": true
+            },
+            "suspicious_patterns": []
+          }
+        },
+        "pattern_analysis": {
+          "suspicious_indicators": [],
+          "risk_factors": [],
+          "domain_age_estimate": "unknown",
+          "structure_analysis": {
+            "total_length": 9,
+            "subdomain_count": 0,
+            "has_numbers": false,
+            "has_hyphens": false,
+            "entropy": 1.92
+          }
+        },
+        "recommendations": [
+          "⚠️ HIGH RISK: Exercise extreme caution",
+          "🔍 Perform additional security verification",
+          "🔐 Consider DMARC policy for email protection"
+        ]
+      },
+      "ip_analyses": {
+        "141.193.213.10": {
+          "ip": "141.193.213.10",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United States",
+            "isp": "Cloudflare London, LLC"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        },
+        "141.193.213.11": {
+          "ip": "141.193.213.11",
+          "reputation_score": 50,
+          "threat_indicators": [],
+          "geolocation_risk": {
+            "risk_level": "low",
+            "country": "United States",
+            "isp": "Cloudflare London, LLC"
+          },
+          "network_analysis": {
+            "ip_type": "IPv4Address",
+            "is_global": true,
+            "is_multicast": false,
+            "version": 4
+          }
+        }
+      },
+      "overall_threat_level": "high",
+      "security_recommendations": [
+        "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+        "⚠️ HIGH RISK: Exercise extreme caution",
+        "🔍 Perform additional security verification",
+        "🔐 Consider DMARC policy for email protection"
+      ],
+      "confidence_score": 100
+    },
+    "cross_validation": {
+      "provider_consensus": {
+        "cloudflare": {
+          "sources": [
+            "HTTP Headers",
+            "Security Headers"
+          ],
+          "confidence_boost": 20
+        },
+        "domains by proxy,": {
+          "sources": [
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "NS Records",
+            "NS Records"
+          ],
+          "confidence_boost": 60
+        }
+      },
+      "confidence_boosters": [
+        "Cloudflare confirmed by 2 sources: HTTP Headers, Security Headers",
+        "Domains By Proxy, confirmed by 6 sources: NS Records, NS Records, NS Records, NS Records, NS Records, NS Records"
+      ],
+      "conflicting_data": [],
+      "validation_score": 60
+    },
+    "security_assessment": {},
+    "advanced_bgp_classification": {
+      "asn": 209242,
+      "ip": "141.193.213.11",
+      "classification": "CLOUD_PROVIDER",
+      "confidence": 0.88,
+      "evidence": [
+        "well_known_asn_cloudways"
+      ],
+      "data_sources": [],
+      "business_type": "CLOUD_PROVIDER",
+      "customer_indicators": [],
+      "provider_indicators": []
+    },
+    "shodan_analysis": {
+      "waf_detection": {
+        "success": true,
+        "domain": "basis.com",
+        "query_used": "hostname:basis.com http.waf",
+        "hosts_with_waf": 0,
+        "waf_detected": false,
+        "waf_type": "unknown",
+        "waf_indicators": [],
+        "confidence": 0,
+        "security_headers": [],
+        "raw_hosts": []
+      },
+      "technology_stack": {
+        "success": true,
+        "domain": "basis.com",
+        "technologies": [
+          "apache httpd",
+          "openssh",
+          "aws elb",
+          "microsoft iis httpd"
+        ],
+        "web_servers": {
+          "apache httpd 2.4.29": 2,
+          "microsoft iis httpd 10.0": 1
+        },
+        "frameworks": {},
+        "cdn_providers": [],
+        "ssl_info": {
+          "subject": {
+            "CN": "www.ab-basis.com"
+          },
+          "issuer": {
+            "C": "BE",
+            "CN": "GlobalSign GCC R6 AlphaSSL CA 2023",
+            "O": "GlobalSign nv-sa"
+          },
+          "version": null,
+          "cipher": {
+            "version": "TLSv1.3",
+            "bits": 256,
+            "name": "TLS_AES_256_GCM_SHA384"
+          },
+          "trust_score": 100
+        },
+        "ports_services": {
+          "22": [
+            "openssh",
+            "openssh"
+          ],
+          "443": [
+            "apache httpd",
+            "",
+            "aws elb",
+            ""
+          ],
+          "80": [
+            "microsoft iis httpd",
+            "apache httpd"
+          ],
+          "53": [
+            ""
+          ],
+          "1194": [
+            ""
+          ]
+        },
+        "confidence": 48,
+        "provider_classification": {
+          "cloud_providers": [
+            "GCP",
+            "AWS"
+          ],
+          "cdn_providers": [],
+          "waf_providers": [],
+          "hosting_providers": [],
+          "confidence_indicators": [
+            "Cloud provider detected: gcp",
+            "Cloud provider detected: aws",
+            "Primary organization: HostDime.com, Inc."
+          ],
+          "primary_infrastructure": "HostDime.com, Inc."
+        },
+        "security_assessment": {
+          "security_headers": {},
+          "ssl_configuration": {
+            "subject": {
+              "CN": "www.ab-basis.com"
+            },
+            "issuer": {
+              "C": "BE",
+              "CN": "GlobalSign GCC R6 AlphaSSL CA 2023",
+              "O": "GlobalSign nv-sa"
+            },
+            "version": null,
+            "cipher": {
+              "version": "TLSv1.3",
+              "bits": 256,
+              "name": "TLS_AES_256_GCM_SHA384"
+            }
+          },
+          "vulnerability_indicators": [
+            "CVE-2019-0196",
+            "CVE-2013-4365",
+            "CVE-2022-28330",
+            "CVE-2021-32791",
+            "CVE-2021-32792",
+            "CVE-2023-31122",
+            "CVE-2024-38476",
+            "CVE-2024-27316",
+            "CVE-2024-38474",
+            "CVE-2024-38475",
+            "CVE-2024-38472",
+            "CVE-2024-38473",
+            "CVE-2009-0796",
+            "CVE-2020-1927",
+            "CVE-2011-2688",
+            "CVE-2021-32786",
+            "CVE-2021-32785",
+            "CVE-2020-9490",
+            "CVE-2007-4723",
+            "CVE-2021-44790",
+            "CVE-2020-13938",
+            "CVE-2019-9517",
+            "CVE-2020-35452",
+            "CVE-2022-22719",
+            "CVE-2024-47252",
+            "CVE-2020-1934",
+            "CVE-2022-36760",
+            "CVE-2018-1333",
+            "CVE-2018-11763",
+            "CVE-2019-0217",
+            "CVE-2024-24795",
+            "CVE-2021-33193",
+            "CVE-2019-0211",
+            "CVE-2019-17567",
+            "CVE-2022-31813",
+            "CVE-2024-42516",
+            "CVE-2012-4360",
+            "CVE-2018-17189",
+            "CVE-2024-39573",
+            "CVE-2021-26690",
+            "CVE-2021-26691",
+            "CVE-2019-0220",
+            "CVE-2024-38477",
+            "CVE-2022-30556",
+            "CVE-2021-39275",
+            "CVE-2025-49630",
+            "CVE-2023-38709",
+            "CVE-2022-29404",
+            "CVE-2018-1312",
+            "CVE-2006-20001",
+            "CVE-2020-11993",
+            "CVE-2017-15710",
+            "CVE-2021-44224",
+            "CVE-2022-22721",
+            "CVE-2022-22720",
+            "CVE-2019-10092",
+            "CVE-2017-15715",
+            "CVE-2019-10098",
+            "CVE-2021-40438",
+            "CVE-2011-1176",
+            "CVE-2022-23943",
+            "CVE-2018-17199",
+            "CVE-2018-1301",
+            "CVE-2018-1302",
+            "CVE-2018-1303",
+            "CVE-2021-34798",
+            "CVE-2023-25690",
+            "CVE-2022-26377",
+            "CVE-2019-10081",
+            "CVE-2019-10082",
+            "CVE-2024-40898",
+            "CVE-2024-43204",
+            "CVE-2012-3526",
+            "CVE-2009-2299",
+            "CVE-2012-4001",
+            "CVE-2022-37436",
+            "CVE-2025-49812",
+            "CVE-2025-53020",
+            "CVE-2013-2765",
+            "CVE-2024-43394",
+            "CVE-2013-0941",
+            "CVE-2013-0942",
+            "CVE-2023-45802",
+            "CVE-2018-1283",
+            "CVE-2022-28615",
+            "CVE-2022-28614",
+            "CVE-2019-0196",
+            "CVE-2013-4365",
+            "CVE-2022-28330",
+            "CVE-2021-32791",
+            "CVE-2021-32792",
+            "CVE-2023-31122",
+            "CVE-2024-38476",
+            "CVE-2024-27316",
+            "CVE-2024-38474",
+            "CVE-2024-38475",
+            "CVE-2024-38472",
+            "CVE-2024-38473",
+            "CVE-2009-0796",
+            "CVE-2020-1927",
+            "CVE-2011-2688",
+            "CVE-2021-32786",
+            "CVE-2021-32785",
+            "CVE-2020-9490",
+            "CVE-2007-4723",
+            "CVE-2021-44790",
+            "CVE-2020-13938",
+            "CVE-2019-9517",
+            "CVE-2020-35452",
+            "CVE-2022-22719",
+            "CVE-2024-47252",
+            "CVE-2020-1934",
+            "CVE-2022-36760",
+            "CVE-2018-1333",
+            "CVE-2018-11763",
+            "CVE-2019-0217",
+            "CVE-2024-24795",
+            "CVE-2021-33193",
+            "CVE-2019-0211",
+            "CVE-2019-17567",
+            "CVE-2022-31813",
+            "CVE-2024-42516",
+            "CVE-2012-4360",
+            "CVE-2018-17189",
+            "CVE-2024-39573",
+            "CVE-2021-26690",
+            "CVE-2021-26691",
+            "CVE-2019-0220",
+            "CVE-2024-38477",
+            "CVE-2022-30556",
+            "CVE-2021-39275",
+            "CVE-2025-49630",
+            "CVE-2023-38709",
+            "CVE-2022-29404",
+            "CVE-2018-1312",
+            "CVE-2006-20001",
+            "CVE-2020-11993",
+            "CVE-2017-15710",
+            "CVE-2021-44224",
+            "CVE-2022-22721",
+            "CVE-2022-22720",
+            "CVE-2019-10092",
+            "CVE-2017-15715",
+            "CVE-2019-10098",
+            "CVE-2021-40438",
+            "CVE-2011-1176",
+            "CVE-2022-23943",
+            "CVE-2018-17199",
+            "CVE-2018-1301",
+            "CVE-2018-1302",
+            "CVE-2018-1303",
+            "CVE-2021-34798",
+            "CVE-2023-25690",
+            "CVE-2022-26377",
+            "CVE-2019-10081",
+            "CVE-2019-10082",
+            "CVE-2024-40898",
+            "CVE-2024-43204",
+            "CVE-2012-3526",
+            "CVE-2009-2299",
+            "CVE-2012-4001",
+            "CVE-2022-37436",
+            "CVE-2025-49812",
+            "CVE-2025-53020",
+            "CVE-2013-2765",
+            "CVE-2024-43394",
+            "CVE-2013-0941",
+            "CVE-2013-0942",
+            "CVE-2023-45802",
+            "CVE-2018-1283",
+            "CVE-2022-28615",
+            "CVE-2022-28614"
+          ],
+          "security_score": 0,
+          "recommendations": [
+            "Vulnerabilities detected - immediate patching required",
+            "Security improvements recommended"
+          ],
+          "waf_indicators": [],
+          "response_analysis": {
+            "status_code": 302,
+            "server": "apache/2.4.29 (ubuntu)",
+            "security_headers_count": 0
+          }
+        },
+        "infrastructure_mapping": {
+          "geographic_distribution": {
+            "United States, Orlando": 5,
+            "United States, Lockhart": 2,
+            "United States, Kansas City": 1,
+            "United States, Boardman": 1,
+            "Russian Federation, Moscow": 1
+          },
+          "port_services": {
+            "22": [
+              "OpenSSH",
+              "OpenSSH"
+            ],
+            "443": [
+              "Apache httpd",
+              "Unknown",
+              "AWS ELB",
+              "Unknown"
+            ],
+            "80": [
+              "Microsoft IIS httpd",
+              "Apache httpd"
+            ],
+            "53": [
+              "Unknown"
+            ],
+            "1194": [
+              "Unknown"
+            ]
+          },
+          "asn_analysis": {
+            "AS33182": "HostDime.com, Inc.",
+            "AS396982": "Google LLC",
+            "AS16509": "Amazon.com, Inc.",
+            "AS25532": "Masterhost.ru is a hosting and technical support organization."
+          },
+          "hosting_patterns": [
+            "cloud",
+            "vpn"
+          ],
+          "organization_analysis": {
+            "HostDime.com, Inc.": 7,
+            "Google LLC": 1,
+            "Amazon.com, Inc.": 1,
+            "Masterhost.ru is a hosting and technical support organization.": 1
+          },
+          "country_analysis": {
+            "United States": 9,
+            "Russian Federation": 1
+          }
+        },
+        "vulnerability_analysis": {
+          "vulnerabilities_found": [
+            "CVE-2019-0196",
+            "CVE-2013-4365",
+            "CVE-2022-28330",
+            "CVE-2021-32791",
+            "CVE-2021-32792",
+            "CVE-2023-31122",
+            "CVE-2024-38476",
+            "CVE-2024-27316",
+            "CVE-2024-38474",
+            "CVE-2024-38475",
+            "CVE-2024-38472",
+            "CVE-2024-38473",
+            "CVE-2009-0796",
+            "CVE-2020-1927",
+            "CVE-2011-2688",
+            "CVE-2021-32786",
+            "CVE-2021-32785",
+            "CVE-2020-9490",
+            "CVE-2007-4723",
+            "CVE-2021-44790",
+            "CVE-2020-13938",
+            "CVE-2019-9517",
+            "CVE-2020-35452",
+            "CVE-2022-22719",
+            "CVE-2024-47252",
+            "CVE-2020-1934",
+            "CVE-2022-36760",
+            "CVE-2018-1333",
+            "CVE-2018-11763",
+            "CVE-2019-0217",
+            "CVE-2024-24795",
+            "CVE-2021-33193",
+            "CVE-2019-0211",
+            "CVE-2019-17567",
+            "CVE-2022-31813",
+            "CVE-2024-42516",
+            "CVE-2012-4360",
+            "CVE-2018-17189",
+            "CVE-2024-39573",
+            "CVE-2021-26690",
+            "CVE-2021-26691",
+            "CVE-2019-0220",
+            "CVE-2024-38477",
+            "CVE-2022-30556",
+            "CVE-2021-39275",
+            "CVE-2025-49630",
+            "CVE-2023-38709",
+            "CVE-2022-29404",
+            "CVE-2018-1312",
+            "CVE-2006-20001",
+            "CVE-2020-11993",
+            "CVE-2017-15710",
+            "CVE-2021-44224",
+            "CVE-2022-22721",
+            "CVE-2022-22720",
+            "CVE-2019-10092",
+            "CVE-2017-15715",
+            "CVE-2019-10098",
+            "CVE-2021-40438",
+            "CVE-2011-1176",
+            "CVE-2022-23943",
+            "CVE-2018-17199",
+            "CVE-2018-1301",
+            "CVE-2018-1302",
+            "CVE-2018-1303",
+            "CVE-2021-34798",
+            "CVE-2023-25690",
+            "CVE-2022-26377",
+            "CVE-2019-10081",
+            "CVE-2019-10082",
+            "CVE-2024-40898",
+            "CVE-2024-43204",
+            "CVE-2012-3526",
+            "CVE-2009-2299",
+            "CVE-2012-4001",
+            "CVE-2022-37436",
+            "CVE-2025-49812",
+            "CVE-2025-53020",
+            "CVE-2013-2765",
+            "CVE-2024-43394",
+            "CVE-2013-0941",
+            "CVE-2013-0942",
+            "CVE-2023-45802",
+            "CVE-2018-1283",
+            "CVE-2022-28615",
+            "CVE-2022-28614",
+            "CVE-2019-0196",
+            "CVE-2013-4365",
+            "CVE-2022-28330",
+            "CVE-2021-32791",
+            "CVE-2021-32792",
+            "CVE-2023-31122",
+            "CVE-2024-38476",
+            "CVE-2024-27316",
+            "CVE-2024-38474",
+            "CVE-2024-38475",
+            "CVE-2024-38472",
+            "CVE-2024-38473",
+            "CVE-2009-0796",
+            "CVE-2020-1927",
+            "CVE-2011-2688",
+            "CVE-2021-32786",
+            "CVE-2021-32785",
+            "CVE-2020-9490",
+            "CVE-2007-4723",
+            "CVE-2021-44790",
+            "CVE-2020-13938",
+            "CVE-2019-9517",
+            "CVE-2020-35452",
+            "CVE-2022-22719",
+            "CVE-2024-47252",
+            "CVE-2020-1934",
+            "CVE-2022-36760",
+            "CVE-2018-1333",
+            "CVE-2018-11763",
+            "CVE-2019-0217",
+            "CVE-2024-24795",
+            "CVE-2021-33193",
+            "CVE-2019-0211",
+            "CVE-2019-17567",
+            "CVE-2022-31813",
+            "CVE-2024-42516",
+            "CVE-2012-4360",
+            "CVE-2018-17189",
+            "CVE-2024-39573",
+            "CVE-2021-26690",
+            "CVE-2021-26691",
+            "CVE-2019-0220",
+            "CVE-2024-38477",
+            "CVE-2022-30556",
+            "CVE-2021-39275",
+            "CVE-2025-49630",
+            "CVE-2023-38709",
+            "CVE-2022-29404",
+            "CVE-2018-1312",
+            "CVE-2006-20001",
+            "CVE-2020-11993",
+            "CVE-2017-15710",
+            "CVE-2021-44224",
+            "CVE-2022-22721",
+            "CVE-2022-22720",
+            "CVE-2019-10092",
+            "CVE-2017-15715",
+            "CVE-2019-10098",
+            "CVE-2021-40438",
+            "CVE-2011-1176",
+            "CVE-2022-23943",
+            "CVE-2018-17199",
+            "CVE-2018-1301",
+            "CVE-2018-1302",
+            "CVE-2018-1303",
+            "CVE-2021-34798",
+            "CVE-2023-25690",
+            "CVE-2022-26377",
+            "CVE-2019-10081",
+            "CVE-2019-10082",
+            "CVE-2024-40898",
+            "CVE-2024-43204",
+            "CVE-2012-3526",
+            "CVE-2009-2299",
+            "CVE-2012-4001",
+            "CVE-2022-37436",
+            "CVE-2025-49812",
+            "CVE-2025-53020",
+            "CVE-2013-2765",
+            "CVE-2024-43394",
+            "CVE-2013-0941",
+            "CVE-2013-0942",
+            "CVE-2023-45802",
+            "CVE-2018-1283",
+            "CVE-2022-28615",
+            "CVE-2022-28614"
+          ],
+          "risk_score": 100,
+          "security_recommendations": [
+            "Critical: Vulnerabilities detected - immediate patching required",
+            "High risk: Enhanced monitoring recommended"
+          ],
+          "outdated_software": [
+            "OpenSSH 7.6p1 Ubuntu 4ubuntu0.7",
+            "OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13",
+            "Apache httpd 2.4.29",
+            "AWS ELB 2.0",
+            "Microsoft IIS httpd 10.0",
+            "Apache httpd 2.4.29"
+          ],
+          "severity_breakdown": {
+            "critical": 0,
+            "high": 172,
+            "medium": 0,
+            "low": 0
+          }
+        },
+        "ssl_trust_analysis": {
+          "certificate_authorities": [
+            "globalsign gcc r6 alphassl ca 2023",
+            "wr3",
+            "amazon rsa 2048 m04",
+            "r3"
+          ],
+          "trust_score": 100,
+          "ssl_configurations": [
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            },
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            },
+            {
+              "version": "TLSv1.2",
+              "cipher_name": "ECDHE-RSA-AES128-GCM-SHA256",
+              "bits": 128
+            },
+            {
+              "version": "TLSv1.3",
+              "cipher_name": "TLS_AES_256_GCM_SHA384",
+              "bits": 256
+            }
+          ],
+          "recommendations": [],
+          "certificate_analysis": {
+            "subject": {
+              "CN": "www.ab-basis.com"
+            },
+            "issuer": {
+              "C": "BE",
+              "CN": "GlobalSign GCC R6 AlphaSSL CA 2023",
+              "O": "GlobalSign nv-sa"
+            },
+            "serial_number": 34155560877557191673368957548,
+            "fingerprint": {
+              "sha256": "a41fbd8412630e9ff453873398588198dcfda3a4a43e1f568a32a59830ba11df",
+              "sha1": "5b31a6b78e42fe1e19dbb3baf73e28c94f48b2a6"
+            }
+          }
+        },
+        "data_richness_score": 83,
+        "total_hosts_analyzed": 10
+      },
+      "ip_analysis": {
+        "success": true,
+        "ip": "141.193.213.11",
+        "host_info": {
+          "org": "WPEngine, Inc.",
+          "isp": "Cloudflare London, LLC",
+          "asn": "AS209242",
+          "country_code": "DE",
+          "country_name": "Germany",
+          "city": "Berlin",
+          "region_code": "BE",
+          "postal_code": "Unknown",
+          "latitude": 52.52437,
+          "longitude": 13.41053,
+          "last_update": "2025-08-27T20:04:42.235534",
+          "ports": [
+            8080,
+            2082,
+            2083,
+            2053,
+            2086,
+            2087,
+            80,
+            8880,
+            8443,
+            443
+          ]
+        },
+        "services": [
+          {
+            "hash": -2037474787,
+            "product": "CloudFlare",
+            "http": {
+              "status": 403,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1039101684,
+              "securitytxt": null,
+              "title": "Direct IP access not allowed | Cloudflare",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": -1402009044,
+              "headers_hash": 144737606,
+              "host": "141.193.213.11",
+              "html": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n<title>Direct IP access not allowed | Cloudflare</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n\n\n<script>\n(function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById(\"error-feedback-survey\"),d=document.getElementById(\"error-feedback-success\"),b=new XMLHttpRequest;a={event:\"feedback clicked\",properties:{errorCode:1003,helpful:a,version:1}};b.open(\"POST\",\"https://sparrow.cloudflare.com/api/v1/event\");b.setRequestHeader(\"Content-Type\",\"application/json\");b.setRequestHeader(\"Sparrow-Source-Key\",\"c771f0e4b54944bebf4261d44bd79a1e\");\nb.send(JSON.stringify(a));c.classList.add(\"feedback-hidden\");d.classList.remove(\"feedback-hidden\")};document.addEventListener(\"DOMContentLoaded\",function(){var a=document.getElementById(\"error-feedback\"),c=document.getElementById(\"feedback-button-yes\"),d=document.getElementById(\"feedback-button-no\");\"classList\"in a&&(a.classList.remove(\"feedback-hidden\"),c.addEventListener(\"click\",function(){e(!0)}),d.addEventListener(\"click\",function(){e(!1)}))})}})();\n</script>\n\n<script defer src=\"https://performance.radar.cloudflare.com/beacon.js\"></script>\n</head>\n<body>\n  <div id=\"cf-wrapper\">\n    <div class=\"cf-alert cf-alert-error cf-cookie-error hidden\" id=\"cookie-alert\" data-translate=\"enable_cookies\">Please enable cookies.</div>\n    <div id=\"cf-error-details\" class=\"p-0\">\n      <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased\">\n         <h1 class=\"inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight\">\n           <span data-translate=\"error\">Error</span>\n           <span>1003</span>\n         </h1>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">Ray ID: 97596c974f6f476d &bull;</span>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">2025-08-27 06:13:39 UTC</span>\n        <h2 class=\"text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light\">Direct IP access not allowed</h2>\n      </header>\n\n      <section class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n          <div id=\"what-happened-section\" class=\"w-1/2 md:w-full\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_happened\">What happened?</h2>\n            <p>You've requested an IP address that is part of the <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">Cloudflare</a> network. A valid Host header must be supplied to reach the desired website.</p>\n            \n              <p>Please see <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/\" target=\"_blank\">https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/</a> for more details.</p>\n            \n          </div>\n\n          \n          <div id=\"resolution-copy-section\" class=\"w-1/2 mt-6 text-15 leading-normal\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_can_i_do\">What can I do?</h2>\n            <p>If you are interested in learning more about Cloudflare, please <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">visit our website</a>.</p>\n          </div>\n          \n      </section>\n\n      <div class=\"feedback-hidden py-8 text-center\" id=\"error-feedback\">\n    <div id=\"error-feedback-survey\" class=\"footer-line-wrapper\">\n        Was this page helpful?\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-yes\" type=\"button\">Yes</button>\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-no\" type=\"button\">No</button>\n    </div>\n    <div class=\"feedback-success feedback-hidden\" id=\"error-feedback-success\">\n        Thank you for your feedback!\n    </div>\n</div>\n\n\n      <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n  <p class=\"text-13\">\n    <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">97596c974f6f476d</strong></span>\n    <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n      Your IP:\n      <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n      <span class=\"hidden\" id=\"cf-footer-ip\">224.18.252.151</span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    </span>\n    <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n    \n  </p>\n  <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n</div><!-- /.error-footer -->\n\n\n    </div><!-- /#cf-error-details -->\n  </div><!-- /#cf-wrapper -->\n\n  <script>\n  window._cf_translation = {};\n  \n  \n</script>\n\n</body>\n</html>\n",
+              "html_hash": 1644837221,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "server_hash": 958142897
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "timestamp": "2025-08-27T06:13:57.574001",
+            "isp": "Cloudflare London, LLC",
+            "transport": "tcp",
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "013e5a802132a34b09e6a1edf3a8692906a53659",
+              "options": {},
+              "module": "http",
+              "id": "8217f63e-661b-4512-aac2-d40a80010103"
+            },
+            "asn": "AS209242",
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Wed, 27 Aug 2025 06:13:39 GMT\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 6235\r\nConnection: close\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nVary: Accept-Encoding\r\nServer: cloudflare\r\nCF-RAY: 97596c974f6f476d-DFW\r\n\r\n",
+            "port": 80,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": -674676360,
+            "asn": "AS209242",
+            "http": {
+              "status": 403,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -353103429,
+              "securitytxt": null,
+              "title": "Just a moment...",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": -729364,
+              "headers_hash": 2108105062,
+              "host": "www.ergonomicgardens.com",
+              "html": "<!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\"><meta name=\"robots\" content=\"noindex,nofollow\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}@media (width <= 720px){.main-content{margin-top:4rem}}.h2{line-height:2.25rem;font-size:1.5rem;font-weight:500}@media (width <= 720px){.h2{line-height:1.5rem;font-size:1.25rem}}#challenge-error-text{background-image:url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iI0IyMEYwMyIgZD0iTTE2IDNhMTMgMTMgMCAxIDAgMTMgMTNBMTMuMDE1IDEzLjAxNSAwIDAgMCAxNiAzbTAgMjRhMTEgMTEgMCAxIDEgMTEtMTEgMTEuMDEgMTEuMDEgMCAwIDEtMTEgMTEiLz48cGF0aCBmaWxsPSIjQjIwRjAzIiBkPSJNMTcuMDM4IDE4LjYxNUgxNC44N0wxNC41NjMgOS41aDIuNzgzem0tMS4wODQgMS40MjdxLjY2IDAgMS4wNTcuMzg4LjQwNy4zODkuNDA3Ljk5NCAwIC41OTYtLjQwNy45ODQtLjM5Ny4zOS0xLjA1Ny4zODktLjY1IDAtMS4wNTYtLjM4OS0uMzk4LS4zODktLjM5OC0uOTg0IDAtLjU5Ny4zOTgtLjk4NS40MDYtLjM5NyAxLjA1Ni0uMzk3Ii8+PC9zdmc+\");background-repeat:no-repeat;background-size:contain;padding-left:34px}@media (prefers-color-scheme: dark){body{background-color:#222;color:#d9d9d9}}</style><meta http-equiv=\"refresh\" content=\"360\"></head><body><div class=\"main-wrapper\" role=\"main\"><div class=\"main-content\"><noscript><div class=\"h2\"><span id=\"challenge-error-text\">Enable JavaScript and cookies to continue</span></div></noscript></div></div><script>(function(){window._cf_chl_opt = {cvId: '3',cZone: 'www.ergonomicgardens.com',cType: 'managed',cRay: '9758cd777a281684',cH: 'roxr3GfE98Y4fYhjvz07Z.7QnERHCYKJG8TJIzOc11s-1756268701-1.2.1.1-ZSexpHgWzQa7NZoOpjak1KfCNiZUGzo6jQ2JCdk52e8zUTWtTBHGSq3yuCuO5a8f',cUPMDTk:\"\\/?__cf_chl_tk=1pd1c082IDYePkp76CYHWLwel1bK5Txw4jE8NKMbRNY-1756268701-1.0.1.1-DYcGPmd.0Hbjo4USW6aqRUmZuOAybqFft00.RiaYHqc\",cFPWv: 'b',cITimeS: '1756268701',cTplC:0,cTplV:5,cTplB: 'cf',fa:\"\\/?__cf_chl_f_tk=1pd1c082IDYePkp76CYHWLwel1bK5Txw4jE8NKMbRNY-1756268701-1.0.1.1-DYcGPmd.0Hbjo4USW6aqRUmZuOAybqFft00.RiaYHqc\",md: 'Pugyp19wEhe9pdQnR0J4iJNAjvgpsN51qCFBn_AQVrw-1756268701-1.2.1.1-lEG3jcSFFE2TynroteEE0JtAAErI_LFkt_lKtHipIhEyG8ArqLQNElBrq0glJTGdKZMWFrDzo4JnOs9hRFkH.JWx6224TgFrcsbVmJnJeiMr5M5SE8qjrOikIdsr_8oIkwEmwTFCS5GPF7vFf1ZFD2L3iOQCMH3VuGk0AYwQoXwHJj_9DfFdDEU.E4pPvabfrlH5n4bd8Ji3lF93BlXvhEoiCoraP32qwRDsRDZgSh1gjsvhbAO01zvoAuEWy8Y6MPz47BBHc2C4UkacXQT1eq38c57.i5iZLT4rGtcaWdLiW.ZkAe4ReONAUJr8oNBAqcqs9TRe2F29iwCYGGJFeujQOTVybk4lhxLbWf3zXuFLQ9g_lhKjY02gPDnNV11FVeeR8YTljh67MH.ECgcuxWKWdYniqBSmrdskRAq9RHoNpuH0EBegRLQnA9qmiY8qeIhK_v4lCuX_18amraHtI5RMSoN59TwnbvImNZ2zekRnggpWStQdA0U7IJcP_eV3jBrDXN5CNPmr9OT59njlCifPbDjyrHSZo5nu7eSHAf7oBdBiovJSDjYQjq7ljsBz.sPdaOkJKZVhAg2RBcBFEIkRRC3.F9uAvYhVm1NB9PZ6b76LxjGiNkzvqcPqt0VgS0mMLHQRTssQabdipleUqVsUjTFYgoXrUqaNnAfMz2M84PvBqro8cwF53NI8Eu63R3DE0W3fXEzqKW3FC9wyrwFjWt26ma4GglHaNe5973c3LnV7sL1vj_Gzl2Hdkfs5fNaZH2.GD12AdZcYV73rz3AAE7_dVWHS6HQOV3dd63JHjSneDT5fgOi7sXgt9blYQHiBMrcIKVrTaFsAKWyS.pWmc2uAF2vzyll9Vmr4G12ngkexKa5YSpq4YerjbNswBiT7lPHRGtFJupXq8LwAkVLLjm7JkyLFlbCoLnTRusDRqwgyvyN7AVKWKD52Xk0iP.Srw7H9qEXv6MBvJeXVwPLHb9zy5.I3CguJmO0MuxUFKZ9CROYBFBFc4.e8rqf2jC.jo_f4ofi3FnKZVq.gNNkXFLS1ozqlT0aHHvwQuxLtBPw.yspP.ulrbwxN9a3k',mdrd: 'NuCjaV2CoK1bxiZP9C1Odff_sbnxKjaEDao5xrn7A_I-1756268701-1.2.1.1-.47YAvJkNGMT.E1QeCJBESNXCJ8j81FDDWu6PmX83X2hBdSfnUu1Ddhcvw4iPV.h6jIjtrYoc2BJBwencIEtEQ75hvI5HqJtuhS_ACpb4z8711HCRvYLkMiMdZQYdYPu8EXyl_XQQQ1Q58UozAt1Luwed0yLIP1K7jriBTIymi_WRMAgeh4GTERjlt0H22Ha_PrOF70M_U6QiE6HvgTpisKzGyY4ihZnALmh3doQBj69QX7qYzPpan14MfQ7ewCD5I.b2LndBZI.b.ltbh2e_svewY4BPUiErT2Pi_jqsGINkK6JgXY5JaeJefzFU8n__JPvNlyF9wgIvTT.W9XMXhOpKb3i56iJwEW78A727Jd0WqPMi2WMFv0BTRvWiuFbPQ8fVi.vxeLcgdA1nEfCQH4qdIYfT.nJZgEvU02Q6JTLWGUoGzkcDSgeXFYvQK2IQffsYWxQzuaHPXEKPtB7HZqH9UMX4u7GttYYKRx0w6d3cmQgIystxkmeIE8gHjCvrQj5bRLKRNC6sco4qFy1ipCHTZTAmH0iaeAPcQAuRHhhGS1k.b0FPQ1Y.jLaAwSinUpCyX5vPCpJdETbEaWS4ZD6fu3ICI2lKil0BR3rCTLPPlYb_BJdClMz7OHpiWeYUtOb9r3yZtcdLSsYXpoHFjpKJqIODebd10uf4o9OmJEYfcPpG1b_k76Lt3g3vryUf19lXQ63FHmuGl6mNe89zwau7EJL6pEl7YawnL8kaQwuzY9VP45SJEBQGfB7C9VukNo1vf9zFcYpaZuxaCzkDPILm..rbhAZNeo.HImQ360eDekjb2p9p8RFzwBqKy_ohaJha3Idb5_MKT1yY2AEHDBQjaCoHZm.0wOZMqUv3vCV2Cs8FftYIHd0TwD.sOQNRNRNfQLJ4mbRTS1vkiio2tjSj5W9pkZxoSnor0by10GYXWGN4oZG1v9l805aHz6rLWPjefqkpEozYsrseFocrMTLN3c7Ie_KVeZeqksFu5SIguY.lZarQuYx0y8LKjg8wSD2t9vcaei3TaEC8nqKZyt3rGYYO_PN.bHlCMRBf1FRgQBpub5vBEnW0xJsw55Vu6AlrjY5zlkd8t0Ck5E9M61DZRJxCGyxiRdD3cYI_l.133hu8JhIkVCRJ3zWYZ0YOK_pSE1bQBsO3veKZF9CNheygRUsf6t6Ltm3psliZK6uWcPXQfwKm_dbPFCAEgf2X.nB89SPytjGGuDccX5_YBnzKbdHbcV37DUU71XNdkOXo9YE8hQp5KkwZgYxQbVsscQixAnAqDOxc9DMZNHx1ADgqaAOTUxvDuGE482BzSmVupc3F04JHUVXokrtKusixJUxHIY918eTMfIyECk33eH1jZ15Cts3U9T7YULcG1jLgxim0IdtnhuY3hJ63fD9aPjdXylQadduK98jWjy8giNCisVenAkQ2gyhXxxVysAgrcz9QNVjNciKb9vo4ommxYcCnHlcmBLA7TTRpj0s707IDsXsXhAH8cWMIRKZUTBaIKGU_ymaieCd.YyVOKDnvhtvqh557TkGWU.F3Nkod3GeGFGvWac_Ek_mEKc5kRF2CzfhDuhweUzICw9uONtUnSZRs06mMWpmt6bVEcLtdhsXpqAuatFfi.veBWo6ENhY4P5GtAo9BE5CciqNBlVRI37FEnjrrzHOusKY38_Fv8ImO2R6k6PZC9g6K8j.esUkrlL8Y0CaKm8_pkHtn4Yi4Ob.vub.Z_60d8ccq1lCmJcclKWJJ3h.h8cN.ARPNWghH4YfIZvK6cL6CL72hHPIuSFta77LLDaGvBx45UNRbtWhnON6k.McjBaYWyh99WIopri_DLX0MVATp407y1qKWaDi6GbVk_ZxUXgcWUUfrgqCGtehAAugx6.Da4Uc80RPG8S1Poz6DPIYMOtAPF9oVbGa4kQpZJ_dsk3mtgytj2JUrTea9Pu_Rz52j9SDnvvskkKpvZaXdrs0dtIcBMbkZYQzcweGfD7SAM2XNAYs0woZcY0_To5SoVo07.NsGdk',};var a = document.createElement('script');a.src = '/cdn-cgi/challenge-platform/h/b/orchestrate/chl_page/v1?ray=9758cd777a281684';window._cf_chl_opt.cOgUHash = location.hash === '' && location.href.indexOf('#') !== -1 ? '#' : location.hash;window._cf_chl_opt.cOgUQuery = location.search === '' && location.href.slice(0, location.href.length - window._cf_chl_opt.cOgUHash.length).indexOf('?') !== -1 ? '?' : location.search;if (window.history && window.history.replaceState) {var ogU = location.pathname + window._cf_chl_opt.cOgUQuery + window._cf_chl_opt.cOgUHash;history.replaceState(null, null,\"\\/?__cf_chl_rt_tk=1pd1c082IDYePkp76CYHWLwel1bK5Txw4jE8NKMbRNY-1756268701-1.0.1.1-DYcGPmd.0Hbjo4USW6aqRUmZuOAybqFft00.RiaYHqc\"+ window._cf_chl_opt.cOgUHash);a.onload = function() {history.replaceState(null, null, ogU);}}document.getElementsByTagName('head')[0].appendChild(a);}());</script></body></html>",
+              "server_hash": 958142897,
+              "location": "/",
+              "components": {
+                "HTTP/3": {
+                  "categories": [
+                    "Miscellaneous"
+                  ]
+                },
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "html_hash": 382619748
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "transport": "tcp",
+            "timestamp": "2025-08-27T04:25:01.374449",
+            "isp": "Cloudflare London, LLC",
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "module": "https",
+              "ptr": true,
+              "options": {
+                "hostname": "www.ergonomicgardens.com",
+                "scan": "QcC5W8qq3JEJiWWW"
+              },
+              "id": "b7bd95b6-e682-4485-b4ba-09525a265ddb",
+              "crawler": "0d11ca04101543110b609e3c39858635f6807353"
+            },
+            "ssl": {
+              "chain_sha256": [
+                "30d9b4327f5fbf773773c460acaf8aef14801913d019013ec63c4af3904f46d2",
+                "76e9e288aafc0e37f4390cbf946aad997d5c1c901b3ce513d3d8fadbabe2ab85"
+              ],
+              "jarm": "00000000000000000000000000000000000000000000000000000000000000",
+              "tlsext": [],
+              "chain": [
+                "-----BEGIN CERTIFICATE-----\nMIIDnzCCAySgAwIBAgISBVxWNZsO+iWCJ7z0Uf6NQFYuMAoGCCqGSM49BAMDMDIx\nCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQDEwJF\nNjAeFw0yNTA3MDgxNTU4MjBaFw0yNTEwMDYxNTU4MTlaMCMxITAfBgNVBAMTGHd3\ndy5lcmdvbm9taWNnYXJkZW5zLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IA\nBDbwTrI0dqirzMWrB6UhaWaIIPiVisY346lJGA82JtCvBm1RYY2soyvEV1aNG/Av\nHzP+nImkvOLaBFoyttH8kQKjggInMIICIzAOBgNVHQ8BAf8EBAMCB4AwHQYDVR0l\nBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYE\nFBoc/RxeDvVsC5FjzoFWi7tH+EWTMB8GA1UdIwQYMBaAFJMnRpgDqVFojpjWxEJI\n2yO/WJTSMDIGCCsGAQUFBwEBBCYwJDAiBggrBgEFBQcwAoYWaHR0cDovL2U2Lmku\nbGVuY3Iub3JnLzAjBgNVHREEHDAaghh3d3cuZXJnb25vbWljZ2FyZGVucy5jb20w\nEwYDVR0gBAwwCjAIBgZngQwBAgEwLQYDVR0fBCYwJDAioCCgHoYcaHR0cDovL2U2\nLmMubGVuY3Iub3JnLzQ3LmNybDCCAQUGCisGAQQB1nkCBAIEgfYEgfMA8QB3AH1Z\nHhLheCp7HGFnfF79+NCHXBSgTpWeuQMv2Q6MLnm4AAABl+r3/fQAAAQDAEgwRgIh\nAJUzw2cuNqQHo1La55QwLqQVTGChAoIWNGYz40f1ZfegAiEAk93dgDH1Qnu4UTCh\nhok5Jf8XRHl4KU5lpUxngebLDTkAdgAS8U40vVNyTIQGGcOPP3oT+Oe1YoeInG0w\nBYTr5YYmOgAAAZfq+AW9AAAEAwBHMEUCIQD5/kIQnoN/19pbDRh9c3WRdyWiQtfs\nRI+ei+Ybvv3hzgIgR1t6H2fPxaGi5GNABwTgSUj+W1FafCkUxgYs2KI76g8wCgYI\nKoZIzj0EAwMDaQAwZgIxAJUQZ0po1qA7vdjS0WAcRir/Kdu3xeR1ll5BVoo2y4RD\nC4Qka/sfpxYF8a7cAOsbmAIxAK1jQuISgTD0F8kVNimvLXUYoj9fGxlXznZPNfmU\nKCHfqVH20IZsF9p9+w88nqaFLw==\n-----END CERTIFICATE-----\n",
+                "-----BEGIN CERTIFICATE-----\nMIIEVzCCAj+gAwIBAgIRALBXPpFzlydw27SHyzpFKzgwDQYJKoZIhvcNAQELBQAw\nTzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\ncmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjQwMzEzMDAwMDAw\nWhcNMjcwMzEyMjM1OTU5WjAyMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3Mg\nRW5jcnlwdDELMAkGA1UEAxMCRTYwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAATZ8Z5G\nh/ghcWCoJuuj+rnq2h25EqfUJtlRFLFhfHWWvyILOR/VvtEKRqotPEoJhC6+QJVV\n6RlAN2Z17TJOdwRJ+HB7wxjnzvdxEP6sdNgA1O1tHHMWMxCcOrLqbGL0vbijgfgw\ngfUwDgYDVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcD\nATASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBSTJ0aYA6lRaI6Y1sRCSNsj\nv1iU0jAfBgNVHSMEGDAWgBR5tFnme7bl5AFzgAiIyBpY9umbbjAyBggrBgEFBQcB\nAQQmMCQwIgYIKwYBBQUHMAKGFmh0dHA6Ly94MS5pLmxlbmNyLm9yZy8wEwYDVR0g\nBAwwCjAIBgZngQwBAgEwJwYDVR0fBCAwHjAcoBqgGIYWaHR0cDovL3gxLmMubGVu\nY3Iub3JnLzANBgkqhkiG9w0BAQsFAAOCAgEAfYt7SiA1sgWGCIpunk46r4AExIRc\nMxkKgUhNlrrv1B21hOaXN/5miE+LOTbrcmU/M9yvC6MVY730GNFoL8IhJ8j8vrOL\npMY22OP6baS1k9YMrtDTlwJHoGby04ThTUeBDksS9RiuHvicZqBedQdIF65pZuhp\neDcGBcLiYasQr/EO5gxxtLyTmgsHSOVSBcFOn9lgv7LECPq9i7mfH3mpxgrRKSxH\npOoZ0KXMcB+hHuvlklHntvcI0mMMQ0mhYj6qtMFStkF1RpCG3IPdIwpVCQqu8GV7\ns8ubknRzs+3C/Bm19RFOoiPpDkwvyNfvmQ14XkyqqKK5oZ8zhD32kFRQkxa8uZSu\nh4aTImFxknu39waBxIRXE4jKxlAmQc4QjFZoq1KmQqQg0J/1JF8RlFvJas1VcjLv\nYlvUB2t6npO6oQjB3l+PNf0DpQH7iUx3Wz5AjQCi6L25FjyE06q6BZ/QlmtYdl/8\nZYao4SRqPEs/6cAiF+Qf5zg2UkaWtDphl1LKMuTNLotvsX99HP69V2faNyegodQ0\nLyTApr/vT01YPE46vNsDLgK+4cL6TrzC/a4WcmF5SRJ938zrv/duJHLXQIku5v0+\nEwOy59Hdm0PT/Er/84dDV0CSjdR/2XuZM3kpysSKLgD1cKiDA+IRguODCxfO9cyY\nIg46v9mFmBvyH04=\n-----END CERTIFICATE-----\n"
+              ],
+              "versions": [
+                "-TLSv1",
+                "-SSLv2",
+                "-SSLv3",
+                "-TLSv1.1",
+                "TLSv1.2",
+                "TLSv1.3"
+              ],
+              "acceptable_cas": [],
+              "alpn": [],
+              "cert": {
+                "sig_alg": "ecdsa-with-SHA384",
+                "issued": "20250708155820Z",
+                "expires": "20251006155819Z",
+                "pubkey": {
+                  "bits": 256,
+                  "type": "dsa"
+                },
+                "version": 2,
+                "extensions": [
+                  {
+                    "critical": true,
+                    "data": "\\x03\\x02\\x07\\x80",
+                    "name": "keyUsage"
+                  },
+                  {
+                    "data": "0\\x14\\x06\\x08+\\x06\\x01\\x05\\x05\\x07\\x03\\x01\\x06\\x08+\\x06\\x01\\x05\\x05\\x07\\x03\\x02",
+                    "name": "extendedKeyUsage"
+                  },
+                  {
+                    "critical": true,
+                    "data": "0\\x00",
+                    "name": "basicConstraints"
+                  },
+                  {
+                    "data": "\\x04\\x14\\x1a\\x1c\\xfd\\x1c^\\x0e\\xf5l\\x0b\\x91c\\xce\\x81V\\x8b\\xbbG\\xf8E\\x93",
+                    "name": "subjectKeyIdentifier"
+                  },
+                  {
+                    "data": "0\\x16\\x80\\x14\\x93\\'F\\x98\\x03\\xa9Qh\\x8e\\x98\\xd6\\xc4BH\\xdb#\\xbfX\\x94\\xd2",
+                    "name": "authorityKeyIdentifier"
+                  },
+                  {
+                    "data": "0$0\"\\x06\\x08+\\x06\\x01\\x05\\x05\\x070\\x02\\x86\\x16http://e6.i.lencr.org/",
+                    "name": "authorityInfoAccess"
+                  },
+                  {
+                    "data": "0\\x1a\\x82\\x18www.ergonomicgardens.com",
+                    "name": "subjectAltName"
+                  },
+                  {
+                    "data": "0\\n0\\x08\\x06\\x06g\\x81\\x0c\\x01\\x02\\x01",
+                    "name": "certificatePolicies"
+                  },
+                  {
+                    "data": "0$0\"\\xa0 \\xa0\\x1e\\x86\\x1chttp://e6.c.lencr.org/47.crl",
+                    "name": "crlDistributionPoints"
+                  },
+                  {
+                    "data": "\\x04\\x81\\xf3\\x00\\xf1\\x00w\\x00}Y\\x1e\\x12\\xe1x*{\\x1cag|^\\xfd\\xf8\\xd0\\x87\\\\\\x14\\xa0N\\x95\\x9e\\xb9\\x03/\\xd9\\x0e\\x8c.y\\xb8\\x00\\x00\\x01\\x97\\xea\\xf7\\xfd\\xf4\\x00\\x00\\x04\\x03\\x00H0F\\x02!\\x00\\x953\\xc3g.6\\xa4\\x07\\xa3R\\xda\\xe7\\x940.\\xa4\\x15L`\\xa1\\x02\\x82\\x164f3\\xe3G\\xf5e\\xf7\\xa0\\x02!\\x00\\x93\\xdd\\xdd\\x801\\xf5B{\\xb8Q0\\xa1\\x86\\x899%\\xff\\x17Dyx)Ne\\xa5Lg\\x81\\xe6\\xcb\\r9\\x00v\\x00\\x12\\xf1N4\\xbdSrL\\x84\\x06\\x19\\xc3\\x8f?z\\x13\\xf8\\xe7\\xb5b\\x87\\x88\\x9cm0\\x05\\x84\\xeb\\xe5\\x86&:\\x00\\x00\\x01\\x97\\xea\\xf8\\x05\\xbd\\x00\\x00\\x04\\x03\\x00G0E\\x02!\\x00\\xf9\\xfeB\\x10\\x9e\\x83\\x7f\\xd7\\xda[\\r\\x18}su\\x91w%\\xa2B\\xd7\\xecD\\x8f\\x9e\\x8b\\xe6\\x1b\\xbe\\xfd\\xe1\\xce\\x02 G[z\\x1fg\\xcf\\xc5\\xa1\\xa2\\xe4c@\\x07\\x04\\xe0IH\\xfe[QZ|)\\x14\\xc6\\x06,\\xd8\\xa2;\\xea\\x0f",
+                    "name": "ct_precert_scts"
+                  }
+                ],
+                "fingerprint": {
+                  "sha256": "30d9b4327f5fbf773773c460acaf8aef14801913d019013ec63c4af3904f46d2",
+                  "sha1": "88b9b4a796676314f3600f9c5b93106ebb4dcced"
+                },
+                "serial": 466981999359858676421243960756125499938350,
+                "issuer": {
+                  "C": "US",
+                  "CN": "E6",
+                  "O": "Let's Encrypt"
+                },
+                "expired": false,
+                "subject": {
+                  "CN": "www.ergonomicgardens.com"
+                }
+              },
+              "cipher": {
+                "version": "TLSv1.3",
+                "bits": 256,
+                "name": "TLS_AES_256_GCM_SHA384"
+              },
+              "trust": {
+                "revoked": false,
+                "browser": null
+              },
+              "handshake_states": [
+                "before SSL initialization",
+                "SSLv3/TLS write client hello",
+                "SSLv3/TLS read server hello",
+                "TLSv1.3 read encrypted extensions",
+                "SSLv3/TLS read server certificate",
+                "TLSv1.3 read server certificate verify",
+                "SSLv3/TLS read finished",
+                "SSLv3/TLS write change cipher spec",
+                "SSLv3/TLS write finished",
+                "SSL negotiation finished successfully"
+              ],
+              "ja3s": "93546012d50bbfdd5a94bc6b31fcafea",
+              "ocsp": {}
+            },
+            "hostnames": [
+              "www.ergonomicgardens.com"
+            ],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [
+              "ergonomicgardens.com"
+            ],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Wed, 27 Aug 2025 04:25:01 GMT\r\nContent-Type: text/html; charset=UTF-8\r\nTransfer-Encoding: chunked\r\nConnection: close\r\naccept-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA\r\ncf-mitigated: challenge\r\ncritical-ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA\r\ncross-origin-embedder-policy: require-corp\r\ncross-origin-opener-policy: same-origin\r\ncross-origin-resource-policy: same-origin\r\norigin-agent-cluster: ?1\r\npermissions-policy: accelerometer=(),autoplay=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()\r\nreferrer-policy: same-origin\r\nserver-timing: chlray;desc=\"9758cd777a281684\"\r\nx-content-type-options: nosniff\r\nx-frame-options: SAMEORIGIN\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nSet-Cookie: __cf_bm=NwwUBpSZRVY3rG8dYbPzE2RmDO3rBoZm6Pt3_sR3qYE-1756268701-1.0.1.1-aQcE2YfVeZ.yieTztlhk1mSlF.Tw.yeYtyj7mIjI79U_3HynwSeGzqc9jgAaUGLhs5YRaK406fb9V3Sy5SyfPB2J_AZvMx8rlfnvOWD8_W4; path=/; expires=Wed, 27-Aug-25 04:55:01 GMT; domain=.www.ergonomicgardens.com; HttpOnly; Secure; SameSite=None\r\nVary: Accept-Encoding\r\nServer: cloudflare\r\nCF-RAY: 9758cd777a281684-SJC\r\nalt-svc: h3=\":443\"; ma=86400\r\n\r\n",
+            "port": 443,
+            "opts": {
+              "vulns": [],
+              "heartbleed": "2025/08/27 04:25:15 141.193.213.11:443 - ERROR: remote error: handshake failure\n"
+            },
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": -551757223,
+            "asn": "AS209242",
+            "http": {
+              "status": 400,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1391280995,
+              "securitytxt": null,
+              "title": "400 The plain HTTP request was sent to HTTPS port",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": 1678420308,
+              "headers_hash": 96733798,
+              "host": "141.193.213.11",
+              "html": "<html>\r\n<head><title>400 The plain HTTP request was sent to HTTPS port</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<center>The plain HTTP request was sent to HTTPS port</center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n",
+              "server_hash": 958142897,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "html_hash": 141477257
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "transport": "tcp",
+            "timestamp": "2025-08-08T15:47:46.420703",
+            "isp": "Cloudflare London, LLC",
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "ece74baf084aa99e6422133ec0b84bafd391fc44",
+              "options": {},
+              "module": "auto",
+              "id": "60febda0-5043-4998-a70d-18a65b3d6d24"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 400 Bad Request\r\nServer: cloudflare\r\nDate: Fri, 08 Aug 2025 15:48:31 GMT\r\nContent-Type: text/html\r\nContent-Length: 655\r\nConnection: close\r\nCF-RAY: -\r\n\r\n",
+            "port": 2053,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": 1493552820,
+            "asn": "AS209242",
+            "http": {
+              "status": 403,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1039101684,
+              "securitytxt": null,
+              "title": "Direct IP access not allowed | Cloudflare",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": -1402009044,
+              "headers_hash": 144737606,
+              "host": "141.193.213.11",
+              "html": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n<title>Direct IP access not allowed | Cloudflare</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n\n\n<script>\n(function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById(\"error-feedback-survey\"),d=document.getElementById(\"error-feedback-success\"),b=new XMLHttpRequest;a={event:\"feedback clicked\",properties:{errorCode:1003,helpful:a,version:1}};b.open(\"POST\",\"https://sparrow.cloudflare.com/api/v1/event\");b.setRequestHeader(\"Content-Type\",\"application/json\");b.setRequestHeader(\"Sparrow-Source-Key\",\"c771f0e4b54944bebf4261d44bd79a1e\");\nb.send(JSON.stringify(a));c.classList.add(\"feedback-hidden\");d.classList.remove(\"feedback-hidden\")};document.addEventListener(\"DOMContentLoaded\",function(){var a=document.getElementById(\"error-feedback\"),c=document.getElementById(\"feedback-button-yes\"),d=document.getElementById(\"feedback-button-no\");\"classList\"in a&&(a.classList.remove(\"feedback-hidden\"),c.addEventListener(\"click\",function(){e(!0)}),d.addEventListener(\"click\",function(){e(!1)}))})}})();\n</script>\n\n<script defer src=\"https://performance.radar.cloudflare.com/beacon.js\"></script>\n</head>\n<body>\n  <div id=\"cf-wrapper\">\n    <div class=\"cf-alert cf-alert-error cf-cookie-error hidden\" id=\"cookie-alert\" data-translate=\"enable_cookies\">Please enable cookies.</div>\n    <div id=\"cf-error-details\" class=\"p-0\">\n      <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased\">\n         <h1 class=\"inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight\">\n           <span data-translate=\"error\">Error</span>\n           <span>1003</span>\n         </h1>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">Ray ID: 975dde256a0f69de &bull;</span>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">2025-08-27 19:10:13 UTC</span>\n        <h2 class=\"text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light\">Direct IP access not allowed</h2>\n      </header>\n\n      <section class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n          <div id=\"what-happened-section\" class=\"w-1/2 md:w-full\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_happened\">What happened?</h2>\n            <p>You've requested an IP address that is part of the <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">Cloudflare</a> network. A valid Host header must be supplied to reach the desired website.</p>\n            \n              <p>Please see <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/\" target=\"_blank\">https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/</a> for more details.</p>\n            \n          </div>\n\n          \n          <div id=\"resolution-copy-section\" class=\"w-1/2 mt-6 text-15 leading-normal\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_can_i_do\">What can I do?</h2>\n            <p>If you are interested in learning more about Cloudflare, please <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">visit our website</a>.</p>\n          </div>\n          \n      </section>\n\n      <div class=\"feedback-hidden py-8 text-center\" id=\"error-feedback\">\n    <div id=\"error-feedback-survey\" class=\"footer-line-wrapper\">\n        Was this page helpful?\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-yes\" type=\"button\">Yes</button>\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-no\" type=\"button\">No</button>\n    </div>\n    <div class=\"feedback-success feedback-hidden\" id=\"error-feedback-success\">\n        Thank you for your feedback!\n    </div>\n</div>\n\n\n      <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n  <p class=\"text-13\">\n    <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">975dde256a0f69de</strong></span>\n    <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n      Your IP:\n      <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n      <span class=\"hidden\" id=\"cf-footer-ip\">224.195.188.89</span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    </span>\n    <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n    \n  </p>\n  <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n</div><!-- /.error-footer -->\n\n\n    </div><!-- /#cf-error-details -->\n  </div><!-- /#cf-wrapper -->\n\n  <script>\n  window._cf_translation = {};\n  \n  \n</script>\n\n</body>\n</html>\n",
+              "server_hash": 958142897,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "html_hash": -2081007331
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "transport": "tcp",
+            "timestamp": "2025-08-27T19:10:13.352896",
+            "isp": "Cloudflare London, LLC",
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "c64d77c38eb400e347e122d201f3e13c88526116",
+              "options": {},
+              "module": "http-simple-new",
+              "id": "b02ad5c7-4df6-48a5-846a-0f93a1734100"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Wed, 27 Aug 2025 19:10:13 GMT\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 6235\r\nConnection: close\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nVary: Accept-Encoding\r\nServer: cloudflare\r\nCF-RAY: 975dde256a0f69de-DFW\r\n\r\n",
+            "port": 2082,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": -1136769374,
+            "asn": "AS209242",
+            "http": {
+              "status": 400,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1391280995,
+              "securitytxt": null,
+              "title": "400 The plain HTTP request was sent to HTTPS port",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": 1678420308,
+              "headers_hash": 96733798,
+              "host": "141.193.213.11",
+              "html": "<html>\r\n<head><title>400 The plain HTTP request was sent to HTTPS port</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<center>The plain HTTP request was sent to HTTPS port</center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n",
+              "server_hash": 958142897,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "html_hash": 141477257
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "transport": "tcp",
+            "timestamp": "2025-08-27T15:34:31.636362",
+            "isp": "Cloudflare London, LLC",
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "b35f2b671af47d1502a0fb2aa1868285e47d1df9",
+              "options": {},
+              "module": "https-simple-new",
+              "id": "9322e613-0ffa-4237-96c9-3dabf2cfd38e"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 400 Bad Request\r\nServer: cloudflare\r\nDate: Wed, 27 Aug 2025 15:35:10 GMT\r\nContent-Type: text/html\r\nContent-Length: 655\r\nConnection: close\r\nCF-RAY: -\r\n\r\n",
+            "port": 2083,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": -1404968223,
+            "asn": "AS209242",
+            "http": {
+              "status": 403,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1039101684,
+              "securitytxt": null,
+              "title": "Direct IP access not allowed | Cloudflare",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": -1402009044,
+              "headers_hash": 144737606,
+              "host": "141.193.213.11",
+              "html": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n<title>Direct IP access not allowed | Cloudflare</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n\n\n<script>\n(function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById(\"error-feedback-survey\"),d=document.getElementById(\"error-feedback-success\"),b=new XMLHttpRequest;a={event:\"feedback clicked\",properties:{errorCode:1003,helpful:a,version:1}};b.open(\"POST\",\"https://sparrow.cloudflare.com/api/v1/event\");b.setRequestHeader(\"Content-Type\",\"application/json\");b.setRequestHeader(\"Sparrow-Source-Key\",\"c771f0e4b54944bebf4261d44bd79a1e\");\nb.send(JSON.stringify(a));c.classList.add(\"feedback-hidden\");d.classList.remove(\"feedback-hidden\")};document.addEventListener(\"DOMContentLoaded\",function(){var a=document.getElementById(\"error-feedback\"),c=document.getElementById(\"feedback-button-yes\"),d=document.getElementById(\"feedback-button-no\");\"classList\"in a&&(a.classList.remove(\"feedback-hidden\"),c.addEventListener(\"click\",function(){e(!0)}),d.addEventListener(\"click\",function(){e(!1)}))})}})();\n</script>\n\n<script defer src=\"https://performance.radar.cloudflare.com/beacon.js\"></script>\n</head>\n<body>\n  <div id=\"cf-wrapper\">\n    <div class=\"cf-alert cf-alert-error cf-cookie-error hidden\" id=\"cookie-alert\" data-translate=\"enable_cookies\">Please enable cookies.</div>\n    <div id=\"cf-error-details\" class=\"p-0\">\n      <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased\">\n         <h1 class=\"inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight\">\n           <span data-translate=\"error\">Error</span>\n           <span>1003</span>\n         </h1>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">Ray ID: 975cc473696ff785 &bull;</span>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">2025-08-27 15:57:55 UTC</span>\n        <h2 class=\"text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light\">Direct IP access not allowed</h2>\n      </header>\n\n      <section class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n          <div id=\"what-happened-section\" class=\"w-1/2 md:w-full\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_happened\">What happened?</h2>\n            <p>You've requested an IP address that is part of the <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">Cloudflare</a> network. A valid Host header must be supplied to reach the desired website.</p>\n            \n              <p>Please see <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/\" target=\"_blank\">https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/</a> for more details.</p>\n            \n          </div>\n\n          \n          <div id=\"resolution-copy-section\" class=\"w-1/2 mt-6 text-15 leading-normal\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_can_i_do\">What can I do?</h2>\n            <p>If you are interested in learning more about Cloudflare, please <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">visit our website</a>.</p>\n          </div>\n          \n      </section>\n\n      <div class=\"feedback-hidden py-8 text-center\" id=\"error-feedback\">\n    <div id=\"error-feedback-survey\" class=\"footer-line-wrapper\">\n        Was this page helpful?\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-yes\" type=\"button\">Yes</button>\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-no\" type=\"button\">No</button>\n    </div>\n    <div class=\"feedback-success feedback-hidden\" id=\"error-feedback-success\">\n        Thank you for your feedback!\n    </div>\n</div>\n\n\n      <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n  <p class=\"text-13\">\n    <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">975cc473696ff785</strong></span>\n    <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n      Your IP:\n      <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n      <span class=\"hidden\" id=\"cf-footer-ip\">224.136.184.25</span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    </span>\n    <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n    \n  </p>\n  <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n</div><!-- /.error-footer -->\n\n\n    </div><!-- /#cf-error-details -->\n  </div><!-- /#cf-wrapper -->\n\n  <script>\n  window._cf_translation = {};\n  \n  \n</script>\n\n</body>\n</html>\n",
+              "server_hash": 958142897,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "html_hash": -705016442
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "transport": "tcp",
+            "timestamp": "2025-08-27T15:57:55.105140",
+            "isp": "Cloudflare London, LLC",
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "667c9d6cc4bbbf0594c20c6f1ba56a8147913fd0",
+              "options": {},
+              "module": "http-simple-new",
+              "id": "764e289c-6f89-48e1-9b71-012d3e59f591"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Wed, 27 Aug 2025 15:57:55 GMT\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 6234\r\nConnection: close\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nVary: Accept-Encoding\r\nServer: cloudflare\r\nCF-RAY: 975cc473696ff785-DFW\r\n\r\n",
+            "port": 2086,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "asn": "AS209242",
+            "hash": 402432565,
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "timestamp": "2025-08-27T20:04:42.235534",
+            "isp": "Cloudflare London, LLC",
+            "transport": "tcp",
+            "_shodan": {
+              "region": "na",
+              "module": "language-server-protocol",
+              "ptr": true,
+              "options": {},
+              "id": "e1578c41-9312-42a9-9c54-392d1a4bed0a",
+              "crawler": "58f2541f841cc4e55a875003cfafa07e7113cb16"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 400 Bad Request\r\nServer: cloudflare\r\nDate: Wed, 27 Aug 2025 20:04:42 GMT\r\nContent-Type: text/html\r\nContent-Length: 155\r\nConnection: close\r\nCF-RAY: -\r\n\r\n<html>\r\n<head><title>400 Bad Request</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n",
+            "port": 2087,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": 1842083919,
+            "product": "CloudFlare",
+            "http": {
+              "status": 403,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1039101684,
+              "securitytxt": null,
+              "title": "Direct IP access not allowed | Cloudflare",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": -1402009044,
+              "headers_hash": 144737606,
+              "host": "141.193.213.11",
+              "html": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\" lang=\"en-US\"> <!--<![endif]-->\n<head>\n<title>Direct IP access not allowed | Cloudflare</title>\n<meta charset=\"UTF-8\" />\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />\n<meta name=\"robots\" content=\"noindex, nofollow\" />\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n<link rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/main.css\" />\n\n\n<script>\n(function(){if(document.addEventListener&&window.XMLHttpRequest&&JSON&&JSON.stringify){var e=function(a){var c=document.getElementById(\"error-feedback-survey\"),d=document.getElementById(\"error-feedback-success\"),b=new XMLHttpRequest;a={event:\"feedback clicked\",properties:{errorCode:1003,helpful:a,version:1}};b.open(\"POST\",\"https://sparrow.cloudflare.com/api/v1/event\");b.setRequestHeader(\"Content-Type\",\"application/json\");b.setRequestHeader(\"Sparrow-Source-Key\",\"c771f0e4b54944bebf4261d44bd79a1e\");\nb.send(JSON.stringify(a));c.classList.add(\"feedback-hidden\");d.classList.remove(\"feedback-hidden\")};document.addEventListener(\"DOMContentLoaded\",function(){var a=document.getElementById(\"error-feedback\"),c=document.getElementById(\"feedback-button-yes\"),d=document.getElementById(\"feedback-button-no\");\"classList\"in a&&(a.classList.remove(\"feedback-hidden\"),c.addEventListener(\"click\",function(){e(!0)}),d.addEventListener(\"click\",function(){e(!1)}))})}})();\n</script>\n\n<script defer src=\"https://performance.radar.cloudflare.com/beacon.js\"></script>\n</head>\n<body>\n  <div id=\"cf-wrapper\">\n    <div class=\"cf-alert cf-alert-error cf-cookie-error hidden\" id=\"cookie-alert\" data-translate=\"enable_cookies\">Please enable cookies.</div>\n    <div id=\"cf-error-details\" class=\"p-0\">\n      <header class=\"mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-15 antialiased\">\n         <h1 class=\"inline-block md:block mr-2 md:mb-2 font-light text-60 md:text-3xl text-black-dark leading-tight\">\n           <span data-translate=\"error\">Error</span>\n           <span>1003</span>\n         </h1>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">Ray ID: 9757265cac75ddb2 &bull;</span>\n         <span class=\"inline-block md:block heading-ray-id font-mono text-15 lg:text-sm lg:leading-relaxed\">2025-08-26 23:36:10 UTC</span>\n        <h2 class=\"text-gray-600 leading-1.3 text-3xl lg:text-2xl font-light\">Direct IP access not allowed</h2>\n      </header>\n\n      <section class=\"w-240 lg:w-full mx-auto mb-8 lg:px-8\">\n          <div id=\"what-happened-section\" class=\"w-1/2 md:w-full\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_happened\">What happened?</h2>\n            <p>You've requested an IP address that is part of the <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">Cloudflare</a> network. A valid Host header must be supplied to reach the desired website.</p>\n            \n              <p>Please see <a rel=\"noopener noreferrer\" href=\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/\" target=\"_blank\">https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1003/</a> for more details.</p>\n            \n          </div>\n\n          \n          <div id=\"resolution-copy-section\" class=\"w-1/2 mt-6 text-15 leading-normal\">\n            <h2 class=\"text-3xl leading-tight font-normal mb-4 text-black-dark antialiased\" data-translate=\"what_can_i_do\">What can I do?</h2>\n            <p>If you are interested in learning more about Cloudflare, please <a href=\"https://www.cloudflare.com/5xx-error-landing/\" target=\"_blank\">visit our website</a>.</p>\n          </div>\n          \n      </section>\n\n      <div class=\"feedback-hidden py-8 text-center\" id=\"error-feedback\">\n    <div id=\"error-feedback-survey\" class=\"footer-line-wrapper\">\n        Was this page helpful?\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-yes\" type=\"button\">Yes</button>\n        <button class=\"border border-solid bg-white cf-button cursor-pointer ml-4 px-4 py-2 rounded\" id=\"feedback-button-no\" type=\"button\">No</button>\n    </div>\n    <div class=\"feedback-success feedback-hidden\" id=\"error-feedback-success\">\n        Thank you for your feedback!\n    </div>\n</div>\n\n\n      <div class=\"cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300\">\n  <p class=\"text-13\">\n    <span class=\"cf-footer-item sm:block sm:mb-1\">Cloudflare Ray ID: <strong class=\"font-semibold\">9757265cac75ddb2</strong></span>\n    <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    <span id=\"cf-footer-item-ip\" class=\"cf-footer-item hidden sm:block sm:mb-1\">\n      Your IP:\n      <button type=\"button\" id=\"cf-footer-ip-reveal\" class=\"cf-footer-ip-reveal-btn\">Click to reveal</button>\n      <span class=\"hidden\" id=\"cf-footer-ip\">224.216.113.193</span>\n      <span class=\"cf-footer-separator sm:hidden\">&bull;</span>\n    </span>\n    <span class=\"cf-footer-item sm:block sm:mb-1\"><span>Performance &amp; security by</span> <a rel=\"noopener noreferrer\" href=\"https://www.cloudflare.com/5xx-error-landing\" id=\"brand_link\" target=\"_blank\">Cloudflare</a></span>\n    \n  </p>\n  <script>(function(){function d(){var b=a.getElementById(\"cf-footer-item-ip\"),c=a.getElementById(\"cf-footer-ip-reveal\");b&&\"classList\"in b&&(b.classList.remove(\"hidden\"),c.addEventListener(\"click\",function(){c.classList.add(\"hidden\");a.getElementById(\"cf-footer-ip\").classList.remove(\"hidden\")}))}var a=document;document.addEventListener&&a.addEventListener(\"DOMContentLoaded\",d)})();</script>\n</div><!-- /.error-footer -->\n\n\n    </div><!-- /#cf-error-details -->\n  </div><!-- /#cf-wrapper -->\n\n  <script>\n  window._cf_translation = {};\n  \n  \n</script>\n\n</body>\n</html>\n",
+              "html_hash": 1887913676,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "server_hash": 958142897
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "timestamp": "2025-08-26T23:36:10.986642",
+            "isp": "Cloudflare London, LLC",
+            "transport": "tcp",
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "882b86ace587f9a0c7e7358585830fb0a6fff519",
+              "options": {},
+              "module": "http-simple-new",
+              "id": "3b051aa4-4d7f-43a1-99ca-dbc4d230ac35"
+            },
+            "asn": "AS209242",
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Tue, 26 Aug 2025 23:36:10 GMT\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 6235\r\nConnection: close\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nVary: Accept-Encoding\r\nServer: cloudflare\r\nCF-RAY: 9757265cac75ddb2-DFW\r\n\r\n",
+            "port": 8080,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "hash": -1338851919,
+            "product": "CloudFlare",
+            "http": {
+              "status": 400,
+              "robots_hash": null,
+              "redirects": [],
+              "title_hash": -1391280995,
+              "securitytxt": null,
+              "title": "400 The plain HTTP request was sent to HTTPS port",
+              "sitemap_hash": null,
+              "waf": "Cloudflare (Cloudflare Inc.)",
+              "robots": null,
+              "dom_hash": 1678420308,
+              "headers_hash": 96733798,
+              "host": "141.193.213.11",
+              "html": "<html>\r\n<head><title>400 The plain HTTP request was sent to HTTPS port</title></head>\r\n<body>\r\n<center><h1>400 Bad Request</h1></center>\r\n<center>The plain HTTP request was sent to HTTPS port</center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n<!-- a padding to disable MSIE and Chrome friendly error page -->\r\n",
+              "html_hash": 141477257,
+              "location": "/",
+              "components": {
+                "Cloudflare": {
+                  "categories": [
+                    "CDN"
+                  ]
+                }
+              },
+              "securitytxt_hash": null,
+              "server": "cloudflare",
+              "sitemap": null,
+              "server_hash": 958142897
+            },
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "timestamp": "2025-08-27T07:01:18.440797",
+            "isp": "Cloudflare London, LLC",
+            "transport": "tcp",
+            "cpe": [
+              "cpe:/a:cloudflare:cloudflare"
+            ],
+            "_shodan": {
+              "region": "na",
+              "crawler": "a4815a8bfadb2b966b4697ac569130d1cfb605d4",
+              "options": {},
+              "module": "https",
+              "id": "c53c3932-7669-4b58-b804-6542ae64d8db"
+            },
+            "asn": "AS209242",
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "cpe23": [
+              "cpe:2.3:a:cloudflare:cloudflare"
+            ],
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 400 Bad Request\r\nServer: cloudflare\r\nDate: Wed, 27 Aug 2025 07:01:12 GMT\r\nContent-Type: text/html\r\nContent-Length: 655\r\nConnection: close\r\nCF-RAY: -\r\n\r\n",
+            "port": 8443,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          },
+          {
+            "asn": "AS209242",
+            "hash": 46189791,
+            "os": null,
+            "tags": [
+              "cdn"
+            ],
+            "timestamp": "2025-08-27T03:53:51.460648",
+            "isp": "Cloudflare London, LLC",
+            "transport": "tcp",
+            "_shodan": {
+              "region": "na",
+              "crawler": "882b86ace587f9a0c7e7358585830fb0a6fff519",
+              "options": {},
+              "module": "https-simple-new",
+              "id": "cdd72619-a26f-47da-afcb-0d5decc10044"
+            },
+            "hostnames": [],
+            "location": {
+              "city": "Berlin",
+              "region_code": "BE",
+              "area_code": null,
+              "longitude": 13.41053,
+              "latitude": 52.52437,
+              "country_code": "DE",
+              "country_name": "Germany"
+            },
+            "ip": 2378290443,
+            "domains": [],
+            "org": "WPEngine, Inc.",
+            "data": "HTTP/1.1 403 Forbidden\r\nDate: Wed, 27 Aug 2025 03:53:51 GMT\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Length: 16\r\nConnection: close\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\nCache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\nExpires: Thu, 01 Jan 1970 00:00:01 GMT\r\nServer: cloudflare\r\nCF-RAY: 97589fd09eeaf785-DFW\r\n\r\nerror code: 1003",
+            "port": 8880,
+            "opts": {},
+            "ip_str": "141.193.213.11"
+          }
+        ],
+        "analysis": {
+          "provider_classification": "unknown",
+          "security_score": 50,
+          "waf_detected": false,
+          "cdn_detected": false,
+          "cloud_provider": null,
+          "security_headers": [],
+          "vulnerabilities": [],
+          "open_ports": [
+            8080,
+            2082,
+            2083,
+            2053,
+            2086,
+            2087,
+            80,
+            8880,
+            8443,
+            443
+          ]
+        }
+      }
+    }
+  },
+  "security_findings": [
+    "Threat Level: high (confidence: 100%)",
+    "Domain Reputation: 40/100",
+    "Security policies detected: 2",
+    "IP Reputation: 50/100",
+    "⚠️ HIGH THREAT: Enhanced monitoring recommended",
+    "⚠️ HIGH RISK: Exercise extreme caution",
+    "🔍 Perform additional security verification",
+    "Technologies identified: 4 (Shodan Enhanced)",
+    "Shodan: Vulnerabilities detected - immediate patching required",
+    "Shodan: Security improvements recommended",
+    "Vulnerabilities found: 172 (Shodan)",
+    "Shodan Risk Score: 100/100",
+    "Vuln: Critical: Vulnerabilities detected - immediate patching required",
+    "Vuln: High risk: Enhanced monitoring recommended",
+    "SSL Trust Score: 100/100 (Shodan)",
+    "IP Security Score: 50/100 (Shodan)"
+  ],
+  "geographic_insights": [
+    "Location: Austin, United States (confidence: 100%)",
+    "ISP: Cloudflare London, LLC",
+    "Organization: WPEngine, Inc.",
+    "Shodan: Primary location - United States, Orlando"
+  ],
+  "bgp_insights": [
+    "HE BGP: AS209242 - Cloudflare London, LLC",
+    "BGP Peers: 8",
+    "IPv4 Prefixes: 353",
+    "Peering Diversity: medium"
+  ],
+  "recommendations": [
+    "⚠️ High security risk detected - review domain carefully",
+    "🎯 High confidence detection - results highly reliable"
+  ],
+  "technical_details": {
+    "confidence_factors": [
+      "HTTP header analysis identified 2 providers",
+      "NS record analysis identified DNS providers: Domains By Proxy,"
+    ],
+    "enhanced_confidence_factors": [
+      "DoH (DNS over HTTPS) analysis completed",
+      "BGP analysis completed with 4 insights",
+      "Advanced BGP classification: CLOUD_PROVIDER (88.0% confidence)",
+      "ASN confirmed as cloud provider",
+      "DNS security policies found: ['google_verified', 'spf']",
+      "Shodan cloud provider: GCP",
+      "Shodan cloud provider: AWS",
+      "Shodan ASN mapping: 4 networks",
+      "Shodan hosting pattern: cloud",
+      "Shodan hosting pattern: vpn",
+      "Shodan SSL CA: globalsign gcc r6 alphassl ca 2023",
+      "Shodan data richness: 83/100",
+      "Shodan hosts analyzed: 10",
+      "Shodan organization: WPEngine, Inc.",
+      "Cloudflare confirmed by 2 sources: HTTP Headers, Security Headers",
+      "Domains By Proxy, confirmed by 6 sources: NS Records, NS Records, NS Records, NS Records, NS Records, NS Records"
+    ],
+    "analysis_methods": [
+      "HTTP Headers",
+      "NS Record Analysis",
+      "VirusTotal API",
+      "SSL Certificate Analysis",
+      "Enhanced DNS Analysis",
+      "Geographic Intelligence",
+      "Dual BGP Analysis",
+      "Advanced BGP Customer Classification",
+      "Threat Intelligence",
+      "Shodan Enhanced Infrastructure Analysis"
+    ],
+    "dns_chain": null,
+    "whois_data": null
+  }
+}

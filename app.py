@@ -417,9 +417,11 @@ def process_single_url(url, progress_callback=None):
     # Format providers by role
     origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
     cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
-    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
+    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['WAF', 'Security']]
     lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
     dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
+    hosting_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Hosting', 'Host']]
+    cloud_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Cloud', 'Cloud Provider']]
     
     return {
         'URL': url,
@@ -430,6 +432,9 @@ def process_single_url(url, progress_callback=None):
         'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
         'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
         'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
+        'Hosting_Providers': ', '.join(hosting_providers) if hosting_providers else 'None',
+        'Cloud_Providers': ', '.join(cloud_providers) if cloud_providers else 'None',
+        'Security_Providers': ', '.join(waf_providers) if waf_providers else 'None',  # Same as WAF for now
         'Confidence_Factors': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low',
         'DNS_Chain': enhanced_result.get('dns_chain', 'N/A'),
         'DNS_Analysis': enhanced_result.get('dns_analysis', {}),
@@ -1395,7 +1400,8 @@ def main():
                         'CDN_Providers': 'CDN Providers',
                         'DNS_Providers': 'DNS Providers',
                         'Hosting_Providers': 'Hosting Providers',
-                        'Cloud_Providers': 'Cloud Providers'
+                        'Cloud_Providers': 'Cloud Providers',
+                        'Security_Providers': 'Security Providers'
                     }
                     
                     for key, category in provider_categories.items():

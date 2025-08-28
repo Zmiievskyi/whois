@@ -830,6 +830,19 @@ class EnhancedProviderDetector(ProviderDetector):
                         result['providers'].append(cdn_provider)
                         result['enhanced_confidence_factors'].append(f"Shodan CDN detection: {cdn}")
                     
+                    # Add hosting providers
+                    hosting_providers = provider_classification.get('hosting_providers', [])
+                    for hosting in hosting_providers:
+                        hosting_provider = {
+                            'name': hosting,
+                            'role': 'Hosting',
+                            'confidence': 'High',
+                            'source': 'Shodan Hosting Classification',
+                            'evidence': 'Detected via Shodan hosting analysis'
+                        }
+                        result['providers'].append(hosting_provider)
+                        result['enhanced_confidence_factors'].append(f"Shodan hosting provider: {hosting}")
+                    
                     # Add WAF providers
                     waf_providers = provider_classification.get('waf_providers', [])
                     for waf in waf_providers:
