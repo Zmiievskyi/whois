@@ -1,0 +1,90 @@
+Category,Key,Value
+Domain,URL,arsenal.co.uk
+Network,IP_Address,217.19.248.132
+Confidence,Enhanced_Confidence,100%
+Analysis,Timestamp,2025-08-28 22:36:51 UTC
+Providers,Primary Provider,Safenames Datacentre
+Providers,CDN Providers,"AWS, AKAMAI, IMPERVA, Amazon.com, Inc., Akamai Technologies, Inc., Imperva Ltd., Akamai International, BV, Incapsula Inc"
+Providers,DNS Providers,Safenames
+Providers,Hosting Providers,AWS
+Providers,Cloud Providers,"AWS, AKAMAI, DIGITALOCEAN, AZURE, GCP, LINODE, VULTR"
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Advanced BGP Classification,completed | +15% confidence | 1 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +-1350% confidence | 13 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
+,,
+=== SHODAN PREMIUM ANALYSIS DETAILS ===,,
+Shodan WAF,Detection Success,True
+Shodan WAF,WAF Detected,False
+,,
+=== SHODAN OPTIMIZATION ANALYTICS ===,,
+Shodan Optimization,Queries Executed,13
+Shodan Optimization,Total Results Available,2324619
+Shodan Optimization,Unique Hosts Collected,65
+Shodan Queries,Query 1,Primary hostname search (1 results)
+Shodan Queries,Query 2,SSL certificate subject search (1 results)
+Shodan Queries,Query 3,HTML content references (0 results)
+Shodan Queries,Query 4,HTTP title tag references (0 results)
+Shodan Queries,Query 5,Visual infrastructure with screenshots (0 results)
+,,
+=== SHODAN STATISTICAL INSIGHTS ===,,
+Shodan Statistics,Total Unique Hosts,65
+Shodan Statistics,Unique IP Addresses,65
+Shodan Statistics,Unique Ports,25
+Shodan Statistics,Countries Detected,11
+Shodan Statistics,SSL Prevalence,69.2%
+Shodan Statistics,Top Ports,"443(26), 80(7), 2082(3)"
+Shodan Statistics,Top Countries,"United Kingdom(41), Czechia(6), France(5)"
+,,
+=== SHODAN EFFICIENCY METRICS ===,,
+Shodan Efficiency,Optimization Level,advanced
+Shodan Efficiency,Credits Used,13
+Shodan Efficiency,Data Completeness,0.0% (limited)
+,,
+=== SHODAN CONFIGURATION ===,,
+Shodan Config,API Plan Detected,Paid Plan (High limits detected)
+Shodan Config,Overall Efficiency,excellent
+Shodan Config,Credit to Data Ratio,5.0
+Shodan Config,Optimization Tips,4 suggestions available
+Shodan Config,Tip 1,Large result set detected - consider using facets for targeted analysis
+Shodan Config,Tip 2,Use count() API for statistical insights without consuming search credits
+Shodan Config,Tip 3,Enable has_screenshot facet for visual infrastructure analysis
+Shodan Config,Follow-up Queries,3 queries recommended
+Shodan Config,Next Query 1,Explore all infrastructure from Incapsula Inc (Priority: high)
+Shodan Config,Next Query 2,Analyze ASN as19551 infrastructure (Priority: medium)
+Shodan Providers,Cloud Providers,"AWS, AKAMAI, DIGITALOCEAN, AZURE, GCP, LINODE, VULTR"
+Shodan Providers,CDN Providers,"AKAMAI, IMPERVA, Amazon.com, Inc., Akamai Technologies, Inc., Imperva Ltd., Akamai International, BV, Incapsula Inc"
+Shodan Providers,WAF Providers,IMPERVA
+Shodan Providers,Primary Infrastructure,Incapsula Inc
+Shodan Technology,Technologies Detected,12 technologies
+Shodan Technology,Technology List,"microsoft rpc endpoint mapper, postfix smtpd, microsoft iis httpd, 3cx phone system management console, akamaighost, cloudfront httpd, whm, pure-ftpd, nginx, apache httpd"
+Shodan Technology,Web Servers,"apache httpd (x5), microsoft iis httpd 10.0 (x2), akamaighost (x3), apache httpd 2.4.58 (x1), nginx (x4), apache httpd 2.4.41 (x1), apache httpd 2.4.63 (x1), apache httpd 2.4.52 (x1), nginx 1.18.0 (x2), apache httpd 2.4.62 (x1), apache httpd 2.2.16 (x1), nginx 1.22.1 (x2), apache httpd 2.4.25 (x2)"
+Shodan Security,Security Score,0/100
+Shodan Security,WAF Indicators,5 indicators
+Shodan Security,Sample WAF Indicators,"WAF-like response: 403, WAF-like response: 403, WAF-like response: 403, WAF-like response: 403, WAF-like response: 403"
+Shodan Security,Security Headers,0 headers detected
+Shodan Security,Security Recommendations,2 recommendations
+Shodan Security,Primary Recommendation,Vulnerabilities detected - immediate patching required
+Shodan Infrastructure,Geographic Locations,35 locations
+Shodan Infrastructure,Primary Location,"United Kingdom, London (14 hosts)"
+Shodan Infrastructure,ASN Networks,32 networks
+Shodan Infrastructure,Primary ASN,AS16276 - OVH SAS
+Shodan Infrastructure,Open Ports,25 ports detected
+Shodan Infrastructure,Hosting Patterns,"cdn, starttls, eol-product, cloud, self-signed"
+Shodan Vulnerabilities,Vulnerabilities Found,745
+Shodan Vulnerabilities,Risk Score,100/100
+Shodan Vulnerabilities,Sample CVEs,"CVE-2024-47252, CVE-2024-38475, CVE-2024-27316"
+Shodan Vulnerabilities,Severity Breakdown,high: 745
+Shodan Vulnerabilities,Security Recommendations,Critical: Vulnerabilities detected - immediate patching required
+Shodan SSL,SSL Trust Score,100/100
+Shodan SSL,Certificate Authorities,"go daddy secure certificate authority - g2, geotrust tls rsa ca g1, digicert global g2 tls rsa sha256 2020 ca1, r13, digicert tls rsa sha256 2020 ca1, r3, gandicert, r11, globalsign atlas r3 dv tls ca 2025 q2, globalsign rsa ov ssl ca 2018, globalsign atlas r3 dv tls ca 2025 q3, e5, r10, digicert tls hybrid ecc sha384 2020 ca1, e6, sectigo rsa domain validation secure server ca, globalsign gcc r6 alphassl ca 2023, imap.example.com"
+Shodan SSL,SSL Configurations,45 configurations
+Shodan SSL,Primary SSL Config,TLSv1.2 (256 bits)
+Shodan Quality,Data Richness Score,100/100
+Shodan Quality,Hosts Analyzed,65
+Shodan Quality,Analysis Confidence,100%

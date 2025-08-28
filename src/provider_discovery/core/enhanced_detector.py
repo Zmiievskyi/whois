@@ -1926,6 +1926,125 @@ class EnhancedProviderDetector(ProviderDetector):
                 
         except Exception as e:
             logger.debug(f"Cleanup failed: {e}")
+    
+    def _generate_comprehensive_csv(self, result: Dict, domain: str) -> str:
+        """Generate comprehensive CSV content for WebUI downloads"""
+        import csv
+        import io
+        
+        # Create StringIO buffer for CSV content
+        csv_buffer = io.StringIO()
+        writer = csv.writer(csv_buffer)
+        writer.writerow(['Category', 'Key', 'Value'])
+        
+        # Basic info
+        writer.writerow(['Domain', 'URL', result.get('URL', domain)])
+        writer.writerow(['Network', 'IP_Address', result.get('IP_Address', 'N/A')])
+        
+        # Fix confidence display
+        confidence_value = result.get('Enhanced_Confidence', 0)
+        if isinstance(confidence_value, (int, float)):
+            confidence_display = f"{confidence_value}%"
+        else:
+            confidence_display = str(confidence_value)
+        writer.writerow(['Confidence', 'Enhanced_Confidence', confidence_display])
+        
+        writer.writerow(['Analysis', 'Timestamp', result.get('timestamp', 'N/A')])
+        
+        # Provider results
+        provider_categories = {
+            'Primary_Provider': 'Primary Provider',
+            'CDN_Providers': 'CDN Providers',
+            'DNS_Providers': 'DNS Providers',
+            'Hosting_Providers': 'Hosting Providers',
+            'Cloud_Providers': 'Cloud Providers',
+            'Security_Providers': 'Security Providers'
+        }
+        
+        for key, category in provider_categories.items():
+            value = result.get(key, 'None')
+            if isinstance(value, list):
+                # Remove duplicates and join
+                unique_values = list(dict.fromkeys([str(v) for v in value if v]))
+                value = ', '.join(unique_values) if unique_values else 'None'
+            elif not value or value == [] or value is None:
+                value = 'None'
+            # Clean value to prevent CSV formatting issues
+            if isinstance(value, str):
+                value = value.replace('\n', ' ').replace('\r', ' ').strip()
+                if not value:
+                    value = 'None'
+            writer.writerow(['Providers', category, value])
+        
+        # Analysis steps summary
+        steps_report = result.get('analysis_steps_report', {})
+        for step_key, step_data in steps_report.items():
+            step_name = step_data.get('step_name', step_key)
+            status = step_data.get('status', 'unknown')
+            confidence_impact = step_data.get('confidence_impact', 0)
+            findings_count = len(step_data.get('findings', []))
+            
+            writer.writerow(['Analysis Steps', step_name, f"{status} | +{confidence_impact}% confidence | {findings_count} findings"])
+        
+        # Enhanced Shodan Analysis Details
+        shodan_analysis = result.get('Enhanced_Analysis', {}).get('shodan_analysis', {})
+        if shodan_analysis:
+            writer.writerow(['', '', ''])  # Empty row for separation
+            writer.writerow(['=== SHODAN PREMIUM ANALYSIS DETAILS ===', '', ''])
+            
+            # Technology Stack Details
+            tech_stack = shodan_analysis.get('technology_stack', {})
+            if tech_stack and tech_stack.get('success'):
+                
+                # Multi-Query Strategy Results
+                raw_shodan_data = tech_stack.get('raw_shodan_data', {})
+                if raw_shodan_data:
+                    writer.writerow(['', '', ''])  # Separator
+                    writer.writerow(['=== SHODAN OPTIMIZATION ANALYTICS ===', '', ''])
+                    
+                    # Multi-query strategy metrics
+                    multi_query_strategy = raw_shodan_data.get('multi_query_strategy', [])
+                    if multi_query_strategy:
+                        writer.writerow(['Shodan Optimization', 'Queries Executed', len(multi_query_strategy)])
+                        writer.writerow(['Shodan Optimization', 'Total Results Available', raw_shodan_data.get('total_results_across_queries', 0)])
+                        writer.writerow(['Shodan Optimization', 'Unique Hosts Collected', raw_shodan_data.get('unique_hosts_collected', 0)])
+                        
+                        # Query breakdown
+                        for i, query_info in enumerate(multi_query_strategy[:5]):  # Show top 5 queries
+                            writer.writerow(['Shodan Queries', f'Query {i+1}', f"{query_info.get('description', 'Unknown')} ({query_info.get('results_count', 0)} results)"])
+                    
+                    # Statistical insights
+                    statistical_insights = raw_shodan_data.get('statistical_insights', {})
+                    if statistical_insights:
+                        writer.writerow(['', '', ''])  # Separator
+                        writer.writerow(['=== SHODAN STATISTICAL INSIGHTS ===', '', ''])
+                        
+                        # Host distribution
+                        host_dist = statistical_insights.get('host_distribution', {})
+                        if host_dist:
+                            writer.writerow(['Shodan Statistics', 'Total Unique Hosts', host_dist.get('total_unique_hosts', 0)])
+                            writer.writerow(['Shodan Statistics', 'Unique IP Addresses', host_dist.get('unique_ips', 0)])
+                            writer.writerow(['Shodan Statistics', 'Unique Ports', host_dist.get('unique_ports', 0)])
+                            writer.writerow(['Shodan Statistics', 'Countries Detected', host_dist.get('countries_detected', 0)])
+                
+                # Provider Classification from Shodan
+                provider_classification = tech_stack.get('provider_classification', {})
+                if provider_classification:
+                    cloud_providers = provider_classification.get('cloud_providers', [])
+                    if cloud_providers:
+                        writer.writerow(['Shodan Providers', 'Cloud Providers', ', '.join(cloud_providers)])
+                    
+                    hosting_providers = provider_classification.get('hosting_providers', [])
+                    if hosting_providers:
+                        writer.writerow(['Shodan Providers', 'Hosting Providers', ', '.join(hosting_providers)])
+                
+                # Technology Analysis
+                technologies = tech_stack.get('technologies', [])
+                if technologies:
+                    writer.writerow(['Shodan Technology', 'Technologies Detected', f"{len(technologies)} technologies"])
+                    writer.writerow(['Shodan Technology', 'Technology List', ', '.join(technologies[:10])])  # Limit to first 10
+        
+        return csv_buffer.getvalue()
 
 # Singleton instance
 _enhanced_detector = None

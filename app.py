@@ -1478,7 +1478,8 @@ def main():
                         "analysis_methods": result.get('analysis_methods', []),
                         "dns_chain": result.get('dns_chain'),
                         "whois_data": result.get('whois_data')
-                    }
+                    },
+                    "comprehensive_analysis": result.get('Comprehensive_Analysis', {})
                 }
                 
                 # Format data for different download formats
@@ -1496,80 +1497,55 @@ def main():
                     )
                 
                 with col2:
-                    # CSV download (simplified view)
+                    # CSV download (comprehensive view with full Shodan analytics)
                     
-                    # Create CSV data
-                    csv_rows = []
-                    
-                    # Basic info
-                    csv_rows.append({
-                        'Category': 'Domain',
-                        'Key': 'URL',
-                        'Value': result.get('URL', 'N/A')
-                    })
-                    csv_rows.append({
-                        'Category': 'Network', 
-                        'Key': 'IP_Address',
-                        'Value': result.get('IP_Address', 'N/A')
-                    })
-                    # Fix confidence display
-                    confidence_value = result.get('Enhanced_Confidence', 0)
-                    if isinstance(confidence_value, (int, float)):
-                        confidence_display = f"{confidence_value}%"
-                    else:
-                        confidence_display = str(confidence_value)
-                    csv_rows.append({
-                        'Category': 'Confidence',
-                        'Key': 'Enhanced_Confidence',
-                        'Value': confidence_display
-                    })
-                    
-                    # Provider results
-                    provider_categories = {
-                        'Primary_Provider': 'Primary Provider',
-                        'CDN_Providers': 'CDN Providers',
-                        'DNS_Providers': 'DNS Providers',
-                        'Hosting_Providers': 'Hosting Providers',
-                        'Cloud_Providers': 'Cloud Providers',
-                        'Security_Providers': 'Security Providers'
-                    }
-                    
-                    for key, category in provider_categories.items():
-                        value = result.get(key, 'None')
-                        if isinstance(value, list):
-                            # Remove duplicates and join
-                            unique_values = list(dict.fromkeys([str(v) for v in value if v]))  # Preserve order, remove duplicates and empty values
-                            value = ', '.join(unique_values) if unique_values else 'None'
-                        elif not value or value == [] or value is None:
-                            value = 'None'
-                        # Clean value to prevent CSV formatting issues
-                        if isinstance(value, str):
-                            value = value.replace('\n', ' ').replace('\r', ' ').strip()
-                            if not value:  # If after cleaning the string is empty
-                                value = 'None'
-                        csv_rows.append({
-                            'Category': 'Providers',
-                            'Key': category,
-                            'Value': value
-                        })
-                    
-                    # Analysis steps summary
-                    steps_report = result.get('analysis_steps_report', {})
-                    for step_key, step_data in steps_report.items():
-                        step_name = step_data.get('step_name', step_key)
-                        status = step_data.get('status', 'unknown')
-                        confidence_impact = step_data.get('confidence_impact', 0)
-                        findings_count = len(step_data.get('findings', []))
+                    # Generate comprehensive CSV using the same logic as file saves
+                    try:
+                        from src.provider_discovery.core.enhanced_detector import EnhancedProviderDetector
                         
-                        csv_rows.append({
-                            'Category': 'Analysis Steps',
-                            'Key': step_name,
-                            'Value': f"{status} | +{confidence_impact}% confidence | {findings_count} findings"
-                        })
-                    
-                    df = pd.DataFrame(csv_rows)
-                    csv_buffer = io.StringIO()
-                    df.to_csv(csv_buffer, index=False)
+                        # Create detector instance to use CSV generation method
+                        detector_instance = EnhancedProviderDetector()
+                        
+                        # Use the same comprehensive CSV generation as file saves
+                        csv_content = detector_instance._generate_comprehensive_csv(download_data, result.get('URL', 'unknown'))
+                        
+                        csv_buffer = io.StringIO()
+                        csv_buffer.write(csv_content)
+                        
+                    except Exception as e:
+                        # Fallback to basic CSV if comprehensive generation fails
+                        st.warning(f"Using simplified CSV due to error: {str(e)}")
+                        
+                        # Create basic CSV data as fallback
+                        csv_rows = []
+                        
+                        # Basic info
+                        csv_rows.append({'Category': 'Domain', 'Key': 'URL', 'Value': result.get('URL', 'N/A')})
+                        csv_rows.append({'Category': 'Network', 'Key': 'IP_Address', 'Value': result.get('IP_Address', 'N/A')})
+                        csv_rows.append({'Category': 'Confidence', 'Key': 'Enhanced_Confidence', 'Value': f"{result.get('Enhanced_Confidence', 0)}%"})
+                        
+                        # Provider results
+                        provider_categories = {
+                            'Primary_Provider': 'Primary Provider',
+                            'CDN_Providers': 'CDN Providers', 
+                            'DNS_Providers': 'DNS Providers',
+                            'Hosting_Providers': 'Hosting Providers',
+                            'Cloud_Providers': 'Cloud Providers',
+                            'Security_Providers': 'Security Providers'
+                        }
+                        
+                        for key, category in provider_categories.items():
+                            value = result.get(key, 'None')
+                            if isinstance(value, list):
+                                unique_values = list(dict.fromkeys([str(v) for v in value if v]))
+                                value = ', '.join(unique_values) if unique_values else 'None'
+                            elif not value:
+                                value = 'None'
+                            csv_rows.append({'Category': 'Providers', 'Key': category, 'Value': value})
+                        
+                        df = pd.DataFrame(csv_rows)
+                        csv_buffer = io.StringIO()
+                        df.to_csv(csv_buffer, index=False)
                     
                     st.download_button(
                         label="📊 Download CSV",
@@ -1600,6 +1576,9 @@ def main():
                             return ', '.join(unique_providers) if unique_providers else none_value
                         return str(provider_list) if provider_list else none_value
                     
+                    # Get comprehensive analysis data
+                    comp_analysis = result.get('Comprehensive_Analysis', {})
+                    
                     txt_report = f"""PROVIDER DISCOVERY TOOL v4.0 - ANALYSIS REPORT
 {'='*60}
 
@@ -1616,6 +1595,94 @@ DNS Providers: {format_providers(result.get('DNS_Providers'))}
 Hosting Providers: {format_providers(result.get('Hosting_Providers'))}
 Cloud Providers: {format_providers(result.get('Cloud_Providers'))}
 Security Providers: {format_providers(result.get('Security_Providers'))}
+
+COMPREHENSIVE TECHNICAL ANALYSIS:
+{'='*35}"""
+
+                    # Add comprehensive analysis sections
+                    if comp_analysis:
+                        # DNS Records Analysis
+                        dns_records = comp_analysis.get('dns_records', {}).get('records', {})
+                        if dns_records:
+                            txt_report += f"""
+
+DNS RECORDS DISCOVERED:
+{'-'*23}"""
+                            for record_type, records in dns_records.items():
+                                if records:
+                                    if isinstance(records, list) and len(records) > 0:
+                                        txt_report += f"\n{record_type}: {len(records)} record(s)"
+                                        # Show first few records for readability
+                                        for i, record in enumerate(records[:3]):
+                                            if isinstance(record, dict):
+                                                txt_report += f"\n  • {record.get('value', record)}"
+                                            else:
+                                                txt_report += f"\n  • {record}"
+                                        if len(records) > 3:
+                                            txt_report += f"\n  • ... and {len(records) - 3} more"
+                        
+                        # Subdomains Analysis
+                        subdomains = comp_analysis.get('subdomains', {})
+                        if subdomains and subdomains.get('total_found', 0) > 0:
+                            txt_report += f"""
+
+SUBDOMAINS DISCOVERED:
+{'-'*22}
+Total Found: {subdomains.get('total_found', 0)}
+Discovery Methods: {', '.join(subdomains.get('enumeration_methods', []))}"""
+                            discovered = subdomains.get('discovered_subdomains', {})
+                            if discovered:
+                                txt_report += "\nSubdomains:"
+                                for subdomain, info in list(discovered.items())[:5]:  # Show first 5
+                                    ips = info.get('ip_addresses', [])
+                                    status = info.get('http_status', 'N/A')
+                                    txt_report += f"\n  • {subdomain} → {', '.join(ips)} (HTTP: {status})"
+                                if len(discovered) > 5:
+                                    txt_report += f"\n  • ... and {len(discovered) - 5} more"
+                        
+                        # HTTP Analysis
+                        http_analysis = comp_analysis.get('http_analysis', {})
+                        if http_analysis:
+                            protocols = http_analysis.get('protocols', {})
+                            if protocols:
+                                for protocol, data in protocols.items():
+                                    if data.get('accessible', False):
+                                        txt_report += f"""
+
+HTTP SECURITY ANALYSIS ({protocol.upper()}):
+{'-'*30}
+Status: {data.get('status_code', 'N/A')}
+Security Score: {data.get('security_headers', {}).get('security_score', 'N/A')}/100"""
+                                        
+                                        security_headers = data.get('security_headers', {}).get('headers_present', [])
+                                        if security_headers:
+                                            txt_report += "\nSecurity Headers:"
+                                            for header in security_headers[:5]:
+                                                if isinstance(header, dict):
+                                                    txt_report += f"\n  • {header.get('header', 'Unknown')}: {header.get('value', 'N/A')}"
+                                        
+                                        cdn_detection = data.get('cdn_detection', {})
+                                        if cdn_detection.get('detected_cdns'):
+                                            txt_report += f"\nCDN Detection: {', '.join(cdn_detection['detected_cdns'])} (Confidence: {cdn_detection.get('confidence', 'N/A')}%)"
+                        
+                        # Origin Detection
+                        origin_detection = comp_analysis.get('origin_detection', {})
+                        if origin_detection and origin_detection.get('potential_origins'):
+                            txt_report += f"""
+
+ORIGIN SERVERS DETECTION:
+{'-'*25}
+Detection Methods: {', '.join(origin_detection.get('detection_methods', []))}
+Potential Origins Found: {len(origin_detection.get('potential_origins', []))}"""
+                            for origin in origin_detection.get('potential_origins', [])[:3]:
+                                origin_type = origin.get('type', 'unknown')
+                                confidence = origin.get('confidence', 'unknown')
+                                if 'ip' in origin:
+                                    txt_report += f"\n  • IP: {origin['ip']} (Type: {origin_type}, Confidence: {confidence})"
+                                elif 'subdomain' in origin:
+                                    txt_report += f"\n  • Subdomain: {origin['subdomain']} → {origin.get('ip', 'N/A')} (Confidence: {confidence})"
+
+                    txt_report += f"""
 
 STEP-BY-STEP ANALYSIS:
 {'='*25}"""
@@ -1677,6 +1744,9 @@ STEP-BY-STEP ANALYSIS:
                     st.write("**All formats include:**")
                     st.write("• Complete analysis metadata (domain, IP, timestamp, confidence)")
                     st.write("• All 9 step-by-step analysis results")
+                    st.write("• **JSON**: Full comprehensive analysis (DNS records, subdomains, HTTP headers, origin detection)")
+                    st.write("• **CSV**: Complete Shodan analytics (80+ metrics, security scores, technologies, vulnerabilities)")
+                    st.write("• **TXT**: Human-readable report with comprehensive analysis (DNS records, subdomains, HTTP security, origin detection)")
                     st.write("• Provider detection results (CDN, DNS, hosting, cloud)")
                     st.write("• Security findings and recommendations")
                     
