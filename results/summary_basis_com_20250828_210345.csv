@@ -2,7 +2,7 @@ Category,Key,Value
 Domain,URL,basis.com
 Network,IP_Address,N/A
 Confidence,Enhanced_Confidence,100%
-Analysis,Timestamp,2025-08-28 14:33:55 UTC
+Analysis,Timestamp,2025-08-28 21:03:09 UTC
 Providers,Primary Provider,"Cloudflare London, LLC"
 Providers,CDN Providers,"Cloudflare, AWS"
 Providers,DNS Providers,"Cloudflare, Domains By Proxy"
@@ -15,36 +15,36 @@ Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
 Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
 Analysis Steps,Advanced BGP Classification,completed | +17% confidence | 1 findings
 Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
-Analysis Steps,Shodan Premium WAF Analysis,completed | +-313% confidence | 10 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +-384% confidence | 10 findings
 Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
 ,,
 === SHODAN PREMIUM ANALYSIS DETAILS ===,,
 Shodan WAF,Detection Success,True
 Shodan WAF,WAF Detected,False
 Shodan Providers,Cloud Providers,"GCP, AWS"
-Shodan Providers,Primary Infrastructure,"HostDime.com, Inc."
-Shodan Technology,Technologies Detected,4 technologies
-Shodan Technology,Technology List,"apache httpd, openssh, aws elb, microsoft iis httpd"
-Shodan Technology,Web Servers,"apache httpd 2.4.29 (x2), microsoft iis httpd 10.0 (x1)"
+Shodan Providers,Primary Infrastructure,JSC IOT
+Shodan Technology,Technologies Detected,5 technologies
+Shodan Technology,Technology List,"exim smtpd, apache httpd, aws elb, microsoft iis httpd, openssh"
+Shodan Technology,Web Servers,"microsoft iis httpd 10.0 (x1), apache httpd 2.4.29 (x2)"
 Shodan Security,Security Score,0/100
 Shodan Security,Security Headers,0 headers detected
 Shodan Security,Security Recommendations,2 recommendations
 Shodan Security,Primary Recommendation,Vulnerabilities detected - immediate patching required
 Shodan Infrastructure,Geographic Locations,5 locations
-Shodan Infrastructure,Primary Location,"United States, Orlando (5 hosts)"
-Shodan Infrastructure,ASN Networks,4 networks
+Shodan Infrastructure,Primary Location,"United States, Orlando (4 hosts)"
+Shodan Infrastructure,ASN Networks,5 networks
 Shodan Infrastructure,Primary ASN,"AS33182 - HostDime.com, Inc."
-Shodan Infrastructure,Open Ports,5 ports detected
-Shodan Infrastructure,Hosting Patterns,"cloud, vpn"
-Shodan Vulnerabilities,Vulnerabilities Found,172
+Shodan Infrastructure,Open Ports,6 ports detected
+Shodan Infrastructure,Hosting Patterns,"vpn, self-signed, starttls, cloud"
+Shodan Vulnerabilities,Vulnerabilities Found,208
 Shodan Vulnerabilities,Risk Score,100/100
 Shodan Vulnerabilities,Sample CVEs,"CVE-2019-0196, CVE-2013-4365, CVE-2022-28330"
-Shodan Vulnerabilities,Severity Breakdown,high: 172
+Shodan Vulnerabilities,Severity Breakdown,high: 208
 Shodan Vulnerabilities,Security Recommendations,Critical: Vulnerabilities detected - immediate patching required
 Shodan SSL,SSL Trust Score,100/100
-Shodan SSL,Certificate Authorities,"globalsign gcc r6 alphassl ca 2023, wr3, amazon rsa 2048 m04, r3"
-Shodan SSL,SSL Configurations,4 configurations
+Shodan SSL,Certificate Authorities,"amazon rsa 2048 m04, globalsign gcc r6 alphassl ca 2023, wr3, gk-basis.com, r3"
+Shodan SSL,SSL Configurations,5 configurations
 Shodan SSL,Primary SSL Config,TLSv1.3 (256 bits)
-Shodan Quality,Data Richness Score,83/100
+Shodan Quality,Data Richness Score,93/100
 Shodan Quality,Hosts Analyzed,10
-Shodan Quality,Analysis Confidence,48%
+Shodan Quality,Analysis Confidence,56%

@@ -29,6 +29,14 @@ from ..integrations import (
     SHODAN_INTEGRATION_AVAILABLE, get_shodan_integration
 )
 
+# Import comprehensive analysis
+try:
+    from ..integrations.comprehensive_analysis import get_comprehensive_analysis
+    COMPREHENSIVE_ANALYSIS_AVAILABLE = True
+except ImportError:
+    COMPREHENSIVE_ANALYSIS_AVAILABLE = False
+    get_comprehensive_analysis = None
+
 logger = logging.getLogger(__name__)
 
 class EnhancedProviderDetector(ProviderDetector):
@@ -297,8 +305,8 @@ class EnhancedProviderDetector(ProviderDetector):
         # Record all step results for comprehensive report
         self._record_all_step_results(result)
         
-        # Save analysis results to backend
-        self._save_analysis_to_backend(result, domain)
+        # Save analysis results to backend (moved to app.py after comprehensive analysis)
+        # self._save_analysis_to_backend(result, domain)
         
         logger.info(f"✅ Comprehensive analysis completed for {domain}")
         return result
@@ -1537,7 +1545,8 @@ class EnhancedProviderDetector(ProviderDetector):
                     "analysis_methods": result.get('analysis_methods', []),
                     "dns_chain": result.get('dns_chain'),
                     "whois_data": result.get('whois_data')
-                }
+                },
+                "comprehensive_analysis": result.get('Comprehensive_Analysis', {})
             }
             
             # Save as JSON

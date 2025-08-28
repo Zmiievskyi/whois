@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Analyze what data Shodan actually returns to optimize extraction"""
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from src.provider_discovery.integrations.shodan import get_shodan_integration
 import json
 

@@ -78,7 +78,7 @@ class EnhancedDNSIntegration(HTTPIntegration):
         
         Args:
             domain: Domain to resolve
-            record_type: DNS record type (A, AAAA, CNAME, MX, TXT, NS)
+            record_type: DNS record type (A, AAAA, CNAME, MX, TXT, NS, SOA, SRV, CAA, PTR, HINFO, NAPTR)
             
         Returns:
             Dict with results from multiple resolvers
@@ -154,6 +154,45 @@ class EnhancedDNSIntegration(HTTPIntegration):
                     records.append(' '.join([part.decode() if isinstance(part, bytes) else str(part) for part in rdata.strings]))
                 elif record_type == 'NS':
                     records.append(str(rdata).rstrip('.'))
+                elif record_type == 'SOA':
+                    records.append({
+                        'mname': str(rdata.mname).rstrip('.'),
+                        'rname': str(rdata.rname).rstrip('.'),
+                        'serial': rdata.serial,
+                        'refresh': rdata.refresh,
+                        'retry': rdata.retry,
+                        'expire': rdata.expire,
+                        'minimum': rdata.minimum
+                    })
+                elif record_type == 'SRV':
+                    records.append({
+                        'priority': rdata.priority,
+                        'weight': rdata.weight,
+                        'port': rdata.port,
+                        'target': str(rdata.target).rstrip('.')
+                    })
+                elif record_type == 'CAA':
+                    records.append({
+                        'flags': rdata.flags,
+                        'tag': rdata.tag.decode() if isinstance(rdata.tag, bytes) else str(rdata.tag),
+                        'value': rdata.value.decode() if isinstance(rdata.value, bytes) else str(rdata.value)
+                    })
+                elif record_type == 'PTR':
+                    records.append(str(rdata).rstrip('.'))
+                elif record_type == 'HINFO':
+                    records.append({
+                        'cpu': rdata.cpu.decode() if isinstance(rdata.cpu, bytes) else str(rdata.cpu),
+                        'os': rdata.os.decode() if isinstance(rdata.os, bytes) else str(rdata.os)
+                    })
+                elif record_type == 'NAPTR':
+                    records.append({
+                        'order': rdata.order,
+                        'preference': rdata.preference,
+                        'flags': rdata.flags.decode() if isinstance(rdata.flags, bytes) else str(rdata.flags),
+                        'service': rdata.service.decode() if isinstance(rdata.service, bytes) else str(rdata.service),
+                        'regexp': rdata.regexp.decode() if isinstance(rdata.regexp, bytes) else str(rdata.regexp),
+                        'replacement': str(rdata.replacement).rstrip('.')
+                    })
                 else:
                     records.append(str(rdata))
             

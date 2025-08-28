@@ -19,6 +19,34 @@ sys.path.insert(0, 'src')
 
 from provider_discovery import get_enhanced_provider_detector, ENHANCED_DETECTOR_AVAILABLE
 
+# Import comprehensive analysis
+COMPREHENSIVE_ANALYSIS_AVAILABLE = False
+get_comprehensive_analysis = None
+
+try:
+    # Import from src path
+    import sys
+    import os
+    src_path = os.path.join(os.path.dirname(__file__), 'src')
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+    
+    print(f"🔧 Attempting to import from: {src_path}")
+    from provider_discovery.integrations.comprehensive_analysis import get_comprehensive_analysis
+    COMPREHENSIVE_ANALYSIS_AVAILABLE = True
+    print("✅ Comprehensive Analysis module loaded successfully!")
+    print(f"🔧 Module path: {get_comprehensive_analysis.__module__}")
+except ImportError as e:
+    print(f"⚠️ ImportError: {e}")
+    COMPREHENSIVE_ANALYSIS_AVAILABLE = False
+    get_comprehensive_analysis = None
+except Exception as e:
+    print(f"⚠️ Other error loading Comprehensive Analysis: {e}")
+    COMPREHENSIVE_ANALYSIS_AVAILABLE = False
+    get_comprehensive_analysis = None
+
+print(f"🔧 Final status: COMPREHENSIVE_ANALYSIS_AVAILABLE = {COMPREHENSIVE_ANALYSIS_AVAILABLE}")
+
 # Page configuration
 st.set_page_config(
     page_title="Provider Discovery Tool v3.0",
@@ -382,37 +410,54 @@ def detect_provider(headers, ip, whois_data, domain=""):
 
 def process_single_url(url, progress_callback=None):
     """Process single URL with Phase 2A enhanced DNS analysis"""
-    if progress_callback:
-        progress_callback(f"Analyzing {url}...")
-    
-    # Get detector instance
-    detector = get_detector_instance()
-    
-    # Enable logging for debugging
+    # Enable logging for debugging FIRST
     import logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
     
     logger.info(f"🚀 Starting analysis for URL: {url}")
     
+    if progress_callback:
+        progress_callback(f"Analyzing {url}...")
+    
+    # Get detector instance
+    detector = get_detector_instance()
+    
     domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
     logger.info(f"📝 Extracted domain: {domain}")
     
-    logger.info(f"🌐 Step 1/4: Fetching headers...")
+    logger.info(f"🌐 Step 1/5: Fetching headers...")
     headers = detector.get_headers(url)
     logger.info(f"✅ Headers fetched: {len(headers)} chars")
     
-    logger.info(f"🔍 Step 2/4: Resolving IP...")
+    logger.info(f"🔍 Step 2/5: Resolving IP...")
     ip = detector.get_ip(url)
     logger.info(f"✅ IP resolved: {ip}")
-    logger.info(f"📋 Step 3/4: Getting WHOIS data...")
+    logger.info(f"📋 Step 3/5: Getting WHOIS data...")
     whois_data = detector.get_whois(ip) if ip else ""
     logger.info(f"✅ WHOIS data fetched: {len(whois_data)} chars")
     
     # Enhanced Provider Detection System v3.0 with 6 integrations
-    logger.info(f"🚀 Step 4/4: Running comprehensive provider detection...")
+    logger.info(f"🚀 Step 4/5: Running enhanced provider detection (6 integrations)...")
     enhanced_result = detect_provider(headers, ip, whois_data, domain)
-    logger.info(f"✅ Comprehensive detection completed!")
+    logger.info(f"✅ Enhanced provider detection completed!")
+    
+    # Comprehensive Analysis (Full DNS, Subdomains, Raw Headers)
+    comprehensive_analysis_result = {}
+    logger.info(f"🔧 Debug: COMPREHENSIVE_ANALYSIS_AVAILABLE = {COMPREHENSIVE_ANALYSIS_AVAILABLE}")
+    if COMPREHENSIVE_ANALYSIS_AVAILABLE:
+        try:
+            logger.info(f"🔍 Step 5/5: Running comprehensive analysis (Full DNS, Subdomains, Headers)...")
+            comprehensive_analyzer = get_comprehensive_analysis()
+            comprehensive_analysis_result = comprehensive_analyzer.analyze_domain_comprehensive(domain)
+            logger.info(f"✅ Comprehensive analysis completed!")
+            logger.info(f"🔧 Debug: comprehensive_analysis_result keys: {list(comprehensive_analysis_result.keys()) if comprehensive_analysis_result else 'None or empty'}")
+            logger.info(f"🔧 Debug: comprehensive_analysis_result size: {len(str(comprehensive_analysis_result)) if comprehensive_analysis_result else 0} chars")
+        except Exception as e:
+            logger.warning(f"⚠️ Comprehensive analysis failed: {e}")
+            comprehensive_analysis_result = {'error': str(e)}
+    else:
+        logger.info("⏭️ Step 5/5: Comprehensive analysis not available (install additional dependencies)")
     
     # Format providers by role
     origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
@@ -423,7 +468,7 @@ def process_single_url(url, progress_callback=None):
     hosting_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Hosting', 'Host']]
     cloud_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] in ['Cloud', 'Cloud Provider']]
     
-    return {
+    result = {
         'URL': url,
         'IP_Address': ip or 'N/A',
         'Primary_Provider': enhanced_result['primary_provider'],
@@ -439,8 +484,36 @@ def process_single_url(url, progress_callback=None):
         'DNS_Chain': enhanced_result.get('dns_chain', 'N/A'),
         'DNS_Analysis': enhanced_result.get('dns_analysis', {}),
         'TTL_Analysis': enhanced_result.get('ttl_analysis', {}),
-        'Enhanced_Analysis': enhanced_result.get('Enhanced_Analysis', {})
+        'Enhanced_Analysis': enhanced_result.get('Enhanced_Analysis', {}),
+        'Comprehensive_Analysis': comprehensive_analysis_result
     }
+    
+    # Save analysis results to backend (moved here after comprehensive analysis)
+    try:
+        logger.info(f"🔧 Debug: Attempting to save analysis results...")
+        from src.provider_discovery.core.enhanced_detector import EnhancedProviderDetector
+        from datetime import datetime
+        logger.info(f"🔧 Debug: Imports successful")
+        
+        detector_instance = EnhancedProviderDetector()
+        logger.info(f"🔧 Debug: Detector instance created")
+        
+        # Create combined result for saving  
+        combined_result = {
+            **enhanced_result,  # All enhanced detection results
+            'Comprehensive_Analysis': comprehensive_analysis_result  # Add comprehensive analysis
+        }
+        logger.info(f"🔧 Debug: Combined result created with {len(str(combined_result))} chars")
+        
+        detector_instance._save_analysis_to_backend(combined_result, domain)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        logger.info(f"✅ Analysis results saved to backend: analysis_{domain.replace('.', '_')}_{timestamp}.json, summary_{domain.replace('.', '_')}_{timestamp}.csv")
+    except Exception as e:
+        logger.error(f"⚠️ Failed to save analysis results: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+    
+    return result
 
 # Main application
 def apply_virustotal_setting(detector, enabled):
@@ -915,32 +988,26 @@ def main():
                                 status_text.text(f"Processing {idx + 1}/{len(df_clean)}: {company}")
                                 
                                 try:
-                                    # Phase 2A: Enhanced multi-layer analysis with DNS
-                                    domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
+                                    # Use the same comprehensive analysis as single URL processing
+                                    clean_url = url.replace('https://', '').replace('http://', '')
+                                    analysis_result = process_single_url(clean_url)
                                     
-                                    headers = detector.get_headers(url)
-                                    ip = detector.get_ip(url)
-                                    whois_data = detector.get_whois(ip) if ip else ""
-                                    enhanced_result = detect_provider(headers, ip, whois_data, domain)
-                                    
-                                    # Format providers by role
-                                    origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
-                                    cdn_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'CDN']
-                                    waf_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'WAF']
-                                    lb_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Load Balancer']
-                                    dns_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'DNS']
-                                    
+                                    # Extract data from analysis result for CSV display
                                     result = {
                                         'Company': company,
-                                        'URL': url,
-                                        'Primary_Provider': enhanced_result['primary_provider'],
-                                        'Origin_Provider': ', '.join(origin_providers) if origin_providers else 'Unknown',
-                                        'CDN_Providers': ', '.join(cdn_providers) if cdn_providers else 'None',
-                                        'WAF_Providers': ', '.join(waf_providers) if waf_providers else 'None',
-                                        'LB_Providers': ', '.join(lb_providers) if lb_providers else 'None',
-                                        'DNS_Providers': ', '.join(dns_providers) if dns_providers else 'Unknown',
-                                        'IP_Address': ip or 'N/A',
-                                        'Confidence': '; '.join(enhanced_result['confidence_factors']) if enhanced_result['confidence_factors'] else 'Low'
+                                        'URL': analysis_result.get('URL', url),
+                                        'Primary_Provider': analysis_result.get('Primary_Provider', 'Unknown'),
+                                        'Origin_Provider': analysis_result.get('Origin_Provider', 'Unknown'),
+                                        'CDN_Providers': analysis_result.get('CDN_Providers', 'None'),
+                                        'WAF_Providers': analysis_result.get('WAF_Providers', 'None'),
+                                        'LB_Providers': analysis_result.get('LB_Providers', 'None'),
+                                        'DNS_Providers': analysis_result.get('DNS_Providers', 'Unknown'),
+                                        'Hosting_Providers': analysis_result.get('Hosting_Providers', 'None'),
+                                        'Cloud_Providers': analysis_result.get('Cloud_Providers', 'None'),
+                                        'Security_Providers': analysis_result.get('Security_Providers', 'None'),
+                                        'IP_Address': analysis_result.get('IP_Address', 'N/A'),
+                                        'Confidence': analysis_result.get('Confidence_Factors', 'Low'),
+                                        'Enhanced_Confidence': analysis_result.get('Enhanced_Confidence', 'N/A')
                                     }
                                     results.append(result)
                                     success_count += 1
@@ -1212,6 +1279,57 @@ def main():
                     st.subheader("💡 Customer Insights")
                     for insight in customer_insights[:4]:
                         st.write(f"• {insight}")
+                
+                # Show Comprehensive Analysis if available
+                comprehensive_analysis = result.get('Comprehensive_Analysis', {})
+                if comprehensive_analysis and 'error' not in comprehensive_analysis:
+                    st.subheader("🔍 Comprehensive Domain Analysis")
+                    
+                    # DNS Records Analysis
+                    dns_records = comprehensive_analysis.get('dns_records', {})
+                    if dns_records and 'records' in dns_records:
+                        st.write("**📊 Complete DNS Records:**")
+                        
+                        dns_summary = {}
+                        for record_type, records in dns_records['records'].items():
+                            if records:  # Only show record types that have data
+                                dns_summary[record_type] = len(records)
+                        
+                        if dns_summary:
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                for record_type, count in list(dns_summary.items())[:4]:
+                                    st.metric(f"{record_type} Records", count)
+                            with col2:
+                                for record_type, count in list(dns_summary.items())[4:8]:
+                                    st.metric(f"{record_type} Records", count)
+                    
+                    # Subdomain Analysis
+                    subdomains = comprehensive_analysis.get('subdomains', {})
+                    if subdomains and subdomains.get('total_found', 0) > 0:
+                        st.write(f"**🌐 Subdomains Discovered:** {subdomains['total_found']}")
+                        methods = subdomains.get('enumeration_methods', [])
+                        if methods:
+                            st.write(f"**Methods Used:** {', '.join(methods)}")
+                    
+                    # HTTP Analysis
+                    http_analysis = comprehensive_analysis.get('http_analysis', {})
+                    if http_analysis:
+                        protocols = http_analysis.get('protocols', {})
+                        if protocols:
+                            st.write("**🌐 HTTP/HTTPS Analysis:**")
+                            for protocol, data in protocols.items():
+                                if data.get('accessible'):
+                                    security_score = data.get('security_headers', {}).get('security_score', 0)
+                                    st.write(f"• {protocol.upper()}: Accessible (Security Score: {security_score}/100)")
+                    
+                    # Origin Detection
+                    origin_detection = comprehensive_analysis.get('origin_detection', {})
+                    if origin_detection and origin_detection.get('potential_origins'):
+                        st.write(f"**🎯 Origin Server Detection:** {len(origin_detection['potential_origins'])} candidates found")
+                        methods = origin_detection.get('detection_methods', [])
+                        if methods:
+                            st.write(f"**Detection Methods:** {', '.join(methods)}")
                 
                 # Show Shodan WAF Analysis if available
                 shodan_analysis = result.get('Enhanced_Analysis', {}).get('shodan_analysis', {})

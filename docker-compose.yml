@@ -1,6 +1,6 @@
 services:
   app:
-    image: anton0509/provider_detector:v1.7
+    image: anton0509/provider_detector:v1.8
     ports:
       - "8501:8501"
     volumes:

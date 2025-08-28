@@ -541,7 +541,28 @@ class ShodanIntegration(APIKeyIntegration):
                     'security': security_assessment,
                     'infrastructure': infrastructure_mapping
                 }),
-                'total_hosts_analyzed': len(hosts)
+                'total_hosts_analyzed': len(hosts),
+                
+                # Raw data preservation for analysis
+                'raw_shodan_data': {
+                    'query_used': tech_query,
+                    'total_results': results.get('total', 0),
+                    'facets_data': facets,
+                    'hosts_sample': hosts[:3] if len(hosts) > 3 else hosts,  # Preserve sample for analysis
+                    'full_response_metadata': {
+                        'query_credits_used': 1,
+                        'search_time': results.get('took', 0),
+                        'query_timestamp': time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())
+                    }
+                },
+                
+                # Configuration and limits info
+                'shodan_config': {
+                    'api_plan_detected': self._detect_api_plan_from_results(results),
+                    'rate_limit_status': self._get_rate_limit_status(),
+                    'optimization_suggestions': self._get_optimization_suggestions(len(hosts)),
+                    'query_efficiency': self._calculate_query_efficiency(results, hosts)
+                }
             }
             
         except shodan.APIError as e:
@@ -1338,6 +1359,88 @@ class ShodanIntegration(APIKeyIntegration):
         score += len(infra.get('asn_analysis', {})) * 4
         
         return min(100, score)
+    
+    def _detect_api_plan_from_results(self, results: Dict) -> str:
+        """Detect API plan based on query results and capabilities"""
+        total_results = results.get('total', 0)
+        facets = results.get('facets', {})
+        
+        # If we get facets data, likely paid plan
+        if facets:
+            return "Paid Plan (Developer/Business)"
+        
+        # If we get many results, likely paid plan
+        if total_results > 100:
+            return "Paid Plan (High limits detected)"
+        
+        # Basic query worked but limited results
+        if total_results > 0:
+            return "Free/Basic Plan (Limited results)"
+        
+        return "Plan detection failed"
+    
+    def _get_rate_limit_status(self) -> Dict[str, Any]:
+        """Get current rate limiting status"""
+        if hasattr(self.rate_limiter, 'get_service_status'):
+            return self.rate_limiter.get_service_status('shodan')
+        
+        return {
+            'rate_limited': False,
+            'requests_remaining': 'Unknown',
+            'time_until_reset': 'Unknown',
+            'current_limit': self.rate_limit
+        }
+    
+    def _get_optimization_suggestions(self, hosts_returned: int) -> List[str]:
+        """Get optimization suggestions based on current usage"""
+        suggestions = []
+        
+        if hosts_returned == 0:
+            suggestions.append("No results found - try broader search terms or check domain accessibility")
+        elif hosts_returned < 3:
+            suggestions.append("Limited results - consider upgrading to paid plan for more comprehensive data")
+        elif hosts_returned >= 10:
+            suggestions.append("Good data coverage - consider using facets for deeper analysis")
+        
+        # Check if we're on free plan (limited results)
+        try:
+            account_info = self.get_account_info()
+            if account_info.get('success') and account_info.get('query_credits', 0) < 10:
+                suggestions.append("Low query credits - consider upgrading plan for continuous monitoring")
+        except:
+            pass
+        
+        suggestions.append("Use caching to avoid repeated queries for same domain")
+        suggestions.append("Consider batch analysis for multiple domains to optimize credit usage")
+        
+        return suggestions
+    
+    def _calculate_query_efficiency(self, results: Dict, hosts: List[Dict]) -> Dict[str, Any]:
+        """Calculate query efficiency metrics"""
+        total_results = results.get('total', 0)
+        hosts_returned = len(hosts)
+        
+        efficiency = {
+            'total_available': total_results,
+            'hosts_analyzed': hosts_returned,
+            'data_utilization': 0,
+            'credit_efficiency': 'Unknown'
+        }
+        
+        if total_results > 0:
+            efficiency['data_utilization'] = round((hosts_returned / total_results) * 100, 2)
+        
+        # Calculate credit efficiency
+        if hosts_returned >= 5:
+            efficiency['credit_efficiency'] = 'High'
+        elif hosts_returned >= 2:
+            efficiency['credit_efficiency'] = 'Medium'
+        elif hosts_returned >= 1:
+            efficiency['credit_efficiency'] = 'Low'
+        else:
+            efficiency['credit_efficiency'] = 'Poor'
+        
+        return efficiency
 
 def get_shodan_integration(api_key: Optional[str] = None) -> ShodanIntegration:
     """

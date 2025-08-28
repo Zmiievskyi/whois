@@ -540,7 +540,7 @@ class EnhancedShodanAnalyzer:
 
 # Test the enhanced analyzer
 if __name__ == "__main__":
-    from src.provider_discovery.integrations.shodan import get_shodan_integration
+    from .shodan import get_shodan_integration
     import json
     
     shodan = get_shodan_integration()
