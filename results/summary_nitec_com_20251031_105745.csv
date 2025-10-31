@@ -1,0 +1,83 @@
+Category,Key,Value
+Domain,URL,nitec.com
+Network,IP_Address,54.171.161.77
+Confidence,Enhanced_Confidence,100%
+Analysis,Timestamp,2025-10-31 10:55:35 UTC
+Providers,Primary Provider,Google
+Providers,CDN Providers,"Cloudflare, Google, AWS"
+Providers,DNS Providers,"Cloudflare, Azure DNS"
+Providers,Hosting Providers,AWS
+Providers,Cloud Providers,"Google, AWS, AZURE"
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,failed | +0% confidence | 1 findings
+Analysis Steps,Advanced BGP Classification,failed | +0% confidence | 1 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +24% confidence | 11 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings
+,,
+=== SHODAN PREMIUM ANALYSIS DETAILS ===,,
+Shodan WAF,Detection Success,True
+Shodan WAF,WAF Detected,False
+,,
+=== SHODAN OPTIMIZATION ANALYTICS ===,,
+Shodan Optimization,Queries Executed,13
+Shodan Optimization,Total Results Available,5
+Shodan Optimization,Unique Hosts Collected,1
+Shodan Queries,Query 1,Primary hostname search (1 results)
+Shodan Queries,Query 2,SSL certificate subject search (1 results)
+Shodan Queries,Query 3,HTML content references (0 results)
+Shodan Queries,Query 4,HTTP title tag references (0 results)
+Shodan Queries,Query 5,Visual infrastructure with screenshots (0 results)
+,,
+=== SHODAN STATISTICAL INSIGHTS ===,,
+Shodan Statistics,Total Unique Hosts,1
+Shodan Statistics,Unique IP Addresses,1
+Shodan Statistics,Unique Ports,1
+Shodan Statistics,Countries Detected,1
+Shodan Statistics,SSL Prevalence,100.0%
+Shodan Statistics,Top Ports,443(1)
+Shodan Statistics,Top Countries,Ireland(1)
+,,
+=== SHODAN EFFICIENCY METRICS ===,,
+Shodan Efficiency,Optimization Level,advanced
+Shodan Efficiency,Credits Used,13
+Shodan Efficiency,Data Completeness,20.0% (limited)
+,,
+=== SHODAN CONFIGURATION ===,,
+Shodan Config,API Plan Detected,Free/Basic Plan (Limited results)
+Shodan Config,Overall Efficiency,poor
+Shodan Config,Credit to Data Ratio,0.08
+Shodan Config,Optimization Tips,4 suggestions available
+Shodan Config,Tip 1,Increase limit parameter to capture more available results
+Shodan Config,Tip 2,Current search captured only a fraction of available data
+Shodan Config,Tip 3,Enable has_screenshot facet for visual infrastructure analysis
+Shodan Config,Follow-up Queries,2 queries recommended
+Shodan Config,Next Query 1,Explore all infrastructure from Microsoft Corporation (Priority: high)
+Shodan Config,Next Query 2,Analyze ASN as8075 infrastructure (Priority: medium)
+Shodan Providers,Cloud Providers,AZURE
+Shodan Providers,Primary Infrastructure,Microsoft Corporation
+Shodan Technology,Technologies Detected,1 technologies
+Shodan Technology,Technology List,microsoft azure application gateway
+Shodan Security,Security Score,15/100
+Shodan Security,Security Headers,0 headers detected
+Shodan Security,Security Recommendations,1 recommendations
+Shodan Security,Primary Recommendation,Security improvements recommended
+Shodan Infrastructure,Geographic Locations,1 locations
+Shodan Infrastructure,Primary Location,"Ireland, Dublin (1 hosts)"
+Shodan Infrastructure,ASN Networks,1 networks
+Shodan Infrastructure,Primary ASN,AS8075 - Microsoft Corporation
+Shodan Infrastructure,Open Ports,1 ports detected
+Shodan Infrastructure,Hosting Patterns,cloud
+Shodan Vulnerabilities,Vulnerabilities Found,0
+Shodan Vulnerabilities,Risk Score,0/100
+Shodan Vulnerabilities,Security Recommendations,No vulnerabilities detected via Shodan
+Shodan SSL,SSL Trust Score,20/100
+Shodan SSL,Certificate Authorities,rapidssl tls rsa ca g1
+Shodan SSL,SSL Configurations,1 configurations
+Shodan SSL,Primary SSL Config,TLSv1.2 (128 bits)
+Shodan Quality,Data Richness Score,25/100
+Shodan Quality,Hosts Analyzed,1
+Shodan Quality,Analysis Confidence,8%

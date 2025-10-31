@@ -1937,57 +1937,91 @@ class EnhancedProviderDetector(ProviderDetector):
         writer = csv.writer(csv_buffer)
         writer.writerow(['Category', 'Key', 'Value'])
         
-        # Basic info
-        writer.writerow(['Domain', 'URL', result.get('URL', domain)])
-        writer.writerow(['Network', 'IP_Address', result.get('IP_Address', 'N/A')])
+        # Basic info - handle both WebUI and backend field formats
+        url = result.get('URL') or result.get('url') or domain
+        writer.writerow(['Domain', 'URL', url])
         
-        # Fix confidence display
-        confidence_value = result.get('Enhanced_Confidence', 0)
+        # Handle multiple IP field formats
+        ip_address = (result.get('IP_Address') or 
+                     result.get('ip_address') or 
+                     result.get('analysis_metadata', {}).get('ip_address') or 
+                     'N/A')
+        writer.writerow(['Network', 'IP_Address', ip_address])
+        
+        # Handle multiple confidence field formats
+        confidence_value = (result.get('Enhanced_Confidence') or 
+                           result.get('enhanced_confidence') or 
+                           result.get('analysis_metadata', {}).get('enhanced_confidence') or 
+                           0)
         if isinstance(confidence_value, (int, float)):
             confidence_display = f"{confidence_value}%"
         else:
             confidence_display = str(confidence_value)
         writer.writerow(['Confidence', 'Enhanced_Confidence', confidence_display])
         
-        writer.writerow(['Analysis', 'Timestamp', result.get('timestamp', 'N/A')])
+        # Handle multiple timestamp formats
+        timestamp = (result.get('timestamp') or 
+                    result.get('analysis_timestamp') or 
+                    result.get('analysis_metadata', {}).get('analysis_timestamp') or 
+                    'N/A')
+        writer.writerow(['Analysis', 'Timestamp', timestamp])
         
-        # Provider results
-        provider_categories = {
-            'Primary_Provider': 'Primary Provider',
-            'CDN_Providers': 'CDN Providers',
-            'DNS_Providers': 'DNS Providers',
-            'Hosting_Providers': 'Hosting Providers',
-            'Cloud_Providers': 'Cloud Providers',
-            'Security_Providers': 'Security Providers'
-        }
+        # Provider results - handle both WebUI and backend field formats
+        provider_mappings = [
+            ('Primary Provider', ['Primary_Provider', 'primary_provider'], 'detection_results'),
+            ('CDN Providers', ['CDN_Providers', 'cdn_providers'], 'detection_results'),
+            ('DNS Providers', ['DNS_Providers', 'dns_providers'], 'detection_results'),
+            ('Hosting Providers', ['Hosting_Providers', 'hosting_providers'], 'detection_results'),
+            ('Cloud Providers', ['Cloud_Providers', 'cloud_providers'], 'detection_results'),
+            ('Security Providers', ['Security_Providers', 'security_providers'], 'detection_results')
+        ]
         
-        for key, category in provider_categories.items():
-            value = result.get(key, 'None')
-            if isinstance(value, list):
+        for category, field_names, backend_section in provider_mappings:
+            value = None
+            
+            # Try WebUI format first
+            for field_name in field_names:
+                if result.get(field_name):
+                    value = result.get(field_name)
+                    break
+            
+            # Try backend format if WebUI format not found
+            if not value and backend_section in result:
+                for field_name in field_names:
+                    backend_field = field_name.lower()
+                    if result[backend_section].get(backend_field):
+                        value = result[backend_section].get(backend_field)
+                        break
+            
+            # Process the value
+            if not value:
+                value = 'None'
+            elif isinstance(value, list):
                 # Remove duplicates and join
                 unique_values = list(dict.fromkeys([str(v) for v in value if v]))
                 value = ', '.join(unique_values) if unique_values else 'None'
-            elif not value or value == [] or value is None:
-                value = 'None'
-            # Clean value to prevent CSV formatting issues
-            if isinstance(value, str):
+            elif isinstance(value, str):
                 value = value.replace('\n', ' ').replace('\r', ' ').strip()
-                if not value:
+                if not value or value in ['None', 'Unknown', 'N/A']:
                     value = 'None'
+            
             writer.writerow(['Providers', category, value])
         
-        # Analysis steps summary
-        steps_report = result.get('analysis_steps_report', {})
+        # Analysis steps summary - handle both WebUI and backend formats
+        steps_report = (result.get('analysis_steps_report', {}) or 
+                       result.get('step_by_step_analysis', {}))
+        
         for step_key, step_data in steps_report.items():
-            step_name = step_data.get('step_name', step_key)
+            step_name = step_data.get('step_name', step_key.replace('_', ' ').title())
             status = step_data.get('status', 'unknown')
             confidence_impact = step_data.get('confidence_impact', 0)
             findings_count = len(step_data.get('findings', []))
             
             writer.writerow(['Analysis Steps', step_name, f"{status} | +{confidence_impact}% confidence | {findings_count} findings"])
         
-        # Enhanced Shodan Analysis Details
-        shodan_analysis = result.get('Enhanced_Analysis', {}).get('shodan_analysis', {})
+        # Enhanced Shodan Analysis Details - handle both WebUI and backend formats
+        shodan_analysis = (result.get('Enhanced_Analysis', {}).get('shodan_analysis', {}) or 
+                          result.get('shodan_analysis', {}))
         if shodan_analysis:
             writer.writerow(['', '', ''])  # Empty row for separation
             writer.writerow(['=== SHODAN PREMIUM ANALYSIS DETAILS ===', '', ''])

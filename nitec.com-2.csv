@@ -1,0 +1,21 @@
+﻿Host,IP,Type,Reverse DNS,Netblock Owner,HTTP Services,Remote Services
+control.nitec.com,40.113.57.66,A,,"MICROSOFT-CORP-MSN-AS-BLOCK
+8075 / Ireland",HTTPS: Microsoft-Azure-Application-Gateway/v2 - 404 Not Found,
+staging.nitec.com,54.171.161.77,A,ec2-54-171-161-77.eu-west-1.compute.amazonaws.com,"AMAZON-02
+16509 / Ireland",HTTP: nginx - 404 Not Found,
+vpn.nitec.com,62.172.98.98,A,mail.nitec.com,"BT-UK-AS BTnet UK Regional network, GB
+2856 / United Kingdom",,
+www.nitec.com,54.171.161.77,A,ec2-54-171-161-77.eu-west-1.compute.amazonaws.com,"AMAZON-02
+16509 / Ireland",HTTP: nginx - 404 Not Found,
+10 eu-smtp-inbound-2.mimecast.com,91.220.42.241,MX,eu-smtp-inbound-2.mimecast.com,"MIMECAST-UK, GB
+42427 / United Kingdom",,
+10 eu-smtp-inbound-1.mimecast.com,195.130.217.201,MX,eu-smtp-inbound-2.mimecast.com,"MIMECAST-UK, GB
+42427 / United Kingdom",,
+ns1-02.azure-dns.com,13.107.236.2,NS,ns1-02.azure-dns.com,"MICROSOFT-CORP-MSN-AS-BLOCK
+8075 / United States",,
+ns2-02.azure-dns.net,150.171.21.2,NS,ns2-02.azure-dns.net,"MICROSOFT-CORP-MSN-AS-BLOCK
+8075 / United States",,
+ns3-02.azure-dns.org,204.14.183.2,NS,ns3-02.azure-dns.org,"MICROSOFT-CORP-MSN-AS-BLOCK
+8075 / United States",,
+ns4-02.azure-dns.info,208.84.5.2,NS,ns4-02.azure-dns.info,"MICROSOFT-CORP-MSN-AS-BLOCK
+8075 / United States",,
