@@ -13,10 +13,14 @@ import requests
 import json
 import logging
 import time
+import subprocess
+import shutil
+from pathlib import Path
 import concurrent.futures
 from typing import Dict, List, Optional, Any, Set, Tuple
 from urllib.parse import urlparse
 from .base import HTTPIntegration
+from ..config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -46,23 +50,24 @@ class ComprehensiveAnalysisIntegration(HTTPIntegration):
         )
         
         self.cache_ttl = cache_ttl
+        self.settings = get_settings()
         
         # DNS record types to query
         self.dns_record_types = [
             'A', 'AAAA', 'CNAME', 'NS', 'MX', 'TXT', 'SOA', 'PTR',
             'CAA', 'SRV', 'HINFO', 'NAPTR'
         ]
-        
-        # Common subdomain prefixes for enumeration
-        self.subdomain_wordlist = [
-            'www', 'mail', 'ftp', 'localhost', 'webmail', 'smtp', 'pop', 'ns1', 'webdisk',
-            'ns2', 'cpanel', 'whm', 'autodiscover', 'autoconfig', 'dev', 'staging', 'test',
-            'admin', 'api', 'blog', 'shop', 'forum', 'support', 'mobile', 'm', 'beta',
-            'alpha', 'app', 'cdn', 'assets', 'static', 'media', 'images', 'img', 'css',
-            'js', 'ajax', 'xml', 'json', 'secure', 'ssl', 'vpn', 'remote', 'cloud',
-            'portal', 'login', 'auth', 'dashboard', 'panel', 'control', 'manage', 'origin',
-            'direct', 'backend', 'server', 'lb', 'loadbalancer', 'db', 'database', 'cache'
-        ]
+        self.subdomain_wordlist = self._load_subdomain_wordlist()
+        self.dictionary_limit = max(0, self.settings.subdomain_dictionary_limit)
+        self.analysis_limit = max(10, self.settings.subdomain_analysis_limit)
+        self.max_concurrency = max(5, self.settings.subdomain_max_concurrency)
+        self.enable_ct_enumeration = self.settings.enable_ct_enumeration
+        self.ct_page_limit = max(1, self.settings.ct_log_page_limit)
+        self.enable_passive_dns = self.settings.enable_passive_dns_enumeration
+        self.enable_subfinder = self.settings.enable_subfinder_enumeration
+        self.subfinder_timeout = max(30, self.settings.subfinder_timeout)
+        self.subfinder_path = self.settings.subfinder_binary_path
+        self.enable_detailed_analysis = self.settings.enable_subdomain_detailed_analysis
         
         # HTTP headers for realistic requests
         self.headers = {
@@ -85,6 +90,60 @@ class ComprehensiveAnalysisIntegration(HTTPIntegration):
     def _get_auth_headers(self) -> Dict[str, str]:
         """Get authentication headers (not needed for this integration)"""
         return {}
+    
+    def _load_subdomain_wordlist(self) -> List[str]:
+        """
+        Load subdomain wordlist from configured path or default dataset
+        """
+        candidates: List[str] = []
+        
+        # Helper to read wordlist file
+        def _read_wordlist(path: Path) -> List[str]:
+            try:
+                if path.exists() and path.is_file():
+                    return [
+                        line.strip()
+                        for line in path.read_text(encoding="utf-8").splitlines()
+                        if line.strip() and not line.startswith("#")
+                    ]
+            except Exception as exc:
+                logger.warning(f"Failed to read subdomain wordlist {path}: {exc}")
+            return []
+        
+        # 1. User-specified path
+        if self.settings.subdomain_wordlist_path:
+            custom_path = Path(self.settings.subdomain_wordlist_path).expanduser()
+            candidates = _read_wordlist(custom_path)
+            if candidates:
+                logger.info(f"Loaded {len(candidates)} subdomain prefixes from {custom_path}")
+        
+        # 2. Project default dataset
+        if not candidates:
+            default_path = Path(__file__).resolve().parent.parent / "data" / "common_subdomains.txt"
+            candidates = _read_wordlist(default_path)
+            if candidates:
+                logger.info(f"Loaded {len(candidates)} subdomain prefixes from bundled dataset")
+        
+        # 3. Fallback minimal list
+        if not candidates:
+            candidates = [
+                'www', 'mail', 'ftp', 'webmail', 'smtp', 'pop', 'ns1', 'ns2', 'dev', 'staging',
+                'test', 'admin', 'api', 'blog', 'shop', 'support', 'm', 'beta', 'app', 'cdn',
+                'assets', 'static', 'media', 'images', 'img', 'portal', 'login', 'auth',
+                'dashboard', 'panel', 'control', 'manage', 'origin', 'direct', 'server',
+                'db', 'cache'
+            ]
+            logger.info("Using fallback subdomain prefix list (minimal set)")
+        
+        # Deduplicate while preserving order
+        seen = set()
+        deduped: List[str] = []
+        for item in candidates:
+            if item not in seen:
+                deduped.append(item)
+                seen.add(item)
+        
+        return deduped
     
     def analyze_domain_comprehensive(self, domain: str) -> Dict[str, Any]:
         """
@@ -132,7 +191,7 @@ class ComprehensiveAnalysisIntegration(HTTPIntegration):
                     if key == 'dns':
                         results['dns_records'] = future.result(timeout=30)
                     elif key == 'subdomains':
-                        results['subdomains'] = future.result(timeout=60)
+                        results['subdomains'] = future.result(timeout=180)  # Increased to 3 minutes for subdomain enumeration
                     elif key == 'http':
                         results['http_analysis'] = future.result(timeout=30)
                     elif key == 'origin':
@@ -271,92 +330,283 @@ class ComprehensiveAnalysisIntegration(HTTPIntegration):
             'domain': domain,
             'discovered_subdomains': {},
             'enumeration_methods': [],
+            'method_summary': [],
             'total_found': 0,
             'errors': []
         }
         
         discovered = set()
-        
-        # Method 1: Dictionary-based enumeration
-        logger.debug(f"Starting dictionary enumeration for {domain}")
-        dictionary_found = self._dictionary_subdomain_enum(domain)
-        discovered.update(dictionary_found)
-        if dictionary_found:
-            subdomain_data['enumeration_methods'].append('dictionary')
-        
-        # Method 2: Certificate Transparency logs (simplified)
+        method_summary = []
+
+        # Method 1: Dictionary-based enumeration (disabled by default for performance)
+        # Only run if domain resolves to avoid DNS timeout issues
         try:
-            ct_found = self._certificate_transparency_enum(domain)
-            discovered.update(ct_found)
-            if ct_found:
-                subdomain_data['enumeration_methods'].append('certificate_transparency')
-        except Exception as e:
-            subdomain_data['errors'].append(f"CT enumeration failed: {e}")
+            import socket
+            socket.gethostbyname(domain)
+            domain_resolves = True
+        except:
+            domain_resolves = False
+
+        if domain_resolves and self.dictionary_limit > 0:
+            logger.debug(f"Starting dictionary enumeration for {domain}")
+            dictionary_found = self._dictionary_subdomain_enum(domain)
+            discovered.update(dictionary_found)
+            if dictionary_found:
+                subdomain_data['enumeration_methods'].append('dictionary')
+                method_summary.append({'method': 'dictionary', 'count': len(dictionary_found)})
+        else:
+            logger.debug(f"Skipping dictionary enumeration for {domain} (domain does not resolve or limit=0)")
         
-        # Analyze discovered subdomains
-        for subdomain in discovered:
+        # Method 2: Passive DNS sources
+        passive_found = self._passive_dns_enum(domain)
+        discovered.update(passive_found)
+        if passive_found:
+            subdomain_data['enumeration_methods'].append('passive_dns')
+            method_summary.append({'method': 'passive_dns', 'count': len(passive_found)})
+        
+        # Method 3: Certificate Transparency logs
+        if self.enable_ct_enumeration:
             try:
-                analysis = self._analyze_subdomain(subdomain)
-                subdomain_data['discovered_subdomains'][subdomain] = analysis
+                ct_found = self._certificate_transparency_enum(domain)
+                discovered.update(ct_found)
+                if ct_found:
+                    subdomain_data['enumeration_methods'].append('certificate_transparency')
+                    method_summary.append({'method': 'certificate_transparency', 'count': len(ct_found)})
             except Exception as e:
-                subdomain_data['discovered_subdomains'][subdomain] = {'error': str(e)}
+                subdomain_data['errors'].append(f"CT enumeration failed: {e}")
         
-        subdomain_data['total_found'] = len(discovered)
+        # Method 4: External tools (subfinder)
+        subfinder_found = self._subfinder_enum(domain)
+        discovered.update(subfinder_found)
+        if subfinder_found:
+            subdomain_data['enumeration_methods'].append('subfinder')
+            method_summary.append({'method': 'subfinder', 'count': len(subfinder_found)})
+        
+        # Normalize and sort results
+        normalized = {
+            sub.lower().strip('.')
+            for sub in discovered
+            if sub and sub != domain and sub.endswith(domain)
+        }
+
+        subdomain_data['total_found'] = len(normalized)
+        subdomain_data['method_summary'] = method_summary
+
+        # Save full list of all subdomain names (for JSON/CSV export)
+        subdomain_data['all_subdomains'] = sorted(list(normalized))
+
+        if not normalized:
+            return subdomain_data
+
+        # Detailed analysis (DNS + HTTP check for each subdomain)
+        if self.enable_detailed_analysis and len(normalized) > 0:
+            analysis_candidates = sorted(normalized)
+            if len(analysis_candidates) > self.analysis_limit:
+                subdomain_data['analysis_truncated'] = len(analysis_candidates) - self.analysis_limit
+                analysis_candidates = analysis_candidates[:self.analysis_limit]
+
+            logger.info(f"Running detailed analysis for {len(analysis_candidates)} subdomains (this may take a while)")
+
+            # Analyze discovered subdomains
+            for subdomain in analysis_candidates:
+                # Skip wildcard artifacts
+                if subdomain.startswith("*."):
+                    continue
+                try:
+                    analysis = self._analyze_subdomain(subdomain)
+                    subdomain_data['discovered_subdomains'][subdomain] = analysis
+                except Exception as e:
+                    subdomain_data['discovered_subdomains'][subdomain] = {'error': str(e)}
+        else:
+            logger.info(f"Detailed subdomain analysis disabled (found {len(normalized)} subdomains). Enable with ENABLE_SUBDOMAIN_DETAILED_ANALYSIS=true")
+            subdomain_data['discovered_subdomains'] = {}
+
+        subdomain_data['total_found'] = len(normalized)
         return subdomain_data
     
-    def _dictionary_subdomain_enum(self, domain: str, max_workers: int = 20) -> Set[str]:
+    def _dictionary_subdomain_enum(self, domain: str) -> Set[str]:
         """Dictionary-based subdomain enumeration"""
-        discovered = set()
+        if not self.subdomain_wordlist:
+            return set()
         
-        def check_subdomain(prefix):
-            subdomain = f"{prefix}.{domain}"
+        prefixes = self.subdomain_wordlist
+        if self.dictionary_limit:
+            prefixes = prefixes[: self.dictionary_limit]
+        
+        prefixes = [prefix.strip() for prefix in prefixes if prefix and prefix.strip()]
+        if not prefixes:
+            return set()
+        
+        discovered: Set[str] = set()
+        max_workers = min(max(len(prefixes), 1), self.max_concurrency)
+        
+        def check_subdomain(prefix: str) -> Optional[str]:
+            subdomain = f"{prefix}.{domain}".lower()
             try:
                 resolver = dns.resolver.Resolver()
                 resolver.timeout = 2
-                resolver.resolve(subdomain, 'A')
-                return subdomain
-            except:
+                resolver.lifetime = 4
+                
+                try:
+                    resolver.resolve(subdomain, 'A')
+                    return subdomain
+                except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN):
+                    # Try CNAME as fallback
+                    resolver.resolve(subdomain, 'CNAME')
+                    return subdomain
+            except (dns.exception.DNSException, socket.gaierror, TimeoutError):
+                return None
+            except Exception:
                 return None
         
-        # Use threading for faster enumeration
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [executor.submit(check_subdomain, prefix) for prefix in self.subdomain_wordlist[:50]]  # Limit to avoid overwhelming
-            
-            for future in concurrent.futures.as_completed(futures, timeout=30):
-                try:
-                    result = future.result()
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                for result in executor.map(check_subdomain, prefixes, chunksize=5):
                     if result:
                         discovered.add(result)
-                except:
-                    pass
+        except Exception as exc:
+            logger.debug(f"Dictionary enumeration error for {domain}: {exc}")
         
         return discovered
     
-    def _certificate_transparency_enum(self, domain: str) -> Set[str]:
-        """Certificate Transparency log enumeration (simplified)"""
-        discovered = set()
+    def _passive_dns_enum(self, domain: str) -> Set[str]:
+        """Passive DNS based enumeration using free community sources"""
+        if not self.enable_passive_dns:
+            return set()
         
+        discovered: Set[str] = set()
+        
+        # Source 1: hackertarget
         try:
-            # Simple CT log query using crt.sh
-            url = f"https://crt.sh/?q=%.{domain}&output=json"
-            response = requests.get(url, timeout=10)
-            
+            response = requests.get(
+                "https://api.hackertarget.com/hostsearch/",
+                params={'q': domain},
+                timeout=15
+            )
+            if response.status_code == 200 and 'error' not in response.text.lower():
+                for line in response.text.splitlines():
+                    parts = line.split(',')
+                    if parts:
+                        host = parts[0].strip().lower()
+                        if host.endswith(domain):
+                            discovered.add(host)
+            elif response.status_code == 429:
+                logger.debug("hackertarget rate limit reached")
+        except Exception as exc:
+            logger.debug(f"Hackertarget passive DNS failed for {domain}: {exc}")
+        
+        # Source 2: dns.bufferover.run
+        try:
+            response = requests.get(
+                "https://dns.bufferover.run/dns",
+                params={'q': f'.{domain}'},
+                timeout=15
+            )
             if response.status_code == 200:
                 data = response.json()
-                for entry in data[:20]:  # Limit results
-                    common_name = entry.get('common_name', '')
-                    if common_name and domain in common_name:
-                        discovered.add(common_name)
-                    
-                    # Also check SANs if available
-                    name_value = entry.get('name_value', '')
-                    if name_value:
-                        for name in name_value.split('\n'):
-                            name = name.strip()
-                            if name and domain in name and not name.startswith('*'):
-                                discovered.add(name)
-        except Exception as e:
-            logger.debug(f"CT enumeration failed for {domain}: {e}")
+                for key in ('FDNS_A', 'RDNS'):
+                    for entry in data.get(key, []) or []:
+                        # Format is "subdomain,IP"
+                        host = entry.split(',')[0].strip().lower()
+                        if host and host.endswith(domain):
+                            discovered.add(host)
+        except Exception as exc:
+            logger.debug(f"bufferover passive DNS failed for {domain}: {exc}")
+        
+        return discovered
+    
+    def _subfinder_enum(self, domain: str) -> Set[str]:
+        """Integrate with subfinder if available (optional)"""
+        if not self.enable_subfinder:
+            return set()
+        
+        binary = self.subfinder_path or shutil.which("subfinder")
+        if not binary:
+            logger.debug("Subfinder enumeration requested but binary not found")
+            return set()
+        
+        cmd = [
+            binary,
+            "-d", domain,
+            "-silent",
+            "-timeout", str(max(10, int(self.subfinder_timeout / 2))),
+        ]
+        
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=self.subfinder_timeout
+            )
+            if result.returncode not in (0, 1):
+                logger.debug(f"Subfinder exited with code {result.returncode}: {result.stderr.strip()}")
+                return set()
+            
+            hosts = {
+                line.strip().lower()
+                for line in result.stdout.splitlines()
+                if line.strip().lower().endswith(domain)
+            }
+            return hosts
+        except FileNotFoundError:
+            logger.debug("Subfinder binary not found during execution")
+        except subprocess.TimeoutExpired:
+            logger.debug("Subfinder execution timed out")
+        except Exception as exc:
+            logger.debug(f"Subfinder enumeration failed: {exc}")
+        
+        return set()
+    
+    def _certificate_transparency_enum(self, domain: str) -> Set[str]:
+        """Certificate Transparency log enumeration with pagination"""
+        discovered: Set[str] = set()
+        page_size = 100
+        throttle_seconds = 1.0
+        seen_entries: Set[str] = set()
+        
+        for page in range(self.ct_page_limit):
+            offset = page * page_size
+            url = f"https://crt.sh/?q=%25.{domain}&output=json&offset={offset}"
+            try:
+                response = requests.get(url, timeout=15)
+            except Exception as exc:
+                logger.debug(f"CT query error for {domain} (offset {offset}): {exc}")
+                break
+            
+            if response.status_code != 200:
+                logger.debug(f"CT query returned status {response.status_code} for {domain}")
+                break
+            
+            try:
+                data = response.json()
+            except ValueError:
+                # crt.sh may return HTML when throttled
+                logger.debug(f"CT query returned non-JSON payload for {domain}")
+                break
+            
+            if not data:
+                break
+            
+            for entry in data:
+                entry_id = str(entry.get('id'))
+                if entry_id in seen_entries:
+                    continue
+                seen_entries.add(entry_id)
+                
+                common_name = entry.get('common_name', '')
+                if common_name and domain in common_name and not common_name.startswith('*.'):
+                    discovered.add(common_name.strip().lower())
+                
+                name_value = entry.get('name_value', '')
+                if name_value:
+                    for name in name_value.split('\n'):
+                        clean = name.strip().lower()
+                        if clean and domain in clean and not clean.startswith('*.'):
+                            discovered.add(clean)
+            
+            # Respect crt.sh fair use
+            time.sleep(throttle_seconds)
         
         return discovered
     
@@ -393,12 +643,21 @@ class ComprehensiveAnalysisIntegration(HTTPIntegration):
             # Quick HTTP check
             if analysis['ip_addresses']:
                 try:
-                    response = requests.head(f"https://{subdomain}", timeout=5, verify=False)
+                    response = requests.head(
+                        f"https://{subdomain}",
+                        timeout=5,
+                        verify=False,
+                        headers=self.headers
+                    )
                     analysis['http_status'] = response.status_code
                     analysis['server_info'] = dict(response.headers)
                 except:
                     try:
-                        response = requests.head(f"http://{subdomain}", timeout=5)
+                        response = requests.head(
+                            f"http://{subdomain}",
+                            timeout=5,
+                            headers=self.headers
+                        )
                         analysis['http_status'] = response.status_code
                         analysis['server_info'] = dict(response.headers)
                     except:

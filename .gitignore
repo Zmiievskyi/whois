@@ -2,6 +2,7 @@
 venv/
 .cursor/
 venv_whois/
+.claude/
 __pycache__/
 *.py[cod]
 *.log

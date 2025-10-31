@@ -418,30 +418,50 @@ def process_single_url(url, progress_callback=None):
     
     logger.info(f"🚀 Starting analysis for URL: {url}")
     
-    if progress_callback:
-        progress_callback(f"Analyzing {url}...")
+    analysis_state = {'error': False}
+    
+    def notify(label, detail=None, state="running"):
+        if state == "error":
+            analysis_state['error'] = True
+        if progress_callback:
+            progress_callback({
+                'label': label,
+                'detail': detail,
+                'state': state
+            })
+    
+    notify("🚀 Initializing analysis", f"Target: {url}")
     
     # Get detector instance
     detector = get_detector_instance()
     
     domain = urlparse(url).netloc or url.replace('https://', '').replace('http://', '').split('/')[0]
     logger.info(f"📝 Extracted domain: {domain}")
+    notify("📝 Domain extracted", f"Working domain: {domain}")
     
     logger.info(f"🌐 Step 1/5: Fetching headers...")
+    notify("🌐 Step 1/6: Fetching HTTP headers", "Requesting headers from target")
     headers = detector.get_headers(url)
     logger.info(f"✅ Headers fetched: {len(headers)} chars")
+    notify("✅ Headers fetched", f"Captured {len(headers)} header characters")
     
     logger.info(f"🔍 Step 2/5: Resolving IP...")
+    notify("🔍 Step 2/6: Resolving IP address", "Performing DNS lookup")
     ip = detector.get_ip(url)
     logger.info(f"✅ IP resolved: {ip}")
+    notify("✅ IP resolved", f"Resolved IP: {ip}")
     logger.info(f"📋 Step 3/5: Getting WHOIS data...")
+    notify("📋 Step 3/6: Collecting WHOIS data", "Querying regional registries")
     whois_data = detector.get_whois(ip) if ip else ""
     logger.info(f"✅ WHOIS data fetched: {len(whois_data)} chars")
+    notify("✅ WHOIS data collected", f"{len(whois_data)} characters retrieved")
     
     # Enhanced Provider Detection System v4.0 with 6 integrations
     logger.info(f"🚀 Step 4/5: Running enhanced provider detection (6 integrations)...")
+    notify("🚀 Step 4/6: Enhanced provider detection", "Correlating headers, DNS, IP and WHOIS")
     enhanced_result = detect_provider(headers, ip, whois_data, domain)
     logger.info(f"✅ Enhanced provider detection completed!")
+    notify("✅ Provider detection complete", "Roles classified, confidence score calculated")
     
     # Comprehensive Analysis (Full DNS, Subdomains, Raw Headers)
     comprehensive_analysis_result = {}
@@ -449,16 +469,20 @@ def process_single_url(url, progress_callback=None):
     if COMPREHENSIVE_ANALYSIS_AVAILABLE:
         try:
             logger.info(f"🔍 Step 5/5: Running comprehensive analysis (Full DNS, Subdomains, Headers)...")
+            notify("🔍 Step 5/6: Comprehensive analysis", "Enumerating DNS records, subdomains and HTTP artefacts")
             comprehensive_analyzer = get_comprehensive_analysis()
             comprehensive_analysis_result = comprehensive_analyzer.analyze_domain_comprehensive(domain)
             logger.info(f"✅ Comprehensive analysis completed!")
+            notify("✅ Comprehensive analysis complete", "Extended DNS and subdomain data collected")
             logger.info(f"🔧 Debug: comprehensive_analysis_result keys: {list(comprehensive_analysis_result.keys()) if comprehensive_analysis_result else 'None or empty'}")
             logger.info(f"🔧 Debug: comprehensive_analysis_result size: {len(str(comprehensive_analysis_result)) if comprehensive_analysis_result else 0} chars")
         except Exception as e:
             logger.warning(f"⚠️ Comprehensive analysis failed: {e}")
             comprehensive_analysis_result = {'error': str(e)}
+            notify("⚠️ Comprehensive analysis failed", str(e), state="error")
     else:
         logger.info("⏭️ Step 5/5: Comprehensive analysis not available (install additional dependencies)")
+        notify("ℹ️ Comprehensive analysis skipped", "Module unavailable", state="running")
     
     # Format providers by role
     origin_providers = [p['name'] for p in enhanced_result['providers'] if p['role'] == 'Origin']
@@ -516,10 +540,17 @@ def process_single_url(url, progress_callback=None):
         detector_instance._save_analysis_to_backend(combined_result, domain)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         logger.info(f"✅ Analysis results saved to backend: analysis_{domain.replace('.', '_')}_{timestamp}.json, summary_{domain.replace('.', '_')}_{timestamp}.csv")
+        notify("💾 Step 6/6: Results archived", "JSON and CSV exports saved")
     except Exception as e:
         logger.error(f"⚠️ Failed to save analysis results: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
+        notify("⚠️ Failed to archive results", str(e), state="error")
+    
+    if analysis_state['error']:
+        notify("⚠️ Analysis completed with warnings", "Some modules returned errors", state="error")
+    else:
+        notify("✅ Analysis complete", "All modules finished", state="complete")
     
     return result
 
@@ -999,10 +1030,25 @@ def main():
                                 progress_bar.progress(progress)
                                 status_text.text(f"Processing {idx + 1}/{len(df_clean)}: {company}")
                                 
+                                def csv_progress_callback(event):
+                                    if event is None:
+                                        return
+                                    if isinstance(event, dict):
+                                        label = event.get('label')
+                                        detail = event.get('detail')
+                                    else:
+                                        label = str(event)
+                                        detail = None
+                                    message = label or "Working..."
+                                    if detail:
+                                        status_text.markdown(f"**{message}**  \n{detail}")
+                                    else:
+                                        status_text.markdown(f"**{message}**")
+                                
                                 try:
                                     # Use the same comprehensive analysis as single URL processing
                                     clean_url = url.replace('https://', '').replace('http://', '')
-                                    analysis_result = process_single_url(clean_url)
+                                    analysis_result = process_single_url(clean_url, progress_callback=csv_progress_callback)
                                     
                                     # Extract data from analysis result for CSV display
                                     result = {
@@ -1166,16 +1212,42 @@ def main():
                 clean_url = url_or_error.replace('https://', '').replace('http://', '')
                 
                 # Run analysis immediately
-                with st.spinner("ANALYZING_TARGET..."):
-                    try:
-                        result = process_single_url(clean_url)
-                        # Save to session state
-                        st.session_state.last_result = result
-                        st.session_state.last_url = url_input
-                        st.success("ANALYSIS_COMPLETED")
-                    except Exception as e:
-                        st.error(f"ANALYSIS_FAILED: {str(e)}")
-                        st.session_state.last_result = None
+                status_panel = st.status(label="Initializing analysis...", expanded=True)
+
+                def ui_progress_callback(event):
+                    if event is None:
+                        return
+                    label = None
+                    detail = None
+                    state = None
+                    if isinstance(event, dict):
+                        label = event.get('label')
+                        detail = event.get('detail')
+                        state = event.get('state')
+                    else:
+                        label = str(event)
+                    update_kwargs = {}
+                    if label:
+                        update_kwargs['label'] = label
+                    if state in ("running", "complete", "error"):
+                        update_kwargs['state'] = state
+                    if update_kwargs:
+                        status_panel.update(**update_kwargs)
+                    if detail:
+                        status_panel.write(detail)
+
+                try:
+                    result = process_single_url(clean_url, progress_callback=ui_progress_callback)
+                    # Save to session state
+                    st.session_state.last_result = result
+                    st.session_state.last_url = url_input
+                    status_panel.update(label="✅ Analysis complete", state="complete")
+                    status_panel.write("All detection modules finished successfully.")
+                    st.success("ANALYSIS_COMPLETED")
+                except Exception as e:
+                    ui_progress_callback({'label': 'Analysis failed', 'detail': str(e), 'state': 'error'})
+                    st.error(f"ANALYSIS_FAILED: {str(e)}")
+                    st.session_state.last_result = None
         
         # Display results if available  
         if st.session_state.last_result:

@@ -13,20 +13,30 @@
 
 ## Overview
 
-The Enhanced Provider Discovery Tool performs comprehensive analysis of websites using **6 completely FREE data sources** to identify hosting and CDN infrastructure. The system combines traditional detection methods with modern intelligence sources for unparalleled accuracy and insight.
+The Enhanced Provider Discovery Tool performs comprehensive analysis of websites using **7 completely FREE data sources** to identify hosting and CDN infrastructure. The system combines traditional detection methods with modern intelligence sources for unparalleled accuracy and insight.
 
-### 🆓 **6 FREE Data Source Integrations**
+### 🆓 **7 FREE Data Source Integrations**
 
 | Integration | Status | Description | Key Features |
 |-------------|--------|-------------|--------------|
 | 🔒 **SSL Certificate Analysis** | ✅ FREE | Certificate Authority detection | Security scoring, provider hints |
 | 🌐 **Enhanced DNS Framework** | ✅ FREE | Multi-resolver + DoH analysis | Cross-validation, consensus |
 | 🌍 **Geographic Intelligence** | ✅ FREE | Multi-provider geolocation | IP location, cloud classification |
-| 📡 **BGP Analysis (BGPView)** | ✅ FREE | ASN and routing data | Network topology, peering |
-| 🌐 **BGP Analysis (Hurricane Electric)** | ✅ FREE | Enhanced BGP intelligence | Web scraping, detailed ASN data |
+| 🌐 **IPInfo.io** | ✅ FREE | **PRIMARY** ASN/BGP data + geolocation | 50k req/month, city-level geo, anycast detection |
+| 📡 **BGP Analysis (Multi-Source)** | ✅ FREE | Intelligent fallback strategy | IPInfo → Hurricane Electric → RIPE |
+| 🌐 **Hurricane Electric BGP** | ✅ FREE | Detailed BGP intelligence (fallback) | Web scraping, ASN details |
 | 🛡️ **Threat Intelligence** | ✅ FREE | Security assessment | Domain reputation, threat scoring |
 
 ## 🆕 Key Features
+
+- **Deep Infrastructure Recon** – combines DNS, HTTP headers, WHOIS, official IP ranges, SSL/TLS, BGP and threat intel to map every provider role.
+- **Aggressive Subdomain Discovery** – dictionary bruteforce, Certificate Transparency pagination, passive DNS feeds and optional subfinder cover customer- and service-specific hosts.
+- **Origin vs Edge Separation** – identifies origin, CDN, WAF, load balancer and DNS layers even behind chained CNAMEs.
+- **Security & Reputation Insights** – VirusTotal, Shodan (opt-in) and custom heuristics flag malicious signals and export recommendations.
+- **Multi-Source BGP Intelligence** – intelligent fallback strategy (IPInfo.io → Hurricane Electric → RIPE → Local) ensures reliable ASN/geolocation data.
+- **Enhanced Geolocation** – IPInfo.io provides city-level precision, coordinates, timezone, and anycast detection (bonus over previous BGPView).
+- **Transparent Confidence Scoring** – every detection lists evidence and confidence factors for rapid verification.
+- **Batch & Interactive Workflows** – Streamlit UI, CLI helpers, CSV batches, caching and rate limiting tuned for free API tiers.
 
 ### Enhanced Multi-Layer Detection (Phase 2B)
 - **VirusTotal Integration** - Cross-validation with global threat intelligence database
@@ -43,9 +53,35 @@ The Enhanced Provider Discovery Tool performs comprehensive analysis of websites
 
 ### Advanced Analytics
 - **Primary vs CDN Provider Charts**
-- **Multi-Provider Setup Statistics** 
+- **Multi-Provider Setup Statistics**
 - **DNS Resolution Chain Visualization**
 - **Confidence Factor Analysis**
+
+### Multi-Source BGP Strategy (Phase 4 - NEW!)
+**Intelligent BGP/ASN data sourcing with automatic fallback:**
+
+1. **IPInfo.io** (Primary) - Fast, reliable, 50k requests/month free
+   - ASN number and organization name
+   - City-level geolocation (latitude, longitude)
+   - Hostname, postal code, timezone
+   - Anycast detection for CDN identification
+   - Works without API key (1000/day limit)
+
+2. **Hurricane Electric** (Secondary) - Detailed BGP data when IPInfo unavailable
+   - Comprehensive ASN information
+   - BGP peering relationships
+   - Route/prefix information
+
+3. **RIPE Stat API** (Tertiary) - European network data
+   - Network ownership information
+   - RIR allocation data
+
+4. **Local BGP Classifier** (Fallback) - Pattern-based classification
+   - Cloud provider detection (AWS, GCP, Azure, etc.)
+   - Hosting provider identification
+   - Works offline with cached patterns
+
+**Why IPInfo.io?** Replaced BGPView (now unreliable due to Recorded Future acquisition) with IPInfo.io, which offers better uptime, richer data (geolocation bonus), and generous free tier.
 
 ### Real-Time Data Sources
 - **Official AWS IP ranges** from Amazon's JSON endpoint
@@ -59,10 +95,16 @@ The Enhanced Provider Discovery Tool performs comprehensive analysis of websites
 - Python 3.10 or higher
 - Virtual environment (recommended)
 - Optional API access (free tiers available):
-  - VirusTotal account and personal API key (register at [virustotal.com](https://www.virustotal.com/))
-  - Shodan account and API key (create at [shodan.io](https://www.shodan.io/); free plan offers limited queries)
+  - **IPInfo.io** (Recommended) - Get free token at [ipinfo.io/signup](https://ipinfo.io/signup) for 50k requests/month
+  - **VirusTotal** - Register at [virustotal.com](https://www.virustotal.com/) for threat intelligence
+  - **Shodan** - Create account at [shodan.io](https://www.shodan.io/) (free plan offers limited queries)
+  - **Censys** - Get API credentials at [search.censys.io/account/api](https://search.censys.io/account/api)
 
-> Tip: store your keys in `.env` as `VT_API_KEY=<your_key>` and `SHODAN_API_KEY=<your_key>` before enabling the corresponding integrations.
+> **Tip:** Store your keys in `.env`:
+> - `IPINFO_API_KEY=your_token` (50k/month free, highly recommended)
+> - `VT_API_KEY=your_key` (for VirusTotal)
+> - `SHODAN_API_KEY=your_key` (for Shodan)
+> - `CENSYS_API_ID=your_id` and `CENSYS_API_SECRET=your_secret` (for Censys)
 
 ### Installation
 
@@ -209,73 +251,97 @@ Input URL → DNS Chain Analysis → HTTP Headers → IP Ranges → WHOIS → Mu
 - **Medium**: Single reliable detection method
 - **Low**: Fallback WHOIS analysis only
 
-### Performance Optimizations
-- **IP address caching** for repeated requests
-- **DNS resolution caching** to avoid duplicate queries
-- **Smart cache invalidation** strategies
-- **Parallel processing** for batch analysis
+- **Performance optimizations**: caching of HTTP/DNS responses, parallel workers for batch mode, smart invalidation policies.
+- **Flexible output**: Streamlit UI, CSV export with per-provider roles, JSON summaries for automation.
 
 ## Output Formats
 
-### Enhanced CSV Output (Phase 2A)
-```csv
+### CSV (default phase 2A schema)
+```
 Company,URL,Primary_Provider,Origin_Provider,CDN_Providers,WAF_Providers,LB_Providers,DNS_Providers,IP_Address,Confidence
-GitHub,github.com,GitHub,GitHub,Fastly,None,None,Namecheap,140.82.121.3,HTTP headers match; DNS provider identified; Official IP ranges match
-Cloudflare,cloudflare.com,Cloudflare,Cloudflare,Cloudflare,None,None,Cloudflare,104.16.124.96,HTTP headers match; DNS provider identified; Official IP ranges match
+GitHub,github.com,GitHub,GitHub,Fastly,None,None,Namecheap,140.82.121.3,Headers match; DNS provider identified; IP range verified
+Cloudflare,cloudflare.com,Cloudflare,Cloudflare,Cloudflare,None,None,Cloudflare,104.16.124.96,Headers match; DNS provider identified; IP range verified
 ```
 
 ### API Response Structure
 ```python
 {
-    'providers': [
-        {'name': 'AWS', 'role': 'Origin', 'confidence': 'High'},
-        {'name': 'Cloudflare', 'role': 'CDN', 'confidence': 'High'}
+    "providers": [
+        {"name": "AWS", "role": "Origin", "confidence": "High"},
+        {"name": "Cloudflare", "role": "CDN", "confidence": "High"}
     ],
-    'primary_provider': 'AWS',
-    'confidence_factors': ['Official IP ranges match', 'HTTP headers match'],
-    'dns_chain': [
-        {'domain': 'example.com', 'cname': 'cdn.example.com', 'provider': 'Cloudflare', 'role': 'CDN'},
-        {'domain': 'cdn.example.com', 'ip': '1.2.3.4', 'provider': 'AWS', 'role': 'Origin'}
+    "primary_provider": "AWS",
+    "confidence_factors": ["Official IP ranges match", "HTTP headers match"],
+    "dns_chain": [
+        {"domain": "example.com", "cname": "cdn.example.com", "provider": "Cloudflare", "role": "CDN"},
+        {"domain": "cdn.example.com", "ip": "1.2.3.4", "provider": "AWS", "role": "Origin"}
     ]
 }
 ```
 
 ## Performance Metrics (Phase 2B)
 
-- **Processing Speed**: 3-5 seconds per domain (with VirusTotal)
-- **Accuracy Rate**: 98%+ for major providers (maintained)
-- **DNS Provider Detection**: 90%+ identification rate
-- **Multi-Provider Detection**: 98%+ coverage (improved)
-- **False Positive Reduction**: 75% improvement over simple methods
-- **Unknown Results Reduction**: 35% fewer unknowns (improved)
-- **Security Detection**: New capability for threat identification
-- **Cross-Validation**: 95%+ agreement with VirusTotal database
+- **Processing speed**: 3–5 seconds per domain (VirusTotal enabled)
+- **Accuracy rate**: ≥98 % on major providers
+- **DNS provider detection**: ≥90 % identification rate
+- **Multi-provider setups**: ≥98 % coverage
+- **False positives**: 75 % reduction vs. naive pattern matching
+- **Unknown results**: 35 % decrease through cross-validation
+- **Threat detection**: reputation scoring and malware flagging (VirusTotal)
 
 ## Dependencies
 
-```txt
+```
 streamlit>=1.28.0    # Web application framework
 pandas>=1.5.0        # Data processing and analysis
 requests>=2.32.0     # HTTP requests for API calls
 dnspython>=2.4.0     # DNS resolution and analysis
 vt-py>=0.21.0        # VirusTotal API integration (Phase 2B)
 shodan>=1.31.0       # Shodan API integration (optional; requires API key)
+subfinder (binary)   # Optional CLI for advanced subdomain enumeration
 ```
+
+> The Docker image built from `Dockerfile` already bundles subfinder (v2.6.6). On local machines install it manually, e.g. `brew install subfinder` or `go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest`.
+
+## Subdomain Enumeration
+
+The comprehensive analysis module combines several discovery techniques:
+
+- **Dictionary bruteforce** with an extensible wordlist (`SUBDOMAIN_WORDLIST_PATH`).
+- **Certificate Transparency** pagination via crt.sh (`ENABLE_CT_ENUMERATION`, `CT_LOG_PAGE_LIMIT`).
+- **Passive DNS feeds** (hackertarget, bufferover) toggled by `ENABLE_PASSIVE_DNS_ENUMERATION`.
+- **Subfinder integration** when `ENABLE_SUBFINDER_ENUMERATION=true`.
+
+Tune behaviour via `.env`:
+
+```
+SUBDOMAIN_DICTIONARY_LIMIT=3000
+SUBDOMAIN_ANALYSIS_LIMIT=400
+SUBDOMAIN_MAX_CONCURRENCY=80
+```
+
+The engine deduplicates discoveries, respects rate limits and truncates deep analysis to the configured limit.
+
+Need even more coverage? Use the helper to merge public wordlists:
+
+```
+python scripts/update_subdomain_wordlist.py --include-existing --sort
+```
+
+Add `--local path/to/list.txt` or `--source https://example.com/subdomains.txt` to blend custom feeds.
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Import Error for UltimateProviderDetector**
-   ```bash
+1. **Import error `ultimate_provider_detector`**
+   ```
    pip install dnspython
    ```
 
-2. **DNS Resolution Failures**
-   ```bash
-   # Check DNS connectivity
+2. **DNS resolution failures**
+   ```
    nslookup example.com
-   # Try different DNS servers
    ```
 
 3. **Slow Performance**
@@ -337,10 +403,13 @@ We welcome contributions! Please follow these steps:
 
 ### Roadmap
 - **Phase 1**: Enhanced detection (✅ Complete)
-- **Phase 2A**: Advanced DNS analysis (✅ Complete) 
+- **Phase 2A**: Advanced DNS analysis (✅ Complete)
 - **Phase 2B**: VirusTotal integration (✅ Complete)
-- **Phase 3**: Advanced analytics and monitoring (Planned)
-- **Phase 4**: Enterprise features and API (Planned)
+- **Phase 3A**: Censys integration (✅ Complete)
+- **Phase 3B**: Shodan integration (✅ Complete)
+- **Phase 4**: Multi-Source BGP Strategy (✅ Complete - IPInfo.io primary source)
+- **Phase 5**: Advanced analytics and monitoring (Planned)
+- **Phase 6**: Enterprise features and API (Planned)
 
 ## License
 

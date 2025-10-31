@@ -1,0 +1,20 @@
+Category,Key,Value
+Domain,URL,prestashop.sh
+Network,IP_Address,DNS resolution failed: [Errno -2] Name or service not known
+Confidence,Enhanced_Confidence,84%
+Analysis,Timestamp,2025-10-31 14:12:51 UTC
+Providers,Primary Provider,Cloudflare
+Providers,CDN Providers,None
+Providers,DNS Providers,"Cloudflare, Cloudflare"
+Providers,Hosting Providers,None
+Providers,Cloud Providers,None
+Providers,Security Providers,None
+Analysis Steps,Base Provider Detection,completed | +15% confidence | 1 findings
+Analysis Steps,SSL Certificate Analysis,completed | +5% confidence | 1 findings
+Analysis Steps,Enhanced DNS Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Geographic Intelligence,completed | +0% confidence | 0 findings
+Analysis Steps,BGP Analysis,completed | +0% confidence | 0 findings
+Analysis Steps,Step 6 Advanced Bgp Classification,pending | +0% confidence | 0 findings
+Analysis Steps,Threat Intelligence,completed | +0% confidence | 1 findings
+Analysis Steps,Shodan Premium WAF Analysis,completed | +22% confidence | 8 findings
+Analysis Steps,Cross-Validation & Final Analysis,completed | +10% confidence | 2 findings

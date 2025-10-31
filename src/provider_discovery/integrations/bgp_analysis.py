@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 """
-BGP Analysis Integration
+BGP Analysis Integration - Multi-Source Strategy
 Provides ASN lookup, routing analysis, and network intelligence
-Uses multiple free BGP data sources including BGPView API
+Uses multiple free BGP data sources with intelligent fallback
+
+Multi-Source Priority:
+1. IPInfo.io (Primary) - Fast, reliable, includes geolocation
+2. Hurricane Electric (Secondary) - Detailed BGP data when IPInfo fails
+3. RIPE Stat (Tertiary) - European networks fallback
+4. Advanced BGP Classifier (Local) - Pattern-based classification
 """
 
 import logging
@@ -15,45 +21,91 @@ logger = logging.getLogger(__name__)
 
 class BGPAnalysisIntegration(HTTPIntegration):
     """
-    BGP Analysis integration using multiple free data sources
-    
-    Data Sources:
-    - BGPView API (api.bgpview.io) - Free BGP data
-    - RIPE Stat API - European network intelligence  
-    - BGP.HE.net - Hurricane Electric data (scraped)
-    - BGPKIT Broker - BGP archive data
+    BGP Analysis integration using multi-source strategy
+
+    Data Sources (Priority Order):
+    1. IPInfo.io - Primary source (replaced BGPView)
+       - Fast and reliable
+       - 50k requests/month with free token
+       - Includes geolocation bonus data
+    2. Hurricane Electric (bgp.he.net) - Secondary source
+       - Detailed BGP data
+       - Web scraping based
+    3. RIPE Stat API - Tertiary source
+       - European network intelligence
+    4. Local BGP Classifier - Fallback
+       - Pattern-based classification
     """
-    
+
     def __init__(self, cache_ttl: int = 7200):
         """
-        Initialize BGP Analysis integration
-        
+        Initialize BGP Analysis integration with multi-source support
+
         Args:
             cache_ttl: Cache TTL in seconds (default 2 hours for better rate limiting)
         """
         super().__init__(
             service_name="bgp_analysis",
-            base_url="https://api.bgpview.io"  # Primary BGP data source
+            base_url="https://stat.ripe.net/data"  # Changed from BGPView to RIPE
         )
-        
+
         self.cache_ttl = cache_ttl
-        self.base_urls = {
-            'bgpview': 'https://api.bgpview.io',
-            'ripe': 'https://stat.ripe.net/data',
-            'bgpkit': 'https://api.broker.bgpkit.com/v2'
-        }
-        
+
+        # Initialize data sources (lazy loading)
+        self._ipinfo = None
+        self._hurricane_electric = None
+        self._bgp_classifier = None
+
         # Setup rate limiting (very conservative for free APIs)
         if hasattr(self.rate_limiter, 'add_service'):
-            self.rate_limiter.add_service('bgp_analysis', 3, 60)  # 3 requests per minute (very conservative)
-        
-        logger.info("BGP Analysis integration initialized")
+            self.rate_limiter.add_service('bgp_analysis', 10, 60)  # 10 requests per minute
+
+        logger.info("BGP Analysis integration initialized (Multi-Source Strategy: IPInfo → HE → RIPE)")
     
     @property
     def is_enabled(self) -> bool:
         """BGP analysis is always enabled (uses free APIs)"""
         return True
-    
+
+    @property
+    def ipinfo(self):
+        """Lazy load IPInfo integration"""
+        if self._ipinfo is None:
+            try:
+                from .ipinfo_integration import get_ipinfo_integration
+                self._ipinfo = get_ipinfo_integration()
+                logger.debug("IPInfo integration loaded")
+            except Exception as e:
+                logger.warning(f"Failed to load IPInfo integration: {e}")
+                self._ipinfo = None
+        return self._ipinfo
+
+    @property
+    def hurricane_electric(self):
+        """Lazy load Hurricane Electric integration"""
+        if self._hurricane_electric is None:
+            try:
+                from .hurricane_electric import get_hurricane_electric_integration
+                self._hurricane_electric = get_hurricane_electric_integration()
+                logger.debug("Hurricane Electric integration loaded")
+            except Exception as e:
+                logger.warning(f"Failed to load Hurricane Electric integration: {e}")
+                self._hurricane_electric = None
+        return self._hurricane_electric
+
+    @property
+    def bgp_classifier(self):
+        """Lazy load Advanced BGP Classifier"""
+        if self._bgp_classifier is None:
+            try:
+                from .advanced_bgp_classifier import get_advanced_bgp_classifier
+                self._bgp_classifier = get_advanced_bgp_classifier()
+                logger.debug("Advanced BGP Classifier loaded")
+            except Exception as e:
+                logger.warning(f"Failed to load Advanced BGP Classifier: {e}")
+                self._bgp_classifier = None
+        return self._bgp_classifier
+
     def _make_api_request(self, endpoint: str, base_url: str = None, **kwargs) -> Dict[str, Any]:
         """
         Make API request to BGP data sources with caching and rate limit handling
@@ -114,48 +166,139 @@ class BGPAnalysisIntegration(HTTPIntegration):
     
     def get_ip_asn_info(self, ip: str) -> Dict[str, Any]:
         """
-        Get ASN information for an IP address
-        
+        Get ASN information for an IP address using multi-source strategy
+
+        Priority:
+        1. IPInfo.io (Primary) - Fast, reliable, includes geolocation
+        2. Hurricane Electric (Secondary) - Detailed BGP data
+        3. RIPE Stat (Tertiary) - European networks
+        4. Local classifier (Fallback) - Pattern matching
+
         Args:
             ip: IP address to lookup
-            
+
         Returns:
-            Dict with ASN information
+            Dict with ASN information including data_source field
         """
         cache_key = f"asn_info_{ip}"
         cached_result = self.cache.get('bgp_analysis', cache_key)
         if cached_result:
             return cached_result
-        
+
+        # Try sources in priority order
+        sources = [
+            ('ipinfo', self._try_ipinfo_asn),
+            ('hurricane_electric', self._try_hurricane_electric_asn),
+            ('ripe', self._try_ripe_asn),
+            ('local_classifier', self._try_local_classifier_asn)
+        ]
+
+        for source_name, source_func in sources:
+            try:
+                result = source_func(ip)
+                if result and 'error' not in result and result.get('asn', 0) != 0:
+                    result['data_source'] = source_name
+                    # Cache successful result
+                    self.cache.set('bgp_analysis', cache_key, result, self.cache_ttl)
+                    logger.debug(f"ASN info for {ip} retrieved from {source_name}")
+                    return result
+            except Exception as e:
+                logger.debug(f"Failed to get ASN from {source_name} for {ip}: {e}")
+                continue
+
+        # All sources failed
+        error_result = {
+            'error': 'All BGP sources failed',
+            'ip': ip,
+            'asn': 0,
+            'data_source': 'none'
+        }
+        return error_result
+
+    def _try_ipinfo_asn(self, ip: str) -> Optional[Dict[str, Any]]:
+        """Try to get ASN info from IPInfo.io"""
+        if not self.ipinfo:
+            return None
+
+        result = self.ipinfo.get_ip_info(ip)
+        if 'error' in result:
+            return None
+
+        # IPInfo returns enriched data with parsed ASN
+        return {
+            'ip': ip,
+            'asn': result.get('asn', 0),
+            'asn_name': result.get('asn_name', ''),
+            'asn_description': result.get('asn_description', ''),
+            'country_code': result.get('country_code', ''),
+            'city': result.get('city', ''),
+            'region': result.get('region', ''),
+            'latitude': result.get('latitude'),
+            'longitude': result.get('longitude'),
+            'hostname': result.get('hostname', ''),
+            'org': result.get('org', ''),
+            'postal': result.get('postal', ''),
+            'timezone': result.get('timezone', ''),
+            'anycast': result.get('anycast', False),
+        }
+
+    def _try_hurricane_electric_asn(self, ip: str) -> Optional[Dict[str, Any]]:
+        """Try to get ASN info from Hurricane Electric"""
+        if not self.hurricane_electric:
+            return None
+
         try:
-            # BGPView API call
-            endpoint = f"ip/{ip}"
-            result = self._make_api_request(endpoint)
-            
-            if 'error' in result:
+            result = self.hurricane_electric.get_ip_asn_info(ip)
+            if result and 'error' not in result:
                 return result
-            
-            # Extract useful information
-            data = result.get('data', {})
-            asn_info = {
-                'ip': ip,
-                'asn': data.get('asn', 0),
-                'asn_name': data.get('name', ''),
-                'asn_description': data.get('description_short', ''),
-                'country_code': data.get('country_code', ''),
-                'registry': data.get('rir_allocation', {}).get('rir_name', ''),
-                'prefixes': data.get('prefixes', []),
-                'data_source': 'bgpview'
-            }
-            
-            # Cache the result
-            self.cache.set('bgp_analysis', cache_key, asn_info, self.cache_ttl)
-            
-            return asn_info
-            
         except Exception as e:
-            logger.error(f"Failed to get ASN info for {ip}: {e}")
-            return {'error': str(e), 'ip': ip}
+            logger.debug(f"Hurricane Electric lookup failed for {ip}: {e}")
+        return None
+
+    def _try_ripe_asn(self, ip: str) -> Optional[Dict[str, Any]]:
+        """Try to get ASN info from RIPE Stat"""
+        try:
+            # RIPE Stat API endpoint
+            url = f"https://stat.ripe.net/data/network-info/data.json?resource={ip}"
+            response = requests.get(url, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                asn_info = data.get('data', {}).get('asns', [])
+
+                if asn_info:
+                    asn = asn_info[0]
+                    return {
+                        'ip': ip,
+                        'asn': int(asn) if asn else 0,
+                        'asn_name': data.get('data', {}).get('holder', ''),
+                        'asn_description': data.get('data', {}).get('holder', ''),
+                        'country_code': '',
+                        'registry': 'RIPE',
+                    }
+        except Exception as e:
+            logger.debug(f"RIPE lookup failed for {ip}: {e}")
+        return None
+
+    def _try_local_classifier_asn(self, ip: str) -> Optional[Dict[str, Any]]:
+        """Try to classify ASN using local patterns"""
+        if not self.bgp_classifier:
+            return None
+
+        try:
+            result = self.bgp_classifier.classify_ip(ip)
+            if result and result.get('asn', 0) != 0:
+                return {
+                    'ip': ip,
+                    'asn': result.get('asn', 0),
+                    'asn_name': result.get('name', ''),
+                    'asn_description': result.get('description', ''),
+                    'country_code': '',
+                    'confidence': result.get('confidence', 'Low'),
+                }
+        except Exception as e:
+            logger.debug(f"Local classifier failed for {ip}: {e}")
+        return None
     
     def get_asn_details(self, asn: int) -> Dict[str, Any]:
         """
@@ -429,65 +572,45 @@ class BGPAnalysisIntegration(HTTPIntegration):
         return {}
     
     def test_connection(self) -> Dict[str, Any]:
-        """Test BGP API connection with rate limit awareness"""
+        """Test BGP multi-source strategy"""
         try:
-            # Check if we're rate limited first
-            if hasattr(self.rate_limiter, 'is_rate_limited') and self.rate_limiter.is_rate_limited('bgp_analysis'):
+            # Test with Google DNS
+            result = self.get_ip_asn_info('8.8.8.8')
+
+            if 'error' in result and result.get('asn', 0) == 0:
                 return {
                     'success': False,
-                    'error': 'Rate limited - please wait before testing BGP API',
-                    'rate_limited': True
+                    'error': result.get('error', 'All BGP sources failed'),
+                    'sources_tested': ['ipinfo', 'hurricane_electric', 'ripe', 'local_classifier']
                 }
-            
-            # Test BGPView API with lightweight request
-            result = self._make_api_request('ip/8.8.8.8')
-            
-            if 'error' in result:
-                error_msg = result['error']
-                
-                # Check for rate limiting specifically
-                if '429' in error_msg or 'rate limit' in error_msg.lower() or 'too many requests' in error_msg.lower():
-                    return {
-                        'success': False,
-                        'error': 'BGPView API rate limited - using 3 req/min limit',
-                        'rate_limited': True,
-                        'fallback_available': True
-                    }
-                
-                return {
-                    'success': False,
-                    'error': error_msg,
-                    'fallback_available': True
-                }
-            
+
             # Success case
-            asn_data = result.get('data', {})
             return {
                 'success': True,
-                'message': 'BGP analysis working',
+                'message': 'BGP multi-source analysis working',
                 'test_ip': '8.8.8.8',
-                'test_asn': asn_data.get('asn'),
-                'test_name': asn_data.get('name', 'Unknown'),
-                'api_status': 'available'
+                'test_asn': result.get('asn'),
+                'test_name': result.get('asn_name', 'Unknown'),
+                'data_source': result.get('data_source', 'unknown'),
+                'sources_available': self._check_available_sources(),
+                'multi_source_enabled': True
             }
-            
+
         except Exception as e:
-            error_str = str(e)
-            
-            # Handle rate limiting errors specifically
-            if '429' in error_str or 'rate limit' in error_str.lower():
-                return {
-                    'success': False,
-                    'error': 'BGPView API temporarily rate limited',
-                    'rate_limited': True,
-                    'suggestion': 'BGP analysis will work with cached data and Hurricane Electric fallback'
-                }
-            
             return {
                 'success': False,
-                'error': error_str,
-                'fallback_available': True
+                'error': str(e),
+                'multi_source_strategy': 'ipinfo → hurricane_electric → ripe → local'
             }
+
+    def _check_available_sources(self) -> Dict[str, bool]:
+        """Check which BGP sources are available"""
+        return {
+            'ipinfo': self.ipinfo is not None,
+            'hurricane_electric': self.hurricane_electric is not None,
+            'ripe': True,  # RIPE API is always available
+            'local_classifier': self.bgp_classifier is not None
+        }
 
 # Singleton instance
 _bgp_analysis_integration = None

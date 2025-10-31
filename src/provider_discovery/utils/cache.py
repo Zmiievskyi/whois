@@ -167,7 +167,8 @@ class MultiLevelCache:
             'enhanced_dns': Cache(default_ttl=default_ttl // 2, max_size=2000), # Enhanced DNS (30min TTL)
             'geo_intelligence': Cache(default_ttl=default_ttl * 6, max_size=1500), # Geographic data (6h TTL)
             'threat_intelligence': Cache(default_ttl=default_ttl * 4, max_size=1000), # Threat data (4h TTL)
-            'hurricane_electric': Cache(default_ttl=default_ttl * 8, max_size=800) # HE BGP data (8h TTL)
+            'hurricane_electric': Cache(default_ttl=default_ttl * 8, max_size=800), # HE BGP data (8h TTL)
+            'ipinfo': Cache(default_ttl=default_ttl * 2, max_size=2000) # IPInfo.io data (2h TTL)
         }
     
     def get(self, cache_type: str, key: str) -> Optional[Any]:

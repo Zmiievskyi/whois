@@ -8,7 +8,15 @@ RUN apt-get update && apt-get install -y \
     whois \
     curl \
     git \
+    wget \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install subfinder
+RUN wget -q https://github.com/projectdiscovery/subfinder/releases/download/v2.6.6/subfinder_2.6.6_linux_amd64.zip \
+    && unzip -q subfinder_2.6.6_linux_amd64.zip -d /usr/local/bin \
+    && rm subfinder_2.6.6_linux_amd64.zip \
+    && chmod +x /usr/local/bin/subfinder
 
 # Copy requirements first for better caching
 COPY requirements.txt .
@@ -16,7 +24,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code and source files
 COPY app.py .
-COPY setup.py .
 COPY src/ src/
 COPY env.example .env
 
