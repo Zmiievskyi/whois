@@ -58,6 +58,11 @@ The Enhanced Provider Discovery Tool performs comprehensive analysis of websites
 ### Prerequisites
 - Python 3.10 or higher
 - Virtual environment (recommended)
+- Optional API access (free tiers available):
+  - VirusTotal account and personal API key (register at [virustotal.com](https://www.virustotal.com/))
+  - Shodan account and API key (create at [shodan.io](https://www.shodan.io/); free plan offers limited queries)
+
+> Tip: store your keys in `.env` as `VT_API_KEY=<your_key>` and `SHODAN_API_KEY=<your_key>` before enabling the corresponding integrations.
 
 ### Installation
 
@@ -254,6 +259,7 @@ pandas>=1.5.0        # Data processing and analysis
 requests>=2.32.0     # HTTP requests for API calls
 dnspython>=2.4.0     # DNS resolution and analysis
 vt-py>=0.21.0        # VirusTotal API integration (Phase 2B)
+shodan>=1.31.0       # Shodan API integration (optional; requires API key)
 ```
 
 ## Troubleshooting
